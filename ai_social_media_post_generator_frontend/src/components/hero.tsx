@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { Zap } from "lucide-react";
 
 const Hero = () => {
   return (
     <section className="container mx-auto px-4 py-20 text-center">
+       <Badge variant="secondary" className="mb-6 px-4 py-2 rounded-full">
+            <Zap className="w-4 h-4 mr-2" />
+            AI-Powered Content Generation
+          </Badge>
       <div className="max-w-4xl mx-auto">
         <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
           Turn Ideas into{" "}
