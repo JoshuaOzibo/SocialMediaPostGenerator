@@ -3,8 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import GoogleSignInButton from './GoogleSignInButton';
-import FloatingLabelInput from './FloatingLabelInput';
+import GoogleSignInButton from '@/components/googleButton';
+import FloatingLabelInput from '@/components/floatinglabel';
 
 const AuthPage = () => {
   return (
