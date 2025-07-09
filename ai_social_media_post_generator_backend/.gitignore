@@ -1,0 +1,24 @@
+# Node modules
+node_modules/
+
+# Build output
+dist/
+build/
+
+# Env files (sensitive credentials)
+.env
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS & Editor junk
+.DS_Store
+Thumbs.db
+*.swp
+
+# Optional: VSCode settings
+.vscode/
