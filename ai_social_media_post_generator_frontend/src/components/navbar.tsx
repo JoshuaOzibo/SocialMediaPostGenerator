@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 
 const Navbar = () => {
   return (
-    <header className="container mx-auto px-4 py-6">
+    <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
       <nav className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <Sparkles className="h-8 w-8 text-blue-600" />
