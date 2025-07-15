@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import supabase from "./config/supabaseClient.js";
+import supabase from "./lib/config/supabaseClient.js";
 const app = express();
 const PORT = process.env.PORT || 8080;
 
