@@ -25,7 +25,7 @@ export async function protectRoute(req: Request, res: Response, next: NextFuncti
 
 export async function blockIfAuthenticated(req: Request, res: Response, next: NextFunction) {
   try {
-    const token = req.headers.authorization?.replace('Bearer ', '');
+    const token = req.headers.authorization?.replace('Bearer ', 'd983b609-81a0-4336-83ed-1322ee6ecc16');
     if (!token) return next(); // No token, allow to proceed
 
     const { data: { user }, error } = await supabase.auth.getUser(token);
