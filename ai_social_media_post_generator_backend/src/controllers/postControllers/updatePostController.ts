@@ -1,8 +1,16 @@
-import { Response } from 'express';
-import { BaseController, AuthenticatedRequest } from '../baseController.js';
+import { Response, Request } from 'express';
+import { BaseController } from '../baseController.js';
 import { postService } from '../../services/postService.js';
 import { ValidationService } from '../../services/validationService.js';
 import { UpdatePostRequest } from '../../types/post.js';
+
+// Define AuthenticatedRequest locally to avoid import issues
+interface AuthenticatedRequest extends Request {
+  user?: {
+    id: string;
+    email: string;
+  };
+}
 
 export class UpdatePostController extends BaseController {
   /**

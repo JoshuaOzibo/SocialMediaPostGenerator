@@ -6,9 +6,9 @@ import {
   createPostController, 
   getPostController, 
   updatePostController, 
-  deletePostController,
-  AuthenticatedRequest 
+  deletePostController
 } from './postControllers/index.js';
+import type { AuthenticatedRequest } from './baseController.js';
 
 // Re-export types for backward compatibility
 export type { AuthenticatedRequest } from './baseController.js';

@@ -1,13 +1,10 @@
 import { Router } from 'express';
 import { 
-  createPost, 
-  getPostById, 
-  getPosts, 
-  updatePost, 
-  regenerateContent, 
-  deletePost, 
-  getPostStats 
-} from '../controllers/postControllers.js';
+  createPostController, 
+  getPostController, 
+  updatePostController, 
+  deletePostController 
+} from '../controllers/postControllers/index.js';
 import { protectRoute } from '../middlewares/authMiddleware.js';
 import { validatePostRequest, validateUpdateRequest, validateQueryParams } from '../middlewares/validationMiddleware.js';
 
@@ -17,12 +14,12 @@ const route = Router();
 route.use(protectRoute);
 
 // 📝 Post Management Routes
-route.post('/', validatePostRequest, createPost);                    // Create new post
-route.get('/', validateQueryParams, getPosts);                      // Get all posts with filters
-route.get('/stats', getPostStats);                                  // Get post statistics
-route.get('/:postId', getPostById);                                 // Get single post
-route.put('/:postId', validateUpdateRequest, updatePost);           // Update post
-route.post('/:postId/regenerate', regenerateContent);               // Regenerate content
-route.delete('/:postId', deletePost);                               // Delete post
+route.post('/', validatePostRequest, (req, res) => createPostController.execute(req, res));                    // Create new post
+route.get('/', validateQueryParams, (req, res) => getPostController.getList(req, res));                      // Get all posts with filters
+route.get('/stats', (req, res) => getPostController.getStats(req, res));                                  // Get post statistics
+route.get('/:postId', (req, res) => getPostController.getById(req, res));                                 // Get single post
+route.put('/:postId', validateUpdateRequest, (req, res) => updatePostController.execute(req, res));           // Update post
+route.post('/:postId/regenerate', (req, res) => updatePostController.regenerateContent(req, res));               // Regenerate content
+route.delete('/:postId', (req, res) => deletePostController.execute(req, res));                               // Delete post
 
 export default route; 
