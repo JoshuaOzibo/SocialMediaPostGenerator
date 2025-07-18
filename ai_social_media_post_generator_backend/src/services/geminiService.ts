@@ -1,19 +1,40 @@
+// This file is now a compatibility layer that delegates to the new structured services
+// For new code, use contentGenerationService directly
+
+import { PostGenerationRequest, GeneratedPost } from '../types/ai.js';
+import { contentGenerationService } from './contentGenerationService.js';
+
+// Re-export types for backward compatibility
+export type { PostGenerationRequest, GeneratedPost } from '../types/ai.js';
+
 /**
+ * @deprecated Use contentGenerationService directly instead
+ */
+export class GeminiService {
+  /**
+   * Generate social media posts from bullet points
+   */
+  async generatePosts(request: PostGenerationRequest): Promise<GeneratedPost[]> {
+    return contentGenerationService.generatePosts(request);
+  }
 
-curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent" \
-  -H 'Content-Type: application/json' \
-  -H 'X-goog-api-key: GEMINI_API_KEY' \
-  -X POST \
-  -d '{
-    "contents": [
-      {
-        "parts": [
-          {
-            "text": "Explain how AI works in a few words"
-          }
-        ]
-      }
-    ]
-  }'
+  /**
+   * Generate hashtags for a given post
+   */
+  async generateHashtags(content: string, platform: string): Promise<string[]> {
+    return contentGenerationService.generateHashtags(content, platform);
+  }
 
-**/
+  /**
+   * Generate image suggestions for a post
+   */
+  async generateImageSuggestions(content: string): Promise<string[]> {
+    return contentGenerationService.generateImageSuggestions(content);
+  }
+}
+
+// Export singleton instance for backward compatibility
+export const geminiService = new GeminiService();
+
+// Also export the new service for direct use
+export { contentGenerationService };
