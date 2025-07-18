@@ -23,4 +23,8 @@ Thumbs.db
 # Optional: VSCode settings
 .vscode/
 
+# WHAT I DONT WANT TO SEE IN THE REPO
+PROJECT_ROADMAP.md
+README.md
+API_DOCUMENTATION.md
 PROJECT_ROADMAP.md
