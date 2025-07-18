@@ -25,7 +25,10 @@ export class CreatePostController extends BaseController {
       ValidationService.validateCreatePostRequest(request);
 
       // Create post
-      const post = await postService.createPost(userId, request);
+      const post = await postService.createPost({
+        ...request,
+        user_id: userId
+      });
       
       this.sendSuccess(res, post, 'Post created successfully', 201);
     } catch (error) {

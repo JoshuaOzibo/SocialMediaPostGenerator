@@ -5,11 +5,14 @@ export class ContentParser {
    * Parse the generated content into structured format
    */
   parseGeneratedPosts(text: string): GeneratedPost[] {
+    console.log('Parsing text:', text);
     const posts: GeneratedPost[] = [];
     const postSections = text.split(/POST \d+:/).filter(section => section.trim());
+    console.log('Post sections:', postSections);
     
     for (const section of postSections) {
       const lines = section.trim().split('\n').filter(line => line.trim());
+      console.log('Processing section lines:', lines);
       if (lines.length === 0) continue;
       
       // Extract content (everything before hashtags)
@@ -18,15 +21,24 @@ export class ContentParser {
       
       for (const line of lines) {
         if (line.includes('#')) {
-          // Extract hashtags from this line
+          // Extract content and hashtags from this line
           const hashtagMatches = line.match(/#\w+/g) || [];
           hashtags.push(...hashtagMatches);
+          console.log('Found hashtags:', hashtagMatches);
+          
+          // Extract content (everything before the hashtags)
+          const contentPart = line.replace(/#\w+/g, '').trim();
+          if (contentPart) {
+            contentLines.push(contentPart);
+          }
         } else {
           contentLines.push(line);
         }
       }
       
-      const content = contentLines.join('\n').trim();
+      const content = contentLines.join(' ').trim();
+      console.log('Extracted content:', content);
+      console.log('Extracted hashtags:', hashtags);
       
       if (content) {
         posts.push({
@@ -37,6 +49,7 @@ export class ContentParser {
       }
     }
     
+    console.log('Final parsed posts:', posts);
     return posts;
   }
 

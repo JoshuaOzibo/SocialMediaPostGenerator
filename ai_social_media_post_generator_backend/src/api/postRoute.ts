@@ -15,6 +15,7 @@ route.use(protectRoute);
 
 // 📝 Post Management Routes
 route.post('/', validatePostRequest, (req, res) => createPostController.execute(req, res));                    // Create new post
+
 route.get('/', validateQueryParams, (req, res) => getPostController.getList(req, res));                      // Get all posts with filters
 route.get('/stats', (req, res) => getPostController.getStats(req, res));                                  // Get post statistics
 route.get('/:postId', (req, res) => getPostController.getById(req, res));                                 // Get single post

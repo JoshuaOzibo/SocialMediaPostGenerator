@@ -9,14 +9,20 @@ export class ContentGenerationService {
    */
   async generatePosts(request: PostGenerationRequest): Promise<GeneratedPost[]> {
     try {
+      console.log('Starting post generation for request:', JSON.stringify(request, null, 2));
+      
       const prompt = promptBuilder.buildPostGenerationPrompt(request);
+      console.log('Generated prompt:', prompt);
+      
       const aiResponse = await geminiClient.generateContent(prompt);
+      console.log('AI Response:', JSON.stringify(aiResponse, null, 2));
       
       if (!aiResponse.success) {
         throw new Error(aiResponse.error || 'Failed to generate posts');
       }
       
       const posts = contentParser.parseGeneratedPosts(aiResponse.text);
+      console.log('Parsed posts:', JSON.stringify(posts, null, 2));
       
       // Generate image suggestions for each post
       for (const post of posts) {
@@ -26,7 +32,8 @@ export class ContentGenerationService {
       return posts;
     } catch (error) {
       console.error('Error generating posts:', error);
-      throw new Error('Failed to generate posts. Please try again.');
+      console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+      throw error; // Re-throw the original error instead of wrapping it
     }
   }
 

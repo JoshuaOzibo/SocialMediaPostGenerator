@@ -1,16 +1,16 @@
 import supabase from '../lib/config/supabaseClient.js';
 import { Post, CreatePostRequest, UpdatePostRequest, PostResponse, PostListResponse, PostFilters } from '../types/post.js';
 import { contentGenerationService } from './contentGenerationService.js';
-import { GeneratePostRequest } from '../types/ai.js';
+import { PostGenerationRequest } from '../types/ai.js';
 
 export class PostService {
   /**
    * Create a new post with AI-generated content
    */
-  async createPost(userId: string, request: CreatePostRequest): Promise<PostResponse> {
+  async createPost(request: CreatePostRequest): Promise<PostResponse> {
     try {
       // Generate AI content first
-      const generateRequest: GeneratePostRequest = {
+      const generateRequest: PostGenerationRequest = {
         inputBullets: request.input_bullets,
         platform: request.platform,
         tone: request.tone,
@@ -26,7 +26,7 @@ export class PostService {
 
       // Create post data
       const postData: Omit<Post, 'id' | 'created_at' | 'updated_at'> = {
-        user_id: userId,
+        user_id: request.user_id,
         platform: request.platform,
         tone: request.tone,
         input_bullets: request.input_bullets,
@@ -37,18 +37,51 @@ export class PostService {
         status: 'draft'
       };
 
-      const { data, error } = await supabase
-        .from('posts')
-        .insert(postData)
-        .select()
-        .single();
+      console.log('Attempting to save post data:', JSON.stringify(postData, null, 2));
+      
+      let data;
+      try {
+        const result = await supabase
+          .from('posts')
+          .insert(postData)
+          .select()
+          .single();
 
-      if (error) throw error;
+        data = result.data;
+        console.log('Supabase response data:', data);
+        console.log('Supabase response error:', result.error);
+
+        if (result.error) {
+          console.error('Supabase error details:', {
+            message: result.error.message,
+            details: result.error.details,
+            hint: result.error.hint,
+            code: result.error.code
+          });
+          throw result.error;
+        }
+
+        if (!data) {
+          throw new Error('No data returned from Supabase insert');
+        }
+      } catch (supabaseError) {
+        console.error('Supabase operation failed:', supabaseError);
+        throw supabaseError;
+      }
       
       return this.mapToPostResponse(data as Post);
     } catch (error) {
       console.error('Error creating post:', error);
-      throw new Error('Failed to create post');
+      // Throw the actual error message instead of a generic one
+      if (error instanceof Error) {
+        throw error;
+      } else {
+        // Handle objects and other types properly
+        const errorMessage = typeof error === 'object' && error !== null 
+          ? JSON.stringify(error, null, 2) 
+          : String(error);
+        throw new Error(`Failed to create post: ${errorMessage}`);
+      }
     }
   }
 
@@ -177,7 +210,7 @@ export class PostService {
       }
 
       // Generate new content
-      const generateRequest: GeneratePostRequest = {
+      const generateRequest: PostGenerationRequest = {
         inputBullets: existingPost.input_bullets,
         platform: existingPost.platform,
         tone: existingPost.tone

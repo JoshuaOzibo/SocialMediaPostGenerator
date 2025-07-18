@@ -15,6 +15,7 @@ export interface Post {
 }
 
 export interface CreatePostRequest {
+  user_id: string;
   platform: Post['platform'];
   tone: Post['tone'];
   input_bullets: string[];
