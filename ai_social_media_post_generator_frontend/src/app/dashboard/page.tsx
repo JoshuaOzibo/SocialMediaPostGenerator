@@ -22,6 +22,7 @@ const Dashboard = () => {
   const [includeImages, setIncludeImages] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPosts, setGeneratedPosts] = useState<any[]>([]);
+  const [days, setDays] = useState("1");
 
   const handleGenerate = async () => {
     if (!ideas.trim() || !platform || !tone) {
@@ -133,7 +134,7 @@ const Dashboard = () => {
                   />
                 </div>
 
-                <div className="grid sm:grid-cols-3 gap-2">
+                <div className="grid sm:grid-cols-2 just gap-8">
                   <div>
                     <Label className="text-sm font-medium text-slate-700 mb-2 block">
                       Platform
@@ -168,15 +169,40 @@ const Dashboard = () => {
 
                   <div>
                     <Label className="text-sm font-medium text-slate-700 mb-2 block">
+                      select Days
+                    </Label>
+                    <Select
+                      value={days}
+                      onValueChange={setDays}
+                    >
+                      <SelectTrigger className="rounded-xl sm:w-[50%] w-[40%] border-slate-200">
+                        <SelectValue placeholder="Select days to start posting" />
+                      </SelectTrigger>
+                      <SelectContent> 
+                        <SelectItem value="1">1</SelectItem>
+                        <SelectItem value="2">2</SelectItem>
+                        <SelectItem value="3">3</SelectItem>
+                        <SelectItem value="4">4</SelectItem>
+                        <SelectItem value="5">5</SelectItem>
+                        <SelectItem value="6">6</SelectItem>
+                        <SelectItem value="7">7</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700 mb-2 block">
                       Schedule Date Posting
                     </Label>
                     <Input
                       type="date"
                       value={scheduleDate}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setScheduleDate(e.target.value)}
-                      className="rounded-xl border-slate-200"
+                      className="rounded-xl sm:w-[70%] w-[40%] border-slate-200"
                     />
                   </div>
+
+                  
                 </div>
 
                 <div className="space-y-4">
