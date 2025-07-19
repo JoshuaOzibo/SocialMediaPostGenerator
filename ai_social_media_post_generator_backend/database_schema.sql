@@ -1,8 +1,6 @@
 -- Database Schema for AI Social Post Generator
 -- Run these SQL commands in your Supabase SQL Editor
 
--- Enable Row Level Security (RLS)
-ALTER TABLE auth.users ENABLE ROW LEVEL SECURITY;
 
 -- Create posts table
 CREATE TABLE IF NOT EXISTS public.posts (
