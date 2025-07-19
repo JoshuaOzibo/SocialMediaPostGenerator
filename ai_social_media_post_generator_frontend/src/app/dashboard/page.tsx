@@ -11,11 +11,13 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Copy, RefreshCw, Save, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
 
 const Dashboard = () => {
   const [ideas, setIdeas] = useState("");
   const [platform, setPlatform] = useState("");
   const [tone, setTone] = useState("");
+  const [scheduleDate, setScheduleDate] = useState("");
   const [includeHashtags, setIncludeHashtags] = useState(true);
   const [includeImages, setIncludeImages] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -131,7 +133,7 @@ const Dashboard = () => {
                   />
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-4">
+                <div className="grid sm:grid-cols-3 gap-2">
                   <div>
                     <Label className="text-sm font-medium text-slate-700 mb-2 block">
                       Platform
@@ -162,6 +164,18 @@ const Dashboard = () => {
                         <SelectItem value="educational">Educational</SelectItem>
                       </SelectContent>
                     </Select>
+                  </div>
+
+                  <div>
+                    <Label className="text-sm font-medium text-slate-700 mb-2 block">
+                      Schedule Date Posting
+                    </Label>
+                    <Input
+                      type="date"
+                      value={scheduleDate}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setScheduleDate(e.target.value)}
+                      className="rounded-xl border-slate-200"
+                    />
                   </div>
                 </div>
 
