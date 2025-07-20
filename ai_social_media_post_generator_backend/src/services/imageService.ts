@@ -1,4 +1,6 @@
 import { createApi } from 'unsplash-js';
+import { promptBuilder } from './ai/promptBuilder.js';
+import { geminiClient } from './ai/geminiClient.js';
 
 // Initialize Unsplash API
 const unsplash = createApi({
@@ -59,6 +61,59 @@ export class ImageService {
   }
 
   /**
+   * Generate AI-powered image search terms based on post content
+   */
+  async generateImageSearchTerms(content: string, platform: string, tone: string): Promise<string[]> {
+    try {
+      // Build detailed image prompt
+      const imagePrompt = promptBuilder.buildImagePrompt(content, platform, tone);
+      
+      // Get AI response for image search terms
+      const aiResponse = await geminiClient.generateContent(imagePrompt);
+      
+      if (!aiResponse.success) {
+        console.error('Error generating image search terms:', aiResponse.error);
+        return this.extractSearchTerms(content, platform);
+      }
+      
+      // Parse the AI response to extract search terms
+      const searchTerms = this.parseImageSearchTerms(aiResponse.text);
+      
+      return searchTerms.length > 0 ? searchTerms : this.extractSearchTerms(content, platform);
+    } catch (error) {
+      console.error('Error generating image search terms:', error);
+      return this.extractSearchTerms(content, platform);
+    }
+  }
+
+  /**
+   * Parse AI-generated image search terms from response
+   */
+  private parseImageSearchTerms(aiResponse: string): string[] {
+    try {
+      // Clean the response and extract key terms
+      const cleanResponse = aiResponse.toLowerCase()
+        .replace(/[^\w\s,]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      
+      // Split into potential search terms
+      const terms = cleanResponse.split(/[,.]/).map(term => term.trim()).filter(term => term.length > 2);
+      
+      // Filter out common words and keep relevant terms
+      const relevantTerms = terms.filter(term => {
+        const commonWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'this', 'that', 'these', 'those'];
+        return !commonWords.includes(term) && term.length > 3;
+      });
+      
+      return relevantTerms.slice(0, 3); // Return top 3 terms
+    } catch (error) {
+      console.error('Error parsing image search terms:', error);
+      return [];
+    }
+  }
+
+  /**
    * Generate placeholder images when Unsplash is not available
    */
   private getPlaceholderImages(searchTerms: string[], count: number): ImageResult[] {
@@ -92,18 +147,21 @@ export class ImageService {
   /**
    * Generate images for a specific post content
    */
-  async generateImagesForPost(content: string, platform: string, count: number = 3): Promise<ImageResult[]> {
+  async generateImagesForPost(content: string, platform: string, tone: string, count: number = 3): Promise<ImageResult[]> {
     try {
-      // Extract key terms from content for better image search
-      const searchTerms = this.extractSearchTerms(content, platform);
+      // Generate AI-powered search terms based on post content
+      const searchTerms = await this.generateImageSearchTerms(content, platform, tone);
       
-      // If we have specific search terms, use them
+      console.log(`Generated image search terms for "${platform}" post:`, searchTerms);
+      
+      // If we have AI-generated search terms, use them
       if (searchTerms.length > 0) {
         return await this.fetchImages(searchTerms, count);
       }
 
-      // Fallback to generic terms based on platform
-      const fallbackTerms = this.getPlatformSpecificTerms(platform);
+      // Fallback to basic extraction if AI fails
+      const fallbackTerms = this.extractSearchTerms(content, platform);
+      console.log(`Using fallback search terms:`, fallbackTerms);
       return await this.fetchImages(fallbackTerms, count);
     } catch (error) {
       console.error('Error generating images for post:', error);

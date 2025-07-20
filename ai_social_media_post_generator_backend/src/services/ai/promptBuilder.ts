@@ -66,6 +66,51 @@ ${includeHashtags ? '#hashtag1 #hashtag2 #hashtag3' : ''}`).join('\n\n')}
       Post content: "${content}"
     `;
   }
+
+  /**
+   * Build detailed image prompts for AI image generation
+   */
+  buildImagePrompt(content: string, platform: string, tone: string): string {
+    const platformStyles: Record<string, string> = {
+      linkedin: 'professional, corporate, business, clean, modern',
+      twitter: 'trending, social media, digital, contemporary',
+      instagram: 'lifestyle, creative, aesthetic, visually appealing',
+      facebook: 'social, community, friendly, approachable',
+      tiktok: 'trendy, vibrant, dynamic, engaging'
+    };
+
+    const toneStyles: Record<string, string> = {
+      professional: 'formal, sophisticated, clean, corporate',
+      casual: 'relaxed, friendly, approachable, natural',
+      humorous: 'fun, playful, colorful, entertaining',
+      formal: 'elegant, refined, professional, polished',
+      friendly: 'warm, welcoming, positive, inviting',
+      enthusiastic: 'energetic, vibrant, dynamic, exciting'
+    };
+
+    const platformStyle = platformStyles[platform] || 'professional, modern';
+    const toneStyle = toneStyles[tone] || 'professional';
+
+    return `
+      Generate a detailed image prompt for a social media post based on this content:
+      
+      Post Content: "${content}"
+      Platform: ${platform}
+      Tone: ${tone}
+      
+      Create a detailed visual description for an image that would perfectly complement this post.
+      Consider the platform style (${platformStyle}) and tone (${toneStyle}).
+      
+      Focus on:
+      - Visual elements that represent the main message
+      - Colors and mood that match the tone
+      - Composition that works well for ${platform}
+      - Professional quality suitable for business use
+      
+      Return a detailed, specific image description that could be used to generate or find the perfect image.
+      Make it descriptive enough to find relevant stock photos.
+    `;
+  }
 }
 
 // Export singleton instance

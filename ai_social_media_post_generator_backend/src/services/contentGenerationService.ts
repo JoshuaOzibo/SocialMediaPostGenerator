@@ -28,7 +28,7 @@ export class ContentGenerationService {
       // Generate real images for each post if requested
       if (request.includeImages !== false) { // Default to true if not specified
         for (const post of posts) {
-          const images = await imageService.generateImagesForPost(post.content, request.platform, 3);
+          const images = await imageService.generateImagesForPost(post.content, request.platform, request.tone, 3);
           post.imageSuggestions = images.map(img => img.url); // Store image URLs
           post.images = images; // Store full image objects
         }
