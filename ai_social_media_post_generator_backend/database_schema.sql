@@ -12,6 +12,7 @@ CREATE TABLE IF NOT EXISTS public.posts (
     generated_posts TEXT[] NOT NULL,
     hashtags TEXT[] DEFAULT '{}',
     images TEXT[] DEFAULT '{}',
+    image_metadata JSONB DEFAULT '[]',
     scheduled_at TIMESTAMP WITH TIME ZONE,
     status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'scheduled', 'published', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -34,21 +35,26 @@ CREATE TABLE IF NOT EXISTS public.user_profiles (
 -- Create scheduled_posts table for advanced scheduling
 CREATE TABLE IF NOT EXISTS public.scheduled_posts (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-    post_id UUID REFERENCES public.posts(id) ON DELETE CASCADE NOT NULL,
+    parent_post_id UUID REFERENCES public.posts(id) ON DELETE CASCADE NOT NULL,
     user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
-    scheduled_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    content TEXT NOT NULL,
+    hashtags TEXT[] DEFAULT '{}',
+    images TEXT[] DEFAULT '{}',
+    image_metadata JSONB DEFAULT '[]',
+    posting_date DATE NOT NULL,
+    day_number INTEGER NOT NULL,
     platform VARCHAR(50) NOT NULL,
-    status VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'published', 'failed', 'cancelled')),
-    retry_count INTEGER DEFAULT 0,
-    error_message TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    tone VARCHAR(50) NOT NULL,
+    status VARCHAR(20) DEFAULT 'scheduled' CHECK (status IN ('scheduled', 'published', 'failed', 'cancelled')),
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create indexes for better performance
 CREATE INDEX IF NOT EXISTS idx_posts_user_id ON public.posts(user_id);
 CREATE INDEX IF NOT EXISTS idx_posts_status ON public.posts(status);
 CREATE INDEX IF NOT EXISTS idx_posts_created_at ON public.posts(created_at);
-CREATE INDEX IF NOT EXISTS idx_scheduled_posts_scheduled_at ON public.scheduled_posts(scheduled_at);
+CREATE INDEX IF NOT EXISTS idx_scheduled_posts_scheduled_at ON public.scheduled_posts(posting_date);
 CREATE INDEX IF NOT EXISTS idx_scheduled_posts_status ON public.scheduled_posts(status);
 
 -- Enable Row Level Security on all tables
@@ -106,4 +112,7 @@ CREATE TRIGGER update_posts_updated_at BEFORE UPDATE ON public.posts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 CREATE TRIGGER update_user_profiles_updated_at BEFORE UPDATE ON public.user_profiles
+    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_scheduled_posts_updated_at BEFORE UPDATE ON public.scheduled_posts
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column(); 

@@ -121,6 +121,36 @@ export const validatePostRequest = (req: AuthenticatedRequest, res: Response, ne
       }
     }
 
+    // Validate days if provided
+    if (request.days !== undefined) {
+      if (typeof request.days !== 'number' || request.days < 1 || request.days > 365) {
+        return res.status(400).json({ error: 'Days must be a number between 1 and 365' });
+      }
+    }
+
+    // Validate includeHashtags if provided
+    if (request.includeHashtags !== undefined && typeof request.includeHashtags !== 'boolean') {
+      return res.status(400).json({ error: 'Include hashtags must be a boolean' });
+    }
+
+    // Validate includeImages if provided
+    if (request.includeImages !== undefined && typeof request.includeImages !== 'boolean') {
+      return res.status(400).json({ error: 'Include images must be a boolean' });
+    }
+
+    // Validate scheduleDate if provided
+    if (request.scheduleDate && !isValidDate(request.scheduleDate)) {
+      return res.status(400).json({ error: 'Invalid scheduleDate date format' });
+    }
+
+    if (request.scheduleDate) {
+      const scheduleDate = new Date(request.scheduleDate);
+      const now = new Date();
+      if (scheduleDate <= now) {
+        return res.status(400).json({ error: 'Schedule date must be in the future' });
+      }
+    }
+
     next();
   } catch (error) {
     console.error('Validation error:', error);

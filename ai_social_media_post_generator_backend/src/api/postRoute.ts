@@ -18,6 +18,7 @@ route.post('/', validatePostRequest, (req, res) => createPostController.execute(
 
 route.get('/', validateQueryParams, (req, res) => getPostController.getList(req, res));                      // Get all posts with filters
 route.get('/stats', (req, res) => getPostController.getStats(req, res));                                  // Get post statistics
+route.get('/scheduled', (req, res) => getPostController.getScheduledPosts(req, res));                     // Get scheduled posts
 route.get('/:postId', (req, res) => getPostController.getById(req, res));                                 // Get single post
 route.put('/:postId', validateUpdateRequest, (req, res) => updatePostController.execute(req, res));           // Update post
 route.post('/:postId/regenerate', (req, res) => updatePostController.regenerateContent(req, res));               // Regenerate content

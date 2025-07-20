@@ -22,6 +22,26 @@ export class ValidationService {
     if (request.scheduled_at) {
       this.validateScheduledDate(request.scheduled_at);
     }
+
+    // Validate days if provided
+    if (request.days !== undefined) {
+      this.validateDays(request.days);
+    }
+
+    // Validate includeHashtags if provided
+    if (request.includeHashtags !== undefined) {
+      this.validateBoolean(request.includeHashtags, 'includeHashtags');
+    }
+
+    // Validate includeImages if provided
+    if (request.includeImages !== undefined) {
+      this.validateBoolean(request.includeImages, 'includeImages');
+    }
+
+    // Validate scheduleDate if provided
+    if (request.scheduleDate) {
+      this.validateScheduleDate(request.scheduleDate);
+    }
   }
 
   /**
@@ -136,6 +156,39 @@ export class ValidationService {
     const now = new Date();
     if (date <= now) {
       throw new Error('Scheduled date must be in the future');
+    }
+  }
+
+  /**
+   * Validate days
+   */
+  private static validateDays(days: number): void {
+    if (typeof days !== 'number' || days < 1 || days > 365) {
+      throw new Error('Days must be a number between 1 and 365');
+    }
+  }
+
+  /**
+   * Validate boolean
+   */
+  private static validateBoolean(value: boolean, fieldName: string): void {
+    if (typeof value !== 'boolean') {
+      throw new Error(`${fieldName} must be a boolean`);
+    }
+  }
+
+  /**
+   * Validate scheduleDate
+   */
+  private static validateScheduleDate(dateString: string): void {
+    const date = new Date(dateString);
+    if (!(date instanceof Date) || isNaN(date.getTime())) {
+      throw new Error('Invalid scheduleDate date format');
+    }
+
+    const now = new Date();
+    if (date <= now) {
+      throw new Error('ScheduleDate must be in the future');
     }
   }
 

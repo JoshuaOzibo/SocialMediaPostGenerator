@@ -1,7 +1,8 @@
-import { PostGenerationRequest, GeneratedPost } from '../types/ai.js';
+import { PostGenerationRequest, GeneratedPost, ScheduledPost } from '../types/ai.js';
 import { geminiClient } from './ai/geminiClient.js';
 import { promptBuilder } from './ai/promptBuilder.js';
 import { contentParser } from './ai/contentParser.js';
+import { imageService, ImageResult } from './imageService.js';
 
 export class ContentGenerationService {
   /**
@@ -24,9 +25,31 @@ export class ContentGenerationService {
       const posts = contentParser.parseGeneratedPosts(aiResponse.text);
       console.log('Parsed posts:', JSON.stringify(posts, null, 2));
       
-      // Generate image suggestions for each post
-      for (const post of posts) {
-        post.imageSuggestions = await this.generateImageSuggestions(post.content);
+      // Generate real images for each post if requested
+      if (request.includeImages !== false) { // Default to true if not specified
+        for (const post of posts) {
+          const images = await imageService.generateImagesForPost(post.content, request.platform, 3);
+          post.imageSuggestions = images.map(img => img.url); // Store image URLs
+          post.images = images; // Store full image objects
+        }
+      } else {
+        // Clear image suggestions if not requested
+        for (const post of posts) {
+          post.imageSuggestions = [];
+          post.images = [];
+        }
+      }
+      
+      // Generate hashtags for each post if requested
+      if (request.includeHashtags !== false) { // Default to true if not specified
+        for (const post of posts) {
+          post.hashtags = await this.generateHashtags(post.content, request.platform);
+        }
+      } else {
+        // Clear hashtags if not requested
+        for (const post of posts) {
+          post.hashtags = [];
+        }
       }
       
       return posts;
@@ -34,6 +57,41 @@ export class ContentGenerationService {
       console.error('Error generating posts:', error);
       console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
       throw error; // Re-throw the original error instead of wrapping it
+    }
+  }
+
+  /**
+   * Generate scheduled posts for multiple days
+   */
+  async generateScheduledPosts(request: PostGenerationRequest, scheduleDate: string): Promise<ScheduledPost[]> {
+    try {
+      const days = request.days || 1;
+      const posts: ScheduledPost[] = [];
+      
+      // Generate base posts
+      const basePosts = await this.generatePosts(request);
+      
+      // Create scheduled posts for each day
+      for (let day = 1; day <= days; day++) {
+        const basePost = basePosts[day - 1] || basePosts[0]; // Use first post as fallback
+        
+        // Calculate posting date
+        const postingDate = new Date(scheduleDate);
+        postingDate.setDate(postingDate.getDate() + day - 1); // Start from scheduleDate
+        
+        const scheduledPost: ScheduledPost = {
+          ...basePost,
+          postingDate: postingDate.toISOString().split('T')[0], // YYYY-MM-DD format
+          dayNumber: day
+        };
+        
+        posts.push(scheduledPost);
+      }
+      
+      return posts;
+    } catch (error) {
+      console.error('Error generating scheduled posts:', error);
+      throw error;
     }
   }
 

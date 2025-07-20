@@ -1,7 +1,7 @@
 import supabase from '../lib/config/supabaseClient.js';
 import { Post, CreatePostRequest, UpdatePostRequest, PostResponse, PostListResponse, PostFilters } from '../types/post.js';
 import { contentGenerationService } from './contentGenerationService.js';
-import { PostGenerationRequest } from '../types/ai.js';
+import { PostGenerationRequest, ScheduledPost } from '../types/ai.js';
 
 export class PostService {
   /**
@@ -14,15 +14,33 @@ export class PostService {
         inputBullets: request.input_bullets,
         platform: request.platform,
         tone: request.tone,
-        additionalContext: request.additionalContext
+        additionalContext: request.additionalContext,
+        days: request.days || 1,
+        includeHashtags: request.includeHashtags !== false, // Default to true
+        includeImages: request.includeImages !== false // Default to true
       };
 
-      const generatedPosts = await contentGenerationService.generatePosts(generateRequest);
+      let generatedPosts;
+      let scheduledPosts: ScheduledPost[] = [];
+
+      // If scheduleDate is provided, generate scheduled posts
+      if (request.scheduleDate) {
+        scheduledPosts = await contentGenerationService.generateScheduledPosts(generateRequest, request.scheduleDate);
+        generatedPosts = scheduledPosts.map(post => ({
+          content: post.content,
+          hashtags: post.hashtags,
+          imageSuggestions: post.imageSuggestions,
+          images: post.images
+        }));
+      } else {
+        generatedPosts = await contentGenerationService.generatePosts(generateRequest);
+      }
       
       // Extract content and hashtags
       const generatedContent = generatedPosts.map(post => post.content);
       const allHashtags = generatedPosts.flatMap(post => post.hashtags);
       const imageSuggestions = generatedPosts.flatMap(post => post.imageSuggestions);
+      const allImages = generatedPosts.flatMap(post => post.images || []);
 
       // Create post data
       const postData: Omit<Post, 'id' | 'created_at' | 'updated_at'> = {
@@ -32,7 +50,8 @@ export class PostService {
         input_bullets: request.input_bullets,
         generated_posts: generatedContent,
         hashtags: allHashtags,
-        images: imageSuggestions,
+        images: imageSuggestions, // Store image URLs
+        image_metadata: allImages, // Store full image objects
         scheduled_at: request.scheduled_at,
         status: 'draft'
       };
@@ -67,6 +86,11 @@ export class PostService {
       } catch (supabaseError) {
         console.error('Supabase operation failed:', supabaseError);
         throw supabaseError;
+      }
+      
+      // If we have scheduled posts, create individual scheduled post records
+      if (scheduledPosts.length > 0) {
+        await this.createScheduledPostRecords(request.user_id, data.id, scheduledPosts, request);
       }
       
       return this.mapToPostResponse(data as Post);
@@ -167,6 +191,52 @@ export class PostService {
     } catch (error) {
       console.error('Error getting posts:', error);
       throw new Error('Failed to get posts');
+    }
+  }
+
+  /**
+   * Get scheduled posts with pagination
+   */
+  async getScheduledPosts(
+    userId: string, 
+    page: number = 1, 
+    limit: number = 10
+  ): Promise<{
+    scheduledPosts: any[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  }> {
+    try {
+      let query = supabase
+        .from('scheduled_posts')
+        .select('*', { count: 'exact' })
+        .eq('user_id', userId)
+        .order('posting_date', { ascending: true });
+
+      // Apply pagination
+      const offset = (page - 1) * limit;
+      query = query.range(offset, offset + limit - 1);
+
+      const { data, error, count } = await query;
+
+      if (error) throw error;
+
+      const scheduledPosts = data || [];
+      const total = count || 0;
+      const hasMore = offset + limit < total;
+
+      return {
+        scheduledPosts,
+        total,
+        page,
+        limit,
+        hasMore
+      };
+    } catch (error) {
+      console.error('Error getting scheduled posts:', error);
+      throw new Error('Failed to get scheduled posts');
     }
   }
 
@@ -298,6 +368,42 @@ export class PostService {
   }
 
   /**
+   * Create individual scheduled post records
+   */
+  private async createScheduledPostRecords(userId: string, parentPostId: string, scheduledPosts: ScheduledPost[], parentRequest: CreatePostRequest): Promise<void> {
+    try {
+      const scheduledPostRecords = scheduledPosts.map(post => ({
+        user_id: userId,
+        parent_post_id: parentPostId,
+        content: post.content,
+        hashtags: post.hashtags,
+        images: post.imageSuggestions,
+        image_metadata: post.images || [],
+        posting_date: post.postingDate,
+        day_number: post.dayNumber,
+        platform: parentRequest.platform,
+        tone: parentRequest.tone,
+        status: 'scheduled',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }));
+
+      const { error } = await supabase
+        .from('scheduled_posts')
+        .insert(scheduledPostRecords);
+
+      if (error) {
+        console.error('Error creating scheduled post records:', error);
+        throw error;
+      }
+    } catch (error) {
+      console.error('Error creating scheduled post records:', error);
+      // Don't throw here as the main post was already created
+      // Just log the error for debugging
+    }
+  }
+
+  /**
    * Map database post to response format
    */
   private mapToPostResponse(post: Post): PostResponse {
@@ -309,6 +415,7 @@ export class PostService {
       generated_posts: post.generated_posts,
       hashtags: post.hashtags,
       images: post.images,
+      image_metadata: post.image_metadata,
       scheduled_at: post.scheduled_at,
       status: post.status,
       created_at: post.created_at,

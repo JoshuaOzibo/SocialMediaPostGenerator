@@ -60,6 +60,22 @@ export class GetPostController extends BaseController {
       this.handleError(res, error, 'getPostStats', 'Failed to get post statistics');
     }
   }
+
+  /**
+   * Get scheduled posts for the authenticated user
+   */
+  async getScheduledPosts(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userId = this.getUserId(req);
+      const { page, limit } = this.parsePagination(req);
+      
+      const result = await postService.getScheduledPosts(userId, page, limit);
+      
+      this.sendSuccess(res, result);
+    } catch (error) {
+      this.handleError(res, error, 'getScheduledPosts', 'Failed to get scheduled posts');
+    }
+  }
 }
 
 // Export singleton instance

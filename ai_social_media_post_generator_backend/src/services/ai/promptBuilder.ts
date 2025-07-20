@@ -8,9 +8,12 @@ export class PromptBuilder {
   buildPostGenerationPrompt(request: PostGenerationRequest): string {
     const platformGuidelines = PLATFORM_GUIDELINES[request.platform];
     const toneGuidelines = TONE_GUIDELINES[request.tone];
+    const days = request.days || 1;
+    const includeHashtags = request.includeHashtags !== false; // Default to true
+    const includeImages = request.includeImages !== false; // Default to true
     
     return `
-      You are an expert social media content creator. Generate 3 different ${request.platform} posts based on these bullet points:
+      You are an expert social media content creator. Generate ${days} different ${request.platform} posts based on these bullet points:
       
       ${request.inputBullets.map(bullet => `• ${bullet}`).join('\n')}
       
@@ -23,25 +26,18 @@ export class PromptBuilder {
       ${toneGuidelines}
       
       Requirements:
-      1. Generate exactly 3 different posts
+      1. Generate exactly ${days} different posts
       2. Each post should be engaging and platform-optimized
-      3. Include relevant hashtags at the end of each post
+      3. ${includeHashtags ? 'Include relevant hashtags at the end of each post' : 'Do not include hashtags'}
       4. Make each post unique in approach and style
       5. Ensure the content flows naturally and is compelling
+      6. Each post should be suitable for posting on consecutive days
       
       Format your response as:
       
-      POST 1:
-      [Post content here]
-      #hashtag1 #hashtag2 #hashtag3
-      
-      POST 2:
-      [Post content here]
-      #hashtag1 #hashtag2 #hashtag3
-      
-      POST 3:
-      [Post content here]
-      #hashtag1 #hashtag2 #hashtag3
+      ${Array.from({ length: days }, (_, i) => `POST ${i + 1}:
+[Post content here]
+${includeHashtags ? '#hashtag1 #hashtag2 #hashtag3' : ''}`).join('\n\n')}
     `;
   }
 
