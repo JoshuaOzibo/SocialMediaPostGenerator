@@ -36,7 +36,11 @@ export class ContentParser {
         }
       }
       
-      const content = contentLines.join(' ').trim();
+      let content = contentLines.join(' ').trim();
+      
+      // Clean up any image descriptions or visual references
+      content = this.cleanImageReferences(content);
+      
       console.log('Extracted content:', content);
       console.log('Extracted hashtags:', hashtags);
       
@@ -51,6 +55,40 @@ export class ContentParser {
     
     console.log('Final parsed posts:', posts);
     return posts;
+  }
+
+  /**
+   * Clean up image descriptions and visual references from content
+   */
+  private cleanImageReferences(content: string): string {
+    // Remove image descriptions in various formats
+    let cleaned = content;
+    
+    // Remove patterns like **(Image: description)**
+    cleaned = cleaned.replace(/\*\*\(Image:[^)]*\)\*\*/g, '');
+    
+    // Remove patterns like [Image: description]
+    cleaned = cleaned.replace(/\[Image:[^\]]*\]/g, '');
+    
+    // Remove patterns like (Image: description)
+    cleaned = cleaned.replace(/\(Image:[^)]*\)/g, '');
+    
+    // Remove patterns like **Image:** description
+    cleaned = cleaned.replace(/\*\*Image:\*\*[^*]*\*\*/g, '');
+    
+    // Remove patterns like Image: description
+    cleaned = cleaned.replace(/Image:[^.!?]*[.!?]/g, '');
+    
+    // Remove visual references like "split screen", "cartoon", "robot", etc.
+    const visualTerms = [
+      'split screen', 'cartoon', 'robot', 'emoji', 'icon', 'illustration',
+      'graphic', 'visual', 'picture', 'photo', 'image', 'drawing'
+    ];
+    
+    // Clean up extra whitespace
+    cleaned = cleaned.replace(/\s+/g, ' ').trim();
+    
+    return cleaned;
   }
 
   /**

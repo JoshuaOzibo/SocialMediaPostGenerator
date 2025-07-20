@@ -32,11 +32,13 @@ export class PromptBuilder {
       4. Make each post unique in approach and style
       5. Ensure the content flows naturally and is compelling
       6. Each post should be suitable for posting on consecutive days
+      7. DO NOT include any image descriptions, placeholders, or visual references in the post content
+      8. Focus only on the written content - images will be handled separately
       
       Format your response as:
       
       ${Array.from({ length: days }, (_, i) => `POST ${i + 1}:
-[Post content here]
+[Post content here - NO image descriptions or visual references]
 ${includeHashtags ? '#hashtag1 #hashtag2 #hashtag3' : ''}`).join('\n\n')}
     `;
   }
