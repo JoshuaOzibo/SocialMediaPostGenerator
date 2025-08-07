@@ -2,6 +2,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/lib/api';
 import { LoginRequest, SignupRequest, AuthResponse } from '@/lib/api/types';
 import { queryKeys } from '@/lib/api/types';
+import { AxiosError } from 'axios';
 
 // Hook for user login
 export const useLogin = () => {
@@ -66,9 +67,9 @@ export const useCurrentUser = () => {
     queryFn: authApi.getCurrentUser,
     enabled: authApi.isAuthenticated(), // Only run if user is authenticated
     staleTime: 5 * 60 * 1000, // 5 minutes
-    retry: (failureCount, error: any) => {
+    retry: (failureCount, error: unknown) => {
       // Don't retry on 401 errors
-      if (error?.response?.status === 401) {
+      if ((error as AxiosError)?.response?.status === 401) {
         return false;
       }
       return failureCount < 3;
@@ -82,7 +83,7 @@ export const useRefreshToken = () => {
 
   return useMutation({
     mutationFn: () => authApi.refreshToken(),
-    onSuccess: (data) => {
+    onSuccess: () => {
       // Update token in cache if needed
       console.log('Token refreshed successfully');
     },
