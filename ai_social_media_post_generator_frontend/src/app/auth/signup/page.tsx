@@ -1,21 +1,40 @@
-"use client"
+"use client";
 
-import React from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Eye, EyeOff, Mail, Lock, User } from 'lucide-react';
-import GoogleSignInButton from '@/components/googleButton';
-import FloatingLabelInput from '@/components/floatinglabel';
-import Link from 'next/link';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import GoogleSignInButton from "@/components/googleButton";
+import FloatingLabelInput from "@/components/floatinglabel";
+import Link from "next/link";
+import { useSignup } from "@/hooks/api/useAuth";
+import { AxiosError } from "axios";
 
 const SignupPage = () => {
+  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const { mutate: signup, isPending, isError, error } = useSignup();
+
+  const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const userData = {
+      username,
+      email,
+      password,
+      confirmPassword,
+    };
+    signup(userData);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
       {/* Background Pattern */}
       <div
         className="absolute inset-0 opacity-30"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
       ></div>
 
@@ -33,14 +52,14 @@ const SignupPage = () => {
             </p>
           </div>
 
-          <div className="space-y-6">
+          <form onSubmit={handleSignup} className="space-y-6">
             <div className="space-y-4">
               <FloatingLabelInput
-                id="signup-name"
+                id="signup-username"
                 type="text"
-                label="User Name"
-                value=""
-                onChange={() => { }}
+                label="Username"
+                value={username}
+                onChange={setUsername}
                 icon={<User className="w-4 h-4" />}
               />
 
@@ -48,8 +67,8 @@ const SignupPage = () => {
                 id="signup-email"
                 type="email"
                 label="Email"
-                value=""
-                onChange={() => { }}
+                value={email}
+                onChange={setEmail}
                 icon={<Mail className="w-4 h-4" />}
               />
 
@@ -57,8 +76,8 @@ const SignupPage = () => {
                 id="signup-password"
                 type="password"
                 label="Password"
-                value=""
-                onChange={() => { }}
+                value={password}
+                onChange={setPassword}
                 icon={<Lock className="w-4 h-4" />}
                 rightIcon={
                   <button
@@ -74,8 +93,8 @@ const SignupPage = () => {
                 id="signup-confirm-password"
                 type="password"
                 label="Confirm Password"
-                value=""
-                onChange={() => { }}
+                value={confirmPassword}
+                onChange={setConfirmPassword}
                 icon={<Lock className="w-4 h-4" />}
                 rightIcon={
                   <button
@@ -89,23 +108,44 @@ const SignupPage = () => {
             </div>
 
             <div className="flex items-center space-x-2 text-sm">
-              <input type="checkbox" className="rounded border-gray-300" required />
+              <input
+                type="checkbox"
+                className="rounded border-gray-300"
+                required
+              />
               <span className="text-gray-600 dark:text-gray-400">
-                I agree to the{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                I agree to the
+                <a
+                  href="#"
+                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                >
                   Terms of Service
-                </a>{' '}
-                and{' '}
-                <a href="#" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
+                </a>
+                and
+                <a
+                  href="#"
+                  className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
+                >
                   Privacy Policy
                 </a>
               </span>
             </div>
 
-            <Button className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02]">
-              Create Account
+            {isError && (
+              <div className="text-red-600 text-sm text-center">
+                {(error as AxiosError<{ message: string }>)?.response?.data
+                  ?.message || "Signup failed. Please try again."}
+              </div>
+            )}
+
+            <Button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
+            >
+              {isPending ? "Creating Account..." : "Create Account"}
             </Button>
-          </div>
+          </form>
 
           <div className="mt-6">
             <div className="relative">
@@ -124,8 +164,11 @@ const SignupPage = () => {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              Already have an account?{' '}
-              <Link href="/auth/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Already have an account?{" "}
+              <Link
+                href="/auth/login"
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+              >
                 Sign in here
               </Link>
             </p>
