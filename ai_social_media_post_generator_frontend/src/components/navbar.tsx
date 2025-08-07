@@ -15,7 +15,7 @@ const Navbar = () => {
           <Link href="/dashboard">
             <Button
               variant="ghost"
-              className="text-slate-600 hover:text-slate-900"
+              className="text-slate-600 cursor-pointer hover:text-slate-900"
             >
               Dashboard
             </Button>
@@ -23,7 +23,7 @@ const Navbar = () => {
           <Link href="/history">
             <Button
               variant="ghost"
-              className="text-slate-600 hover:text-slate-900"
+              className="text-slate-600 cursor-pointer hover:text-slate-900"
             >
               History
             </Button>
