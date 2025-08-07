@@ -1,5 +1,5 @@
 // API Response Types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   message?: string;
@@ -16,7 +16,6 @@ export interface SignupRequest {
   username: string;
   email: string;
   password: string;
-  confirmPassword: string;
 }
 
 export interface AuthResponse {
@@ -42,7 +41,7 @@ export interface Post {
   generated_posts: string[];
   hashtags: string[];
   images: string[];
-  image_metadata?: any[];
+  image_metadata?: unknown[];
   scheduled_at?: string;
   status: PostStatus;
   created_at: string;

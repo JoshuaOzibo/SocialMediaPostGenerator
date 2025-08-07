@@ -1,6 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { authApi } from '@/lib/api';
-import { LoginRequest, SignupRequest, AuthResponse } from '@/lib/api/types';
+import { LoginRequest, SignupRequest } from '@/lib/api/types';
 import { queryKeys } from '@/lib/api/types';
 import { AxiosError } from 'axios';
 
@@ -10,7 +10,7 @@ export const useLogin = () => {
 
   return useMutation({
     mutationFn: (credentials: LoginRequest) => authApi.login(credentials),
-    onSuccess: (data: AuthResponse) => {
+    onSuccess: (data: { session: unknown; user: unknown }) => {
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
       
@@ -29,7 +29,7 @@ export const useSignup = () => {
 
   return useMutation({
     mutationFn: (userData: SignupRequest) => authApi.signup(userData),
-    onSuccess: (data: AuthResponse) => {
+    onSuccess: (data: { user: unknown }) => {
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
       

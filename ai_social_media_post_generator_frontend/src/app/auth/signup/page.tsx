@@ -3,27 +3,27 @@
 import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
+import { Eye, Mail, Lock, User } from "lucide-react";
 import GoogleSignInButton from "@/components/googleButton";
 import FloatingLabelInput from "@/components/floatinglabel";
 import Link from "next/link";
 import { useSignup } from "@/hooks/api/useAuth";
 import { AxiosError } from "axios";
+import { SignupRequest } from "@/lib/api/types";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
   const { mutate: signup, isPending, isError, error } = useSignup();
 
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const userData = {
+    
+    const userData: SignupRequest = {
       username,
       email,
       password,
-      confirmPassword,
     };
     signup(userData);
   };
@@ -86,26 +86,9 @@ const SignupPage = () => {
                   >
                     <Eye className="w-4 h-4" />
                   </button>
-                }
-              />
-
-              <FloatingLabelInput
-                id="signup-confirm-password"
-                type="password"
-                label="Confirm Password"
-                value={confirmPassword}
-                onChange={setConfirmPassword}
-                icon={<Lock className="w-4 h-4" />}
-                rightIcon={
-                  <button
-                    type="button"
-                    className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
-                  >
-                    <EyeOff className="w-4 h-4" />
-                  </button>
-                }
-              />
-            </div>
+                                  }
+                />
+              </div>
 
             <div className="flex items-center space-x-2 text-sm">
               <input
@@ -164,7 +147,7 @@ const SignupPage = () => {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              Already have an account?{" "}
+              Already have an account?
               <Link
                 href="/auth/login"
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"

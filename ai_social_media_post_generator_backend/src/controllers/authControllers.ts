@@ -2,7 +2,7 @@ import supabase from '../lib/config/supabaseClient.js';
 import { Request, Response } from 'express';
 
 export const signUp = async (req: Request, res: Response) => {
-  const { email, password } = req.body;
+    const { username, email, password } = req.body;
 
   // Get all users (pagination can be added for large user bases)
   const { data: usersData, error: listError } = await supabase.auth.admin.listUsers();
@@ -14,7 +14,12 @@ export const signUp = async (req: Request, res: Response) => {
 
   const { data, error } = await supabase.auth.signUp({
     email,
-    password
+    password,
+    options: {
+      data: {
+        username,
+      },
+    },
   });
   if (error) return res.status(400).json({ error: error.message });
   res.status(201).json({ user: data.user });

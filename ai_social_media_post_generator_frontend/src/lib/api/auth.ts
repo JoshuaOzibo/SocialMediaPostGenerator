@@ -3,23 +3,23 @@ import { LoginRequest, SignupRequest, AuthResponse } from './types';
 
 // Auth API endpoints
 const AUTH_ENDPOINTS = {
-  LOGIN: '/auth/signin',
-  SIGNUP: '/auth/signup',
-  LOGOUT: '/auth/logout',
-  REFRESH: '/auth/refresh',
-  ME: '/auth/me',
+  LOGIN: '/api/v1/auth/signin',
+  SIGNUP: '/api/v1/auth/signup',
+  LOGOUT: '/api/v1/auth/logout',
+  REFRESH: '/api/v1/auth/refresh',
+  ME: '/api/v1/auth/me',
 } as const;
 
 // Auth API service
 export const authApi = {
   // Login user
-  login: async (credentials: LoginRequest): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>(AUTH_ENDPOINTS.LOGIN, credentials);
+  login: async (credentials: LoginRequest): Promise<{ session: unknown; user: unknown }> => {
+    const response = await api.post<{ session: unknown; user: unknown }>(AUTH_ENDPOINTS.LOGIN, credentials);
     
-    if (response.success && response.data) {
-      // Store token and user data in localStorage
+    if (response && response.data && response.data.session && response.data.user) {
+      // Store session token and user data in localStorage
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', response.data.token);
+        localStorage.setItem('auth_token', (response.data.session as { access_token: string }).access_token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
     }
@@ -28,13 +28,12 @@ export const authApi = {
   },
 
   // Signup user
-  signup: async (userData: SignupRequest): Promise<AuthResponse> => {
-    const response = await api.post<AuthResponse>(AUTH_ENDPOINTS.SIGNUP, userData);
+  signup: async (userData: SignupRequest): Promise<{ user: unknown }> => {
+    const response = await api.post<{ user: unknown }>(AUTH_ENDPOINTS.SIGNUP, userData);
     
-    if (response.success && response.data) {
-      // Store token and user data in localStorage
+    if (response && response.data && response.data.user) {
+      // Store user data in localStorage (no token from signup)
       if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', response.data.token);
         localStorage.setItem('user', JSON.stringify(response.data.user));
       }
     }
