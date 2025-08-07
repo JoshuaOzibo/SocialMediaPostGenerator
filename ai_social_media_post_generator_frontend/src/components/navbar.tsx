@@ -28,6 +28,14 @@ const Navbar = () => {
               History
             </Button>
           </Link>
+          <Link href="/auth/login">
+            <Button
+              variant="outline"
+              className="text-slate-600 cursor-pointer hover:text-slate-900"
+            >
+              Sign In
+            </Button>
+          </Link>
         </div>
       </nav>
     </header>

@@ -20,8 +20,17 @@ yarn-error.log*
 Thumbs.db
 *.swp
 
+# Supabase
+.supabase/
+.supabase/
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
 # Optional: VSCode settings
 .vscode/
+
 
 # WHAT I DONT WANT TO SEE IN THE REPO
 PROJECT_ROADMAP.md

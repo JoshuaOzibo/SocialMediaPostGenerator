@@ -25,7 +25,7 @@ const Hero = () => {
           post generation.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/dashboard">
+          <Link href="/auth/signup">
             <Button
               size="lg"
               className="bg-blue-600 hover:bg-blue-700 text-white rounded-2xl px-8 py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"

@@ -13,7 +13,7 @@ const CtaSection = () => {
           Join thousands of creators who've revolutionized their social media
           presence
         </p>
-        <Link href="/dashboard">
+        <Link href="/auth/signup">
           <Button
             size="lg"
             variant="secondary"
