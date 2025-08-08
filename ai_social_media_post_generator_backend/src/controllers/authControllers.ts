@@ -12,18 +12,35 @@ export const signUp = async (req: Request, res: Response) => {
     return res.status(400).json({ error: 'User with this email already exists.' });
   }
 
-  const { data, error } = await supabase.auth.signUp({
+  // Use admin API to create user directly (bypasses email confirmation)
+  const { data: adminData, error: adminError } = await supabase.auth.admin.createUser({
     email,
     password,
-    options: {
-      data: {
-        username,
-      },
+    email_confirm: true,
+    user_metadata: {
+      username,
     },
   });
-  if (error) return res.status(400).json({ error: error.message });
-  res.status(201).json({ user: data.user });
-  // console.log(data);
+  
+  if (adminError) return res.status(400).json({ error: adminError.message });
+
+  // Sign in the user to get the session
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
+  
+  if (signInError) {
+    return res.status(500).json({ error: 'Failed to sign in user after signup' });
+  }
+
+  // Return the session and user data
+  res.status(201).json({ 
+    user: signInData.user, 
+    session: signInData.session,
+    message: 'User created and signed in successfully'
+  });
+  console.log(signInData);
 };
 
 export const signIn = async (req: Request, res: Response) => {
@@ -34,5 +51,5 @@ export const signIn = async (req: Request, res: Response) => {
   });
   if (error) return res.status(400).json({ error: error.message });
   res.status(200).json({ session: data.session, user: data.user });
-  // console.log(data);
+  console.log(data);
 };

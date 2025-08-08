@@ -1,14 +1,31 @@
 "use client"
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import GoogleSignInButton from '@/components/googleButton';
 import FloatingLabelInput from '@/components/floatinglabel';
 import Link from 'next/link';
+import { useLogin } from '@/hooks/api/useAuth';
+import { AxiosError } from 'axios';
+import { LoginRequest } from '@/lib/api/types';
 
 const LoginPage = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const { mutate: login, isPending, isError, error } = useLogin();
+
+  const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    
+    const credentials: LoginRequest = {
+      email,
+      password,
+    };
+    login(credentials);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 p-4">
       {/* Background Pattern */}
@@ -33,14 +50,14 @@ const LoginPage = () => {
             </p>
           </div>
 
-          <div className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-4">
               <FloatingLabelInput
                 id="login-email"
                 type="email"
                 label="Email"
-                value=""
-                onChange={() => { }}
+                value={email}
+                onChange={setEmail}
                 icon={<Mail className="w-4 h-4" />}
               />
 
@@ -48,8 +65,8 @@ const LoginPage = () => {
                 id="login-password"
                 type="password"
                 label="Password"
-                value=""
-                onChange={() => { }}
+                value={password}
+                onChange={setPassword}
                 icon={<Lock className="w-4 h-4" />}
                 rightIcon={
                   <button
@@ -72,10 +89,21 @@ const LoginPage = () => {
               </a>
             </div>
 
-            <Button className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02]">
-              Sign In
+            {isError && (
+              <div className="text-red-600 text-sm text-center">
+                {(error as AxiosError<{ message: string }>)?.response?.data
+                  ?.message || "Login failed. Please try again."}
+              </div>
+            )}
+
+            <Button 
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
+            >
+              {isPending ? "Signing In..." : "Sign In"}
             </Button>
-          </div>
+          </form>
 
           <div className="mt-6">
             <div className="relative">

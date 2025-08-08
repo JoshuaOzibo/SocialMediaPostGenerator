@@ -3,10 +3,12 @@ import { authApi } from '@/lib/api';
 import { LoginRequest, SignupRequest } from '@/lib/api/types';
 import { queryKeys } from '@/lib/api/types';
 import { AxiosError } from 'axios';
+import { useRouter } from 'next/navigation';
 
 // Hook for user login
 export const useLogin = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: (credentials: LoginRequest) => authApi.login(credentials),
@@ -16,6 +18,9 @@ export const useLogin = () => {
       
       // Set user data in query cache
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
+      
+      // Navigate to dashboard
+      router.push('/dashboard');
     },
     onError: (error) => {
       console.error('Login error:', error);
@@ -26,15 +31,19 @@ export const useLogin = () => {
 // Hook for user signup
 export const useSignup = () => {
   const queryClient = useQueryClient();
+  const router = useRouter();
 
   return useMutation({
     mutationFn: (userData: SignupRequest) => authApi.signup(userData),
-    onSuccess: (data: { user: unknown }) => {
+    onSuccess: (data: { user: unknown; session: unknown; message: string }) => {
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
       
       // Set user data in query cache
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
+      
+      // Navigate to dashboard immediately since user is authenticated
+      router.push('/dashboard');
     },
     onError: (error) => {
       console.error('Signup error:', error);

@@ -21,10 +21,14 @@ export interface SignupRequest {
 export interface AuthResponse {
   user: {
     id: string;
-    username: string;
+    username?: string;
     email: string;
   };
-  token: string;
+  session: {
+    access_token: string;
+    refresh_token?: string;
+    expires_at?: number;
+  };
 }
 
 // Post Types
