@@ -35,7 +35,7 @@ export const useSignup = () => {
 
   return useMutation({
     mutationFn: (userData: SignupRequest) => authApi.signup(userData),
-    onSuccess: (data: { user: unknown; session: unknown; message: string }) => {
+    onSuccess: (data: { user: unknown; session: unknown }) => {
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
       
