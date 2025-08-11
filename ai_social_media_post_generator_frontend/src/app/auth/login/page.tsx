@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
+import { Eye, Mail, Lock } from 'lucide-react';
 import GoogleSignInButton from '@/components/googleButton';
 import FloatingLabelInput from '@/components/floatinglabel';
 import Link from 'next/link';
@@ -105,7 +105,8 @@ const LoginPage = () => {
             </Button>
           </form>
 
-          <div className="mt-6">
+          {/* Google Sign In Button */}
+          <div className="mt-6 cursor-pointer">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
                 <div className="w-full border-t border-gray-300 dark:border-gray-600" />
@@ -122,7 +123,7 @@ const LoginPage = () => {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              Don't have an account?{' '}
+              Don&apos;t have an account?{' '}
               <Link href="/auth/signup" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
                 Sign up here
               </Link>
