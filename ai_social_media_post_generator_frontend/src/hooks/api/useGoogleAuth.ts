@@ -74,6 +74,19 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
       const errorMessage = err instanceof Error ? err.message : 'Google sign-in failed';
       setError(errorMessage);
       console.error('Google Sign-In Hook Error:', err);
+      
+      // Clear any partial state on error
+      setUser(null);
+      setIsAuthenticated(false);
+      setBackendUser(null);
+      setBackendSession(null);
+      
+      // Clear localStorage on error
+      localStorage.removeItem('googleUser');
+      localStorage.removeItem('googleAccessToken');
+      localStorage.removeItem('googleTokenExpiry');
+      localStorage.removeItem('backendUser');
+      localStorage.removeItem('backendSession');
     } finally {
       setIsLoading(false);
     }

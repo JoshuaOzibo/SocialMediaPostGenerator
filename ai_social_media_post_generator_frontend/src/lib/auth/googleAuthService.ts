@@ -65,6 +65,11 @@ export class GoogleAuthService {
     try {
       const formattedUser = formatUserData(user);
       
+      console.log('Sending to backend:', {
+        user: formattedUser,
+        apiUrl: `${this.apiUrl}/auth/google`
+      });
+      
       const response = await fetch(`${this.apiUrl}/auth/google`, {
         method: 'POST',
         headers: {
@@ -76,12 +81,23 @@ export class GoogleAuthService {
         }),
       });
 
+      const data = await response.json();
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to authenticate with backend');
+        console.error('Backend authentication failed:', {
+          status: response.status,
+          statusText: response.statusText,
+          error: data.error
+        });
+        
+        // Handle specific backend errors
+        if (data.error?.includes('already been registered')) {
+          throw new Error('This email is already registered with a different authentication method. Please use email/password login.');
+        }
+        
+        throw new Error(data.error || 'Failed to authenticate with backend');
       }
 
-      const data = await response.json();
       console.log('Backend authentication successful:', {
         message: data.message,
         userId: data.user?.id,
@@ -96,8 +112,13 @@ export class GoogleAuthService {
 
     } catch (error) {
       console.error('Backend authentication error:', error);
-      // Don't throw error here to avoid breaking the frontend flow
-      // The user can still use the app with Google authentication
+      
+      // Re-throw the error so the frontend can handle it
+      if (error instanceof Error) {
+        throw error;
+      }
+      
+      throw new Error('Failed to connect to backend server');
     }
   }
 

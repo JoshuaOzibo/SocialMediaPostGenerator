@@ -1,10 +1,8 @@
 "use client"
 
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import { useGoogleAuth } from '@/hooks/api/useGoogleAuth';
-import { GoogleLogin } from '@react-oauth/google';
-import GoogleAuthService from '@/lib/auth/googleAuthService';
+import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
 interface GoogleSignInButtonProps {
   onSuccess?: () => void;
@@ -15,21 +13,27 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   onSuccess, 
   onError 
 }) => {
-  const { signInWithGoogle, isLoading, error } = useGoogleAuth();
-  const googleAuthService = GoogleAuthService.getInstance();
+  const { signInWithGoogle, error } = useGoogleAuth();
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     try {
-      await signInWithGoogle(credentialResponse.credential);
-      onSuccess?.();
+      console.log('Google OAuth success, credential received');
+      if (credentialResponse.credential) {
+        await signInWithGoogle(credentialResponse.credential);
+        onSuccess?.();
+      } else {
+        throw new Error('No credential received from Google');
+      }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Google sign-in failed';
+      console.error('Google sign-in error:', err);
       onError?.(errorMessage);
     }
   };
 
   const handleGoogleError = () => {
-    const errorMessage = 'Google sign-in was cancelled or failed';
+    console.error('Google OAuth error occurred');
+    const errorMessage = 'Google sign-in was cancelled or failed. Please try again.';
     onError?.(errorMessage);
   };
 
@@ -38,7 +42,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={handleGoogleError}
-        useOneTap
+        useOneTap={false} // Disable One Tap to avoid FedCM issues
         theme="outline"
         size="large"
         type="standard"
@@ -48,8 +52,6 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         width="100%"
         locale="en"
         context="signin"
-        clientId={googleAuthService.getGoogleClientId()}
-        disabled={isLoading}
       />
       
       {error && (

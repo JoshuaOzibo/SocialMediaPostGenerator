@@ -4,13 +4,13 @@ import { blockIfAuthenticated } from '../middlewares/authMiddleware.js';
 
 const route = Router();
 
-// 📝 Signup Route
+// Signup Route
 route.post('/signup', blockIfAuthenticated, signUp);
 
-// 📝 Signin Route
+// Signin Route
 route.post('/signin', signIn);
 
-// 📝 Google OAuth Route
+// Google OAuth Route
 route.post('/google', blockIfAuthenticated, googleAuth);
 
 export default route;
