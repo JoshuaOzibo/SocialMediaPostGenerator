@@ -110,3 +110,26 @@ export const queryKeys = {
     scheduled: () => [...queryKeys.posts.all, 'scheduled'] as const,
   },
 } as const;
+
+// Google Authentication Types
+export interface GoogleUser {
+  sub: string;
+  name: string;
+  given_name: string;
+  family_name: string;
+  picture: string;
+  email: string;
+  email_verified: boolean;
+  locale: string;
+}
+
+export interface GoogleAuthResponse {
+  user: GoogleUser;
+  access_token: string;
+  expires_at: number;
+}
+
+export interface GoogleAuthError {
+  error: string;
+  error_description?: string;
+}

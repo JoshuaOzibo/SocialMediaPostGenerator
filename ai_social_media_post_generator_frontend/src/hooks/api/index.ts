@@ -1,3 +1,4 @@
 // Export all API hooks
-export * from './useAuth';
-export * from './usePosts';
+export { useAuth } from './useAuth';
+export { usePosts } from './usePosts';
+export { useGoogleAuth } from './useGoogleAuth';

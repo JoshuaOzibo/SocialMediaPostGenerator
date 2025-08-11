@@ -10,6 +10,7 @@ import Link from 'next/link';
 import { useLogin } from '@/hooks/api/useAuth';
 import { AxiosError } from 'axios';
 import { LoginRequest } from '@/lib/api/types';
+import { toast } from 'sonner';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -24,6 +25,14 @@ const LoginPage = () => {
       password,
     };
     login(credentials);
+  };
+
+  const handleGoogleSuccess = () => {
+    toast.success('Google sign-in successful! Check console for user details.');
+  };
+
+  const handleGoogleError = (error: string) => {
+    toast.error(`Google sign-in failed: ${error}`);
   };
 
   return (
@@ -118,7 +127,10 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <GoogleSignInButton />
+            <GoogleSignInButton 
+              onSuccess={handleGoogleSuccess}
+              onError={handleGoogleError}
+            />
           </div>
 
           <div className="mt-6 text-center">
