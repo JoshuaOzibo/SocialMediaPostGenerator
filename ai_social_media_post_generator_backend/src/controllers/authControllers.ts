@@ -1,3 +1,4 @@
+import { CLIENT_RENEG_LIMIT } from 'tls';
 import supabase from '../lib/config/supabaseClient.js';
 import { Request, Response } from 'express';
 
@@ -40,7 +41,7 @@ export const signUp = async (req: Request, res: Response) => {
     session: signInData.session,
     message: 'User created and signed in successfully'
   });
-  // console.log(signInData);
+  console.log(signInData);
 };
 
 export const signIn = async (req: Request, res: Response) => {
@@ -51,7 +52,7 @@ export const signIn = async (req: Request, res: Response) => {
   });
   if (error) return res.status(400).json({ error: error.message });
   res.status(200).json({ session: data.session, user: data.user });
-  // console.log(data);
+  console.log(data);
 };
 
 export const googleAuth = async (req: Request, res: Response) => {
@@ -97,6 +98,7 @@ export const googleAuth = async (req: Request, res: Response) => {
             }
           }
         );
+        console.log(updateData);
         
         if (updateError) {
           console.error('Error updating user metadata:', updateError);
@@ -128,6 +130,7 @@ export const googleAuth = async (req: Request, res: Response) => {
           token_type: 'bearer',
           user: authUser
         };
+        console.log(session);
         
       } else {
         // This is a regular user, not a Google user

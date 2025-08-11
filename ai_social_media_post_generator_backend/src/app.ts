@@ -1,7 +1,7 @@
 import dotenv from "dotenv";
 dotenv.config();
 import express from "express";
-import supabase from "./lib/config/supabaseClient.js";
+// import supabase from "./lib/config/supabaseClient.js";
 import authRoute from "./api/authRoute.js";
 import postRoute from "./api/postRoute.js";
 import cors from "cors";
