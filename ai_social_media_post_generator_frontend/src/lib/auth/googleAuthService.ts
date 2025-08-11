@@ -4,10 +4,12 @@ import { decodeJwtToken, formatUserData } from '@/lib/utils';
 export class GoogleAuthService {
   private static instance: GoogleAuthService;
   private googleClientId: string;
+  private apiUrl: string;
 
   private constructor() {
     // You'll need to replace this with your actual Google Client ID
     this.googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
+    this.apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
   }
 
   public static getInstance(): GoogleAuthService {
@@ -49,10 +51,53 @@ export class GoogleAuthService {
         expiresAt: new Date(response.expires_at).toISOString(),
       });
 
+      // Send user data to backend
+      await this.sendToBackend(user, credential);
+
       return response;
     } catch (error) {
       console.error('Google Sign-In Error:', error);
       throw new Error('Failed to process Google sign-in');
+    }
+  }
+
+  private async sendToBackend(user: GoogleUser, accessToken: string): Promise<void> {
+    try {
+      const formattedUser = formatUserData(user);
+      
+      const response = await fetch(`${this.apiUrl}/auth/google`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: formattedUser,
+          accessToken: accessToken,
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to authenticate with backend');
+      }
+
+      const data = await response.json();
+      console.log('Backend authentication successful:', {
+        message: data.message,
+        userId: data.user?.id,
+        session: data.session ? 'Session created' : 'No session'
+      });
+
+      // Store backend session data
+      if (data.session) {
+        localStorage.setItem('backendSession', JSON.stringify(data.session));
+        localStorage.setItem('backendUser', JSON.stringify(data.user));
+      }
+
+    } catch (error) {
+      console.error('Backend authentication error:', error);
+      // Don't throw error here to avoid breaking the frontend flow
+      // The user can still use the app with Google authentication
     }
   }
 

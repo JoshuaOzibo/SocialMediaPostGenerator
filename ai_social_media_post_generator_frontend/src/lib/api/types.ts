@@ -133,3 +133,26 @@ export interface GoogleAuthError {
   error: string;
   error_description?: string;
 }
+
+// Backend Authentication Types
+export interface BackendUser {
+  id: string;
+  email: string;
+  user_metadata?: {
+    google_id?: string;
+    full_name?: string;
+    avatar_url?: string;
+    email_verified?: boolean;
+    auth_provider?: string;
+  };
+  created_at: string;
+  updated_at: string;
+}
+
+export interface BackendSession {
+  access_token: string;
+  refresh_token: string;
+  expires_in: number;
+  token_type: string;
+  user: BackendUser;
+}

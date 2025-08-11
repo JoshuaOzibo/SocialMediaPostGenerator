@@ -3,11 +3,12 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 import { useGoogleAuth } from '@/hooks/api/useGoogleAuth';
 import { formatUserData } from '@/lib/utils';
 
 const GoogleAuthDemo: React.FC = () => {
-  const { user, isAuthenticated, signOut, isLoading } = useGoogleAuth();
+  const { user, isAuthenticated, signOut, isLoading, backendUser, backendSession } = useGoogleAuth();
 
   if (!isAuthenticated || !user) {
     return (
@@ -59,6 +60,37 @@ const GoogleAuthDemo: React.FC = () => {
             <span className={formattedUser.emailVerified ? 'text-green-600' : 'text-red-600'}>
               {formattedUser.emailVerified ? 'Yes' : 'No'}
             </span>
+          </div>
+        </div>
+
+        {/* Backend Authentication Status */}
+        <div className="border-t pt-4">
+          <h4 className="font-medium mb-2">Backend Authentication</h4>
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600 dark:text-gray-400">Status:</span>
+              <Badge variant={backendUser ? "default" : "secondary"}>
+                {backendUser ? "Connected" : "Not Connected"}
+              </Badge>
+            </div>
+            {backendUser && (
+              <>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Backend User ID:</span>
+                  <span className="font-mono text-xs">{backendUser.id}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-600 dark:text-gray-400">Auth Provider:</span>
+                  <span className="text-xs">{backendUser.user_metadata?.auth_provider || 'Unknown'}</span>
+                </div>
+                {backendSession && (
+                  <div className="flex justify-between text-sm">
+                    <span className="text-gray-600 dark:text-gray-400">Session:</span>
+                    <span className="text-xs text-green-600">Active</span>
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </div>
 
