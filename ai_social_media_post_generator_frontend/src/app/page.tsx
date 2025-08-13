@@ -1,15 +1,29 @@
 "use client";
-import { useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Zap, Target, Clock } from "lucide-react";
 
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 import Hero from "@/components/hero";
-import Navbar from "@/components/navbar";
 import CtaSection from "@/components/cta_section";
 import Demo from "@/components/Demo";
 import Features from "@/components/features";
 
 export default function Home() {
+  const router = useRouter();
+  const { isAuthenticated, isLoading } = useAuth();
+
+  // Redirect unauthenticated users to login
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/auth/login');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // Show loading or redirect if not authenticated
+  if (isLoading || !isAuthenticated) {
+    return null; // Don't render anything while checking auth
+  }
+
   const demoSteps = [
     {
       title: "Enter Your Ideas",

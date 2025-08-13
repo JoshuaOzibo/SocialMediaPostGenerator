@@ -12,6 +12,7 @@ import { Copy, RefreshCw, Save, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
+import RouteGuard from "@/components/middleware/RouteGuard";
 
 const Dashboard = () => {
   const [ideas, setIdeas] = useState("");
@@ -83,7 +84,8 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <RouteGuard requireAuth={true}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Header */}
       <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <nav className="flex items-center justify-between">
@@ -350,7 +352,7 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
-    </div>
+    </RouteGuard>
   );
 };
 

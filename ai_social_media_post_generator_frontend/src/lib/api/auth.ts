@@ -1,5 +1,6 @@
 import { api } from './client';
 import { LoginRequest, SignupRequest } from './types';
+import { setAuthToken, clearAuthData, getAuthToken, isAuthenticated as checkAuthStatus } from '@/lib/utils/auth';
 
 // Auth API endpoints
 const AUTH_ENDPOINTS = {
@@ -18,10 +19,10 @@ export const authApi = {
     
     // Backend returns { session, user } directly
     if (response && response.session && response.user) {
-      // Store only the access_token in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', (response.session as { access_token: string }).access_token);
-      }
+      const accessToken = (response.session as { access_token: string }).access_token;
+      
+      // Store token securely
+      setAuthToken(accessToken);
     }
     
     return response;
@@ -33,10 +34,10 @@ export const authApi = {
     
     // Backend now returns { user, session, message } directly
     if (response && response.session && (response.session as { access_token: string }).access_token) {
-      // Store only the access_token in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', (response.session as { access_token: string }).access_token);
-      }
+      const accessToken = (response.session as { access_token: string }).access_token;
+      
+      // Store token securely
+      setAuthToken(accessToken);
     }
     
     return response;
@@ -49,10 +50,8 @@ export const authApi = {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Clear only the auth_token from localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.removeItem('auth_token');
-      }
+      // Clear all auth data securely
+      clearAuthData();
     }
   },
 
@@ -70,13 +69,11 @@ export const authApi = {
 
   // Check if user is authenticated
   isAuthenticated: (): boolean => {
-    if (typeof window === 'undefined') return false;
-    return !!localStorage.getItem('auth_token');
+    return checkAuthStatus();
   },
 
   // Get stored token
   getStoredToken: (): string | null => {
-    if (typeof window === 'undefined') return null;
-    return localStorage.getItem('auth_token');
+    return getAuthToken();
   },
 };

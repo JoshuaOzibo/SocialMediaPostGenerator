@@ -16,7 +16,6 @@ export default function ProviderWrapper({ children }: { children: React.ReactNod
       <GoogleOAuthProvider clientId={googleAuthService.getGoogleClientId()}>
         <TooltipProvider>
           <Toaster position="bottom-right" richColors />
-          {/* <Sonner /> */}
           {children}
         </TooltipProvider>
       </GoogleOAuthProvider>

@@ -6,6 +6,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { ArrowLeft, Calendar, Filter, Trash2, Edit3, Clock, Copy } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
+import RouteGuard from "@/components/middleware/RouteGuard";
 
 const History = () => {
   const [filterPlatform, setFilterPlatform] = useState("all");
@@ -134,7 +135,8 @@ const History = () => {
    */
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+    <RouteGuard requireAuth={true}>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Header */}
       <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <nav className="flex items-center justify-between">
@@ -304,7 +306,7 @@ const History = () => {
           </div>
         </div>
       </div>
-    </div>
+    </RouteGuard>
   );
 };
 
