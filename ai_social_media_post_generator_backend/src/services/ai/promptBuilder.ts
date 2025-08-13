@@ -1,5 +1,5 @@
-import { PostGenerationRequest } from '../../types/ai.ts';
-import { PLATFORM_GUIDELINES, TONE_GUIDELINES } from '../../constants/platformGuidelines.ts';
+import type { PostGenerationRequest } from '../../types/ai.js';
+import { PLATFORM_GUIDELINES, TONE_GUIDELINES } from '../../constants/platformGuidelines.js';
 
 export class PromptBuilder {
   /**

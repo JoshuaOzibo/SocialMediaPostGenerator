@@ -1,4 +1,4 @@
-import { ImageResult } from '../services/imageService.ts';
+import type { ImageResult } from '../services/imageService.js';
 
 export interface PostGenerationRequest {
   inputBullets: string[];

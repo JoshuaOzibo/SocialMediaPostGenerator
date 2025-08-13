@@ -7,11 +7,11 @@ import {
   getPostController, 
   updatePostController, 
   deletePostController
-} from './postControllers/index.ts';
-import type { AuthenticatedRequest } from './baseController.ts';
+} from './postControllers/index.js';
+import type { AuthenticatedRequest } from './baseController.js';
 
 // Re-export types for backward compatibility
-export type { AuthenticatedRequest } from './baseController.ts';
+export type { AuthenticatedRequest } from './baseController.js';
 
 /**
  * @deprecated Use createPostController.execute() directly instead

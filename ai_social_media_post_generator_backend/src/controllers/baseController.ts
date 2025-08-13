@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import type { Request, Response } from 'express';
 
 // Extend Request interface to include user
 export interface AuthenticatedRequest extends Request {

@@ -1,7 +1,5 @@
-  import { CLIENT_RENEG_LIMIT } from 'tls';
-  
-import supabase from '../lib/config/supabaseClient.ts';
-import { Request, Response } from 'express';
+import supabase from '../lib/config/supabaseClient.js';
+import type { Request, Response } from 'express';
 
 export const signUp = async (req: Request, res: Response) => {
     const { username, email, password } = req.body;

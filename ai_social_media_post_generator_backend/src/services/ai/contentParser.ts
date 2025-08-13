@@ -1,4 +1,4 @@
-import { GeneratedPost } from '../../types/ai.ts';
+import type { GeneratedPost } from '../../types/ai.js';
 
 export class ContentParser {
   /**

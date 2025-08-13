@@ -1,5 +1,5 @@
 // Export all post controllers
-export { createPostController } from './createPostController.ts';
-export { getPostController } from './getPostController.ts';
-export { updatePostController } from './updatePostController.ts';
-export { deletePostController } from './deletePostController.ts'; 
+export { createPostController } from './createPostController.js';
+export { getPostController } from './getPostController.js';
+export { updatePostController } from './updatePostController.js';
+export { deletePostController } from './deletePostController.js'; 
