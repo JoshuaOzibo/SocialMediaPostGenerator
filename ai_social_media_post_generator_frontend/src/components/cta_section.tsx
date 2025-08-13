@@ -10,8 +10,8 @@ const CtaSection = () => {
           Ready to Transform Your Content Strategy?
         </h2>
         <p className="text-xl mb-8 opacity-90">
-          Join thousands of creators who've revolutionized their social media
-          presence
+          Join thousands of creators who&apos;ve revolutionized their social
+          media presence
         </p>
         <Link href="/auth/signup">
           <Button

@@ -8,14 +8,13 @@ import GoogleSignInButton from '@/components/googleButton';
 import FloatingLabelInput from '@/components/floatinglabel';
 import Link from 'next/link';
 import { useLogin } from '@/hooks/api/useAuth';
-import { AxiosError } from 'axios';
 import { LoginRequest } from '@/lib/api/types';
 import { toast } from 'sonner';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { mutate: login, isPending, isError, error } = useLogin();
+  const { mutate: login, isPending } = useLogin();
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -98,12 +97,7 @@ const LoginPage = () => {
               </a>
             </div>
 
-            {isError && (
-              <div className="text-red-600 text-sm text-center">
-                {(error as AxiosError<{ message: string }>)?.response?.data
-                  ?.message || "Login failed. Please try again."}
-              </div>
-            )}
+
 
             <Button 
               type="submit"

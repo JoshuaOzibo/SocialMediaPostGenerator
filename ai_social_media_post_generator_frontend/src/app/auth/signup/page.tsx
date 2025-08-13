@@ -8,14 +8,14 @@ import GoogleSignInButton from "@/components/googleButton";
 import FloatingLabelInput from "@/components/floatinglabel";
 import Link from "next/link";
 import { useSignup } from "@/hooks/api/useAuth";
-import { AxiosError } from "axios";
 import { SignupRequest } from "@/lib/api/types";
+import RouteGuard from "@/components/middleware/RouteGuard";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { mutate: signup, isPending, isError, error } = useSignup();
+  const { mutate: signup, isPending } = useSignup();
 
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -115,12 +115,7 @@ const SignupPage = () => {
               </span>
             </div>
 
-            {isError && (
-              <div className="text-red-600 text-sm text-center">
-                {(error as AxiosError<{ message: string }>)?.response?.data
-                  ?.message || "Signup failed. Please try again."}
-              </div>
-            )}
+
 
             <Button
               type="submit"

@@ -15,7 +15,7 @@ const Features = () => {
               Lightning Fast
             </h3>
             <p className="text-slate-600 leading-relaxed">
-              Generate a week's worth of content in under 30 seconds. No more
+              Generate a week&apos;s worth of content in under 30 seconds. No more
               staring at blank screens.
             </p>
           </CardContent>
