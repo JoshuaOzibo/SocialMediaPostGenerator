@@ -4,9 +4,9 @@ import {
   getPostController, 
   updatePostController, 
   deletePostController 
-} from '../controllers/postControllers/index.js';
-import { protectRoute } from '../middlewares/authMiddleware.js';
-import { validatePostRequest, validateUpdateRequest, validateQueryParams } from '../middlewares/validationMiddleware.js';
+} from '../controllers/postControllers/index.ts';
+import { protectRoute } from '../middlewares/authMiddleware.ts';
+import { validatePostRequest, validateUpdateRequest, validateQueryParams } from '../middlewares/validationMiddleware.ts';
 
 const route = Router();
 

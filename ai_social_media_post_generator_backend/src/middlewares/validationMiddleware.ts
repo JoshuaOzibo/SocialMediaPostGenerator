@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { CreatePostRequest, UpdatePostRequest } from '../types/post.js';
+import { CreatePostRequest, UpdatePostRequest } from '../types/post.ts';
 
 // Extend Request interface to include user
 interface AuthenticatedRequest extends Request {

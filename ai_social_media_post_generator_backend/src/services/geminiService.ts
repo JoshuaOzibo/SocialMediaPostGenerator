@@ -1,11 +1,11 @@
 // This file is now a compatibility layer that delegates to the new structured services
 // For new code, use contentGenerationService directly
 
-import { PostGenerationRequest, GeneratedPost } from '../types/ai.js';
-import { contentGenerationService } from './contentGenerationService.js';
+import { PostGenerationRequest, GeneratedPost } from '../types/ai.ts';
+import { contentGenerationService } from './contentGenerationService.ts';
 
 // Re-export types for backward compatibility
-export type { PostGenerationRequest, GeneratedPost } from '../types/ai.js';
+export type { PostGenerationRequest, GeneratedPost } from '../types/ai.ts';
 
 /**
  * @deprecated Use contentGenerationService directly instead

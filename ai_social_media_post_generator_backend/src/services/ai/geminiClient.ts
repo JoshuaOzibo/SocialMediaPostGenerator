@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { AIResponse } from '../../types/ai.js';
+import { AIResponse } from '../../types/ai.ts';
 
 export class GeminiClient {
   private apiKey = process.env.GEMINI_API_KEY || '';

@@ -1,8 +1,8 @@
-import { PostGenerationRequest, GeneratedPost, ScheduledPost } from '../types/ai.js';
-import { geminiClient } from './ai/geminiClient.js';
-import { promptBuilder } from './ai/promptBuilder.js';
-import { contentParser } from './ai/contentParser.js';
-import { imageService, ImageResult } from './imageService.js';
+import { PostGenerationRequest, GeneratedPost, ScheduledPost } from '../types/ai.ts';
+import { geminiClient } from './ai/geminiClient.ts';
+import { promptBuilder } from './ai/promptBuilder.ts';
+import { contentParser } from './ai/contentParser.ts';
+import { imageService, ImageResult } from './imageService.ts';
 
 export class ContentGenerationService {
   /**

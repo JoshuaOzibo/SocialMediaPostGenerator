@@ -1,6 +1,6 @@
 import { createApi } from 'unsplash-js';
-import { promptBuilder } from './ai/promptBuilder.js';
-import { geminiClient } from './ai/geminiClient.js';
+import { promptBuilder } from './ai/promptBuilder.ts';
+import { geminiClient } from './ai/geminiClient.ts';
 
 // Initialize Unsplash API
 const unsplash = createApi({

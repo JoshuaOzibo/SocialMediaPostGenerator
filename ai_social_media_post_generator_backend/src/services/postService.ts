@@ -1,7 +1,7 @@
-import supabase from '../lib/config/supabaseClient.js';
-import { Post, CreatePostRequest, UpdatePostRequest, PostResponse, PostListResponse, PostFilters } from '../types/post.js';
-import { contentGenerationService } from './contentGenerationService.js';
-import { PostGenerationRequest, ScheduledPost } from '../types/ai.js';
+import supabase from '../lib/config/supabaseClient.ts';
+import { Post, CreatePostRequest, UpdatePostRequest, PostResponse, PostListResponse, PostFilters } from '../types/post.ts';
+import { contentGenerationService } from './contentGenerationService.ts';
+import { PostGenerationRequest, ScheduledPost } from '../types/ai.ts';
 
 export class PostService {
   /**

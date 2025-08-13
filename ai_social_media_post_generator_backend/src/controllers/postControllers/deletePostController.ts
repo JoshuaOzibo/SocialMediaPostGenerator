@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
-import { BaseController } from '../baseController.js';
-import { postService } from '../../services/postService.js';
+import { BaseController } from '../baseController.ts';
+import { postService } from '../../services/postService.ts';
 
 // Define AuthenticatedRequest locally to avoid import issues
 interface AuthenticatedRequest extends Request {

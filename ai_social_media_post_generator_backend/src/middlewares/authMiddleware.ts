@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import supabase from '../lib/config/supabaseClient.js';
+import supabase from '../lib/config/supabaseClient.ts';
 
 export async function protectRoute(req: Request, res: Response, next: NextFunction) {
   try {

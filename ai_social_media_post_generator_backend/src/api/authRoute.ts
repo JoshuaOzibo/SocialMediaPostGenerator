@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { signUp, signIn, googleAuth } from '../controllers/authControllers.js';
-import { blockIfAuthenticated } from '../middlewares/authMiddleware.js';
+import { signUp, signIn, googleAuth } from '../controllers/authControllers.ts';
+import { blockIfAuthenticated } from '../middlewares/authMiddleware.ts';
 
 const route = Router();
 

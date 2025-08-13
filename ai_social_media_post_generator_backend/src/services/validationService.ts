@@ -1,4 +1,4 @@
-import { CreatePostRequest, UpdatePostRequest, PostFilters } from '../types/post.js';
+import { CreatePostRequest, UpdatePostRequest, PostFilters } from '../types/post.ts';
 
 export class ValidationService {
   /**
