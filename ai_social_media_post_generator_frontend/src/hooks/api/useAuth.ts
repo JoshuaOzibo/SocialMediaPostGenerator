@@ -4,6 +4,7 @@ import { LoginRequest, SignupRequest } from '@/lib/api/types';
 import { queryKeys } from '@/lib/api/types';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
 
 // Hook for user login
 export const useLogin = () => {
@@ -19,11 +20,34 @@ export const useLogin = () => {
       // Set user data in query cache
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
       
+      // Show success message
+      toast.success('Login successful!');
+      
       // Navigate to dashboard
       router.push('/dashboard');
     },
-    onError: (error) => {
+    onError: (error: AxiosError) => {
       console.error('Login error:', error);
+      
+      // Handle different types of errors
+      if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+        toast.error('Network Error', {
+          description: 'Please check your internet connection and try again.',
+        });
+      } else if (error.response?.status === 401) {
+        toast.error('Invalid Credentials', {
+          description: 'Please check your email and password.',
+        });
+      } else if (error.response?.status === 404) {
+        toast.error('Service Unavailable', {
+          description: 'Authentication service is currently unavailable.',
+        });
+      } else {
+        const errorMessage = (error.response?.data as any)?.message || 'Login failed. Please try again.';
+        toast.error('Login Failed', {
+          description: errorMessage,
+        });
+      }
     },
   });
 };
@@ -42,11 +66,38 @@ export const useSignup = () => {
       // Set user data in query cache
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
       
+      // Show success message
+      toast.success('Account created successfully!');
+      
       // Navigate to dashboard immediately since user is authenticated
       router.push('/dashboard');
     },
-    onError: (error) => {
+    onError: (error: AxiosError) => {
       console.error('Signup error:', error);
+      
+      // Handle different types of errors
+      if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
+        toast.error('Network Error', {
+          description: 'Please check your internet connection and try again.',
+        });
+      } else if (error.response?.status === 409) {
+        toast.error('Account Already Exists', {
+          description: 'An account with this email already exists.',
+        });
+      } else if (error.response?.status === 400) {
+        toast.error('Invalid Data', {
+          description: 'Please check your input and try again.',
+        });
+      } else if (error.response?.status === 404) {
+        toast.error('Service Unavailable', {
+          description: 'Registration service is currently unavailable.',
+        });
+      } else {
+        const errorMessage = (error.response?.data as any)?.message || 'Signup failed. Please try again.';
+        toast.error('Signup Failed', {
+          description: errorMessage,
+        });
+      }
     },
   });
 };
