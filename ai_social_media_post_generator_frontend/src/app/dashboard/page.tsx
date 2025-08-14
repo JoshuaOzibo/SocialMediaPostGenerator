@@ -1,20 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Skeleton } from "@/components/ui/skeleton";
-import { Copy, RefreshCw, Save, ArrowLeft, Sparkles } from "lucide-react";
-import Link from "next/link";
 import { toast } from "sonner";
 import RouteGuard from "@/components/middleware/RouteGuard";
 import DashboardGeneratorSection from "@/components/dashboard_component/dashboard_generator_section";
 import DashboardResult from "@/components/dashboard_component/dashboard_result";
 
+interface PostType {
+  id: number;
+  content: string;
+  platform: string;
+  tone: string;
+  day: string;
+}
+
 const Dashboard = () => {
   const [platform, setPlatform] = useState("");
   const [tone, setTone] = useState("");
-  const [generatedPosts, setGeneratedPosts] = useState<unknown[]>([]);
+  const [generatedPosts, setGeneratedPosts] = useState<PostType[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
     
@@ -51,47 +54,37 @@ const Dashboard = () => {
         description: "Your social media posts are ready to use.",
       });
     }, 2000);
-  };
 
-  const handleCopy = (content: string) => {
-    navigator.clipboard.writeText(content);
-    toast.success("Copied!", {
-      description: "Post content copied to clipboard.",
-    });
-  };
 
-  const handleSave = (post: unknown) => {
-    toast.success("Saved!", {
-      description: "Post saved to your history.",
-    });
-  };
 
-  return (
-    <RouteGuard requireAuth={true}>
-      <>
+      
+
+    return (
+      <RouteGuard requireAuth={true}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Header */}
-      <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <nav className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </Link>
-            <div className="flex items-center space-x-2">
-              <Sparkles className="h-6 w-6 text-blue-600" />
-              <span className="text-lg font-semibold text-slate-900">Dashboard</span>
-            </div>
-          </div>
-          <Link href="/history">
-            <Button variant="outline" className="rounded-xl">
-              View History
-            </Button>
-          </Link>
-        </nav>
-      </header>
+          {/* Header */}
+          
+          {/* <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+            <nav className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Link href="/">
+                  <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back
+                  </Button>
+                </Link>
+                <div className="flex items-center space-x-2">
+                  <Sparkles className="h-6 w-6 text-blue-600" />
+                  <span className="text-lg font-semibold text-slate-900">Dashboard</span>
+                </div>
+              </div>
+              <Link href="/history">
+                <Button variant="outline" className="rounded-xl">
+                  View History
+                </Button>
+              </Link>
+            </nav>
+          </header> */}
 
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
@@ -101,26 +94,24 @@ const Dashboard = () => {
             platform={platform}
             setTone={setTone}
             tone={tone}
-                  
+
           />
 
           {/* Results Section */}
           <DashboardResult
             generatedPosts={generatedPosts}
             isGenerating={isGenerating}
-            handleGenerate={handleGenerate}
-            handleSave={handleSave}
-            handleCopy={handleCopy}
+            handleGenerate={() => {}}
           />
           
           </div>
         </div>
       </div>
-      </div>
-
-        </>
+  
     </RouteGuard>
-  );
-};
+    )
+  };
 
-export default Dashboard
+  
+
+export default Dashboard;

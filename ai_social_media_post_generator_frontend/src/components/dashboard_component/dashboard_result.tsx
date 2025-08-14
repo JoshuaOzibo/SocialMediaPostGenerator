@@ -3,7 +3,8 @@ import { Card, CardContent } from "../ui/card";
 import { RefreshCw, Save, Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
 import DashboardSkeleton from "./dashboard_skeleton";
-import { Copy } from "lucide-react";
+import { Copy } from "lucide-react";  
+import { toast } from "sonner";
 
 interface PostType {
   id: number;
@@ -16,16 +17,30 @@ interface PostType {
 const DashboardResult = ({
   generatedPosts,
   isGenerating,
-  handleGenerate,
-  handleSave,
-  handleCopy,
-}: {
+  handleGenerate}: {
   generatedPosts: PostType[];
   isGenerating: boolean;
   handleGenerate: () => void;
-  handleSave: (post: PostType) => void;
-  handleCopy: (content: string) => void;
 }) => {
+
+
+  const handleCopy = (content: string) => {
+    navigator.clipboard.writeText(content);
+    toast.success("Copied!", {
+      description: "Post content copied to clipboard.",
+    });
+  };
+
+  const handleSave = () => {
+    toast.success("Saved!", {
+      description: "Post saved to your history.",
+    });
+  };
+
+
+
+
+
   return (
     <>
       <div className="space-y-6">
@@ -95,7 +110,7 @@ const DashboardResult = ({
                     Regenerate
                   </Button>
                   <Button
-                    onClick={() => handleSave(post)}
+                    onClick={handleSave}
                     variant="outline"
                     size="sm"
                     className="rounded-xl"
