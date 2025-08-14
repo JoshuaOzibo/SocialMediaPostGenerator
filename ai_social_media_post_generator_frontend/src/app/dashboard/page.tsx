@@ -2,38 +2,20 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Copy, RefreshCw, Save, ArrowLeft, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
-import { Input } from "@/components/ui/input";
 import RouteGuard from "@/components/middleware/RouteGuard";
+import DashboardGeneratorSection from "@/components/dashboard_generator_section";
 
 const Dashboard = () => {
-  const [ideas, setIdeas] = useState("");
   const [platform, setPlatform] = useState("");
   const [tone, setTone] = useState("");
-  const [scheduleDate, setScheduleDate] = useState("");
-  const [includeHashtags, setIncludeHashtags] = useState(true);
-  const [includeImages, setIncludeImages] = useState(false);
-  const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPosts, setGeneratedPosts] = useState<unknown[]>([]);
-  const [days, setDays] = useState("1");
+  const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerate = async () => {
-    if (!ideas.trim() || !platform || !tone) {
-      toast.error("Missing Information", {
-        description: "Please fill in all required fields before generating posts.",
-      });
-      return;
-    }
-
-    setIsGenerating(true);
     
     // Simulate API call
     setTimeout(() => {
@@ -113,144 +95,13 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
           {/* Generator Section */}
-          <div className="space-y-6">
-            <Card className="border-0 shadow-lg rounded-2xl">
-              <CardHeader className="pb-4">
-                <CardTitle className="text-2xl font-bold text-slate-900">
-                  Create Your Posts
-                </CardTitle>
-                <p className="text-slate-600">
-                  Enter your ideas and let AI craft engaging social media content
-                </p>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div>
-                  <Label htmlFor="ideas" className="text-sm font-medium text-slate-700 mb-2 block">
-                    Your Ideas (bullet points work best)
-                  </Label>
-                  <Textarea
-                    id="ideas"
-                    placeholder="• Launched new product feature&#10;• Team collaboration tips&#10;• Industry insights&#10;• Customer success story"
-                    value={ideas}
-                    onChange={(e) => setIdeas(e.target.value)}
-                    className="min-h-32 rounded-xl border-slate-200 focus:border-blue-300 focus:ring-blue-200 resize-none"
-                  />
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-8">
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700 mb-2 block">
-                      Platform
-                    </Label>
-                    <Select value={platform} onValueChange={setPlatform}>
-                      <SelectTrigger className="rounded-xl border-slate-200">
-                        <SelectValue placeholder="Choose platform" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="linkedin">LinkedIn</SelectItem>
-                        <SelectItem value="twitter">Twitter</SelectItem>
-                        <SelectItem value="instagram">Instagram</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700 mb-2 block">
-                      Tone
-                    </Label>
-                    <Select value={tone} onValueChange={setTone}>
-                      <SelectTrigger className="rounded-xl border-slate-200">
-                        <SelectValue placeholder="Select tone" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="professional">Professional</SelectItem>
-                        <SelectItem value="funny">Funny</SelectItem>
-                        <SelectItem value="educational">Educational</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700 mb-2 block">
-                      select Days
-                    </Label>
-                    <Select
-                      value={days}
-                      onValueChange={setDays}
-                    >
-                      <SelectTrigger className="rounded-xl sm:w-[50%] w-[40%] border-slate-200">
-                        <SelectValue placeholder="Select days to start posting" />
-                      </SelectTrigger>
-                      <SelectContent> 
-                        <SelectItem value="1">1</SelectItem>
-                        <SelectItem value="2">2</SelectItem>
-                        <SelectItem value="3">3</SelectItem>
-                        <SelectItem value="4">4</SelectItem>
-                        <SelectItem value="5">5</SelectItem>
-                        <SelectItem value="6">6</SelectItem>
-                        <SelectItem value="7">7</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <Label className="text-sm font-medium text-slate-700 mb-2 block">
-                      Schedule Date Posting
-                    </Label>
-                    <Input
-                      type="date"
-                      value={scheduleDate}
-                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setScheduleDate(e.target.value)}
-                      className="rounded-xl sm:w-[70%] w-[40%] border-slate-200"
-                    />
-                  </div>
-
-                  
-                </div>
-
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="hashtags" className="text-sm font-medium text-slate-700">
-                      Include hashtags
-                    </Label>
-                    <Switch
-                      id="hashtags"
-                      checked={includeHashtags}
-                      onCheckedChange={setIncludeHashtags}
-                    />
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Label htmlFor="images" className="text-sm font-medium text-slate-700">
-                      Suggest images
-                    </Label>
-                    <Switch
-                      id="images"
-                      checked={includeImages}
-                      onCheckedChange={setIncludeImages}
-                    />
-                  </div>
-                </div>
-
-                <Button
-                  onClick={handleGenerate}
-                  disabled={isGenerating}
-                  className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
-                >
-                  {isGenerating ? (
-                    <>
-                      <RefreshCw className="h-5 w-5 mr-2 animate-spin" />
-                      Generating Posts...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="h-5 w-5 mr-2" />
-                      Generate Posts
-                    </>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
+          <DashboardGeneratorSection
+            setPlatform={setPlatform}
+            platform={platform}
+            setTone={setTone}
+            tone={tone}
+          
+          />
 
           {/* Results Section */}
           <div className="space-y-6">
