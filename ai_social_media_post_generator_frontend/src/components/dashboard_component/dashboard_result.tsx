@@ -3,7 +3,7 @@ import { Card, CardContent } from "../ui/card";
 import { RefreshCw, Save, Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
 import DashboardSkeleton from "./dashboard_skeleton";
-import { Copy } from "lucide-react";  
+import { Copy } from "lucide-react";
 import { toast } from "sonner";
 
 interface PostType {
@@ -17,13 +17,12 @@ interface PostType {
 const DashboardResult = ({
   generatedPosts,
   isGenerating,
-  handleGenerate}: {
+  handleGenerate,
+}: {
   generatedPosts: PostType[];
   isGenerating: boolean;
   handleGenerate: () => void;
 }) => {
-
-
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content);
     toast.success("Copied!", {
@@ -36,10 +35,6 @@ const DashboardResult = ({
       description: "Post saved to your history.",
     });
   };
-
-
-
-
 
   return (
     <>
