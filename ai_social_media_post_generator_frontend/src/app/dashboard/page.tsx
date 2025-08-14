@@ -22,7 +22,7 @@ const Dashboard = () => {
   const [includeHashtags, setIncludeHashtags] = useState(true);
   const [includeImages, setIncludeImages] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [generatedPosts, setGeneratedPosts] = useState<any[]>([]);
+  const [generatedPosts, setGeneratedPosts] = useState<unknown[]>([]);
   const [days, setDays] = useState("1");
 
   const handleGenerate = async () => {
@@ -77,7 +77,7 @@ const Dashboard = () => {
     });
   };
 
-  const handleSave = (post: any) => {
+  const handleSave = (post: unknown) => {
     toast.success("Saved!", {
       description: "Post saved to your history.",
     });
@@ -85,6 +85,7 @@ const Dashboard = () => {
 
   return (
     <RouteGuard requireAuth={true}>
+      <>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       {/* Header */}
       <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
@@ -136,7 +137,7 @@ const Dashboard = () => {
                   />
                 </div>
 
-                <div className="grid sm:grid-cols-2 just gap-8">
+                <div className="grid sm:grid-cols-2 gap-8">
                   <div>
                     <Label className="text-sm font-medium text-slate-700 mb-2 block">
                       Platform
@@ -352,6 +353,8 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+      </div>
+        </>
     </RouteGuard>
   );
 };
