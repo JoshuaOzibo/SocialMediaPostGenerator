@@ -23,8 +23,8 @@ export const useLogin = () => {
       // Show success message
       toast.success('Login successful!');
       
-      // Navigate to dashboard
-      router.push('/dashboard');
+      // Navigate to homapage
+      router.push('/');
     },
     onError: (error: AxiosError) => {
       console.error('Login error:', error);
@@ -69,9 +69,11 @@ export const useSignup = () => {
       // Show success message
       toast.success('Account created successfully!');
       
-      // Navigate to dashboard immediately since user is authenticated
-      router.push('/dashboard');
+      // Navigate to homepage immediately since user is authenticated
+      router.push('/');
     },
+
+
     onError: (error: AxiosError) => {
       console.error('Signup error:', error);
       
@@ -139,21 +141,21 @@ export const useCurrentUser = () => {
 
 // Hook for refreshing token
 export const useRefreshToken = () => {
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
-  return useMutation({
-    mutationFn: () => authApi.refreshToken(),
-    onSuccess: () => {
-      // Update token in cache if needed
-      console.log('Token refreshed successfully');
-    },
-    onError: (error) => {
-      console.error('Token refresh error:', error);
-      // If refresh fails, logout user
-      authApi.logout();
-      queryClient.clear();
-    },
-  });
+  // return useMutation({
+  //   mutationFn: () => authApi.refreshToken(),
+  //   onSuccess: () => {
+  //     // Update token in cache if needed
+  //     console.log('Token refreshed successfully');
+  //   },
+  //   onError: (error) => {
+  //     console.error('Token refresh error:', error);
+  //     // If refresh fails, logout user
+  //     authApi.logout();
+  //     queryClient.clear();
+  //   },
+  // });
 };
 
 // Hook for checking authentication status

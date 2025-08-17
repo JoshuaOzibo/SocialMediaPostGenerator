@@ -28,7 +28,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Protected routes that require authentication
-const PROTECTED_ROUTES = ['/dashboard', '/history'];
+const PROTECTED_ROUTES = ['/dashboard', '/history', '/'];
 // Public routes that should redirect to dashboard if authenticated
 const PUBLIC_ROUTES = ['/auth/login', '/auth/signup', '/auth', '/'];
 
@@ -51,9 +51,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       
       if (hasToken && PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
-        // User is authenticated but on public route, redirect to dashboard
+        // User is authenticated but on public route, redirect to hom
         if (pathname === '/') {
-          router.push('/dashboard');
+          router.push('/');
         }
         return;
       }
@@ -72,10 +72,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     if (error && !isLoading) {
       // If there's an auth error and we're not loading, user might be logged out
-      if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-        toast.error('Session expired. Please log in again.');
-        router.push('/auth/login');
-      }
+      // if (PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
+      //   toast.error('Session expired. Please log in again.');
+      //   router.push('/auth/login');
+      // }
     }
   }, [error, isLoading, pathname, router, isInitialized]);
 

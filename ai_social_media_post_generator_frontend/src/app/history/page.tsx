@@ -2,8 +2,23 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ArrowLeft, Calendar, Filter, Trash2, Edit3, Clock, Copy } from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  ArrowLeft,
+  Calendar,
+  Filter,
+  Trash2,
+  Edit3,
+  Clock,
+  Copy,
+  Sparkles
+} from "lucide-react";
 import Link from "next/link";
 import { toast } from "sonner";
 import RouteGuard from "@/components/middleware/RouteGuard";
@@ -16,52 +31,63 @@ const History = () => {
   const savedPosts = [
     {
       id: 1,
-      content: "🚀 Excited to share some insights on team collaboration! Here are 3 key strategies that have transformed our workflow...",
+      content:
+        "🚀 Excited to share some insights on team collaboration! Here are 3 key strategies that have transformed our workflow...",
       platform: "linkedin",
       tone: "professional",
       createdAt: "2024-01-15",
-      status: "published"
+      status: "published",
     },
     {
       id: 2,
-      content: "💡 Pro tip: The best product features come from listening to your users. Here's how we gather feedback...",
+      content:
+        "💡 Pro tip: The best product features come from listening to your users. Here's how we gather feedback...",
       platform: "twitter",
       tone: "educational",
       createdAt: "2024-01-14",
-      status: "draft"
+      status: "draft",
     },
     {
       id: 3,
-      content: "🎯 Industry insight: The future of remote work is hybrid. Companies that adapt quickly will attract top talent...",
+      content:
+        "🎯 Industry insight: The future of remote work is hybrid. Companies that adapt quickly will attract top talent...",
       platform: "instagram",
       tone: "professional",
       createdAt: "2024-01-13",
-      status: "scheduled"
+      status: "scheduled",
     },
     {
       id: 4,
-      content: "🔥 Just shipped a new feature! Here's what our users are saying about the improved workflow...",
+      content:
+        "🔥 Just shipped a new feature! Here's what our users are saying about the improved workflow...",
       platform: "linkedin",
       tone: "funny",
       createdAt: "2024-01-12",
-      status: "published"
+      status: "published",
     },
     {
       id: 5,
-      content: "📚 Learning in public: My journey from junior to senior developer in 2 years...",
+      content:
+        "📚 Learning in public: My journey from junior to senior developer in 2 years...",
       platform: "twitter",
       tone: "educational",
       createdAt: "2024-01-11",
-      status: "draft"
-    }
+      status: "draft",
+    },
   ];
 
-  const filteredPosts = savedPosts.filter(post => {
-    const platformMatch = filterPlatform === "all" || post.platform === filterPlatform;
-    const dateMatch = filterDate === "all" || 
-      (filterDate === "week" && new Date(post.createdAt) > new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
-      (filterDate === "month" && new Date(post.createdAt) > new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
-    
+  const filteredPosts = savedPosts.filter((post) => {
+    const platformMatch =
+      filterPlatform === "all" || post.platform === filterPlatform;
+    const dateMatch =
+      filterDate === "all" ||
+      (filterDate === "week" &&
+        new Date(post.createdAt) >
+          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
+      (filterDate === "month" &&
+        new Date(post.createdAt) >
+          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+
     return platformMatch && dateMatch;
   });
 
@@ -110,35 +136,35 @@ const History = () => {
     }
   };
 
-  /**
-   *  <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <nav className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <Link href="/">
-              <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">
-                <ArrowLeft className="h-4 w-4 mr-2" />
-                Back
-              </Button>
-            </Link>
-            <div className="flex items-center space-x-2">
-              <Sparkles className="h-6 w-6 text-blue-600" />
-              <span className="text-lg font-semibold text-slate-900">Dashboard</span>
-            </div>
-          </div>
-          <Link href="/history">
-            <Button variant="outline" className="rounded-xl">
-              View History
-            </Button>
-          </Link>
-        </nav>
-      </header>
-   */
+  //  <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+  //       <nav className="flex items-center justify-between">
+  //         <div className="flex items-center space-x-4">
+  //           <Link href="/">
+  //             <Button variant="ghost" size="sm" className="text-slate-600 hover:text-slate-900">
+  //               <ArrowLeft className="h-4 w-4 mr-2" />
+  //               Back
+  //             </Button>
+  //           </Link>
+  //           <div className="flex items-center space-x-2">
+  //             <Sparkles className="h-6 w-6 text-blue-600" />
+  //             <span className="text-lg font-semibold text-slate-900">Dashboard</span>
+  //           </div>
+  //         </div>
+  //         <Link href="/history">
+  //           <Button variant="outline" className="rounded-xl">
+  //             View History
+  //           </Button>
+  //         </Link>
+  //       </nav>
+  //     </header>
+  
 
   return (
-    <RouteGuard requireAuth={true}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-      {/* Header */}
-      <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+    <>
+      <RouteGuard requireAuth={true}>
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
+          {/* Header */}
+          <header className="container mx-auto px-4 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
         <nav className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <Link href="/dashboard">
@@ -160,10 +186,10 @@ const History = () => {
         </nav>
       </header>
 
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-6">
-          {/* Filters */}
-          <Card className="border-0 shadow-lg rounded-2xl">
+          <div className="container mx-auto px-4 py-8">
+            <div className="max-w-4xl mx-auto space-y-6">
+              {/* Filters */}
+              <Card className="border-0 shadow-lg rounded-2xl">
             <CardHeader className="pb-4">
               <div className="flex items-center justify-between">
                 <CardTitle className="text-xl font-bold text-slate-900 flex items-center">
@@ -213,8 +239,8 @@ const History = () => {
             </CardContent>
           </Card>
 
-          {/* Posts List */}
-          <div className="space-y-4">
+              {/* Posts List */}
+              <div className="space-y-4">
             {filteredPosts.length > 0 ? (
               filteredPosts.map((post) => (
                 <Card key={post.id} className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200">
@@ -304,9 +330,11 @@ const History = () => {
               </Card>
             )}
           </div>
+            </div>
+          </div>
         </div>
-      </div>
-    </RouteGuard>
+      </RouteGuard>
+    </>
   );
 };
 

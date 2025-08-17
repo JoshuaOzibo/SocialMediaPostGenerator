@@ -32,16 +32,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
-  // If unauthenticated user is on home page, redirect to login
-  if (!isAuthenticated && pathname === '/') {
-    return NextResponse.redirect(new URL('/auth/login', request.url));
-  }
-
-  // If authenticated user is on home page, redirect to dashboard
-  if (isAuthenticated && pathname === '/') {
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
   return NextResponse.next();
 }
 
