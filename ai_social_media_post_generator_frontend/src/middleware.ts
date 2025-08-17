@@ -22,13 +22,15 @@ export function middleware(request: NextRequest) {
 
   // If accessing protected route without authentication, redirect to login
   if (isProtectedRoute && !isAuthenticated) {
-    const loginUrl = new URL('/', request.url);
+    console.log('Middleware: Redirecting unauthenticated user from', pathname, 'to /auth/login');
+    const loginUrl = new URL('/auth/login', request.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
   // If authenticated user tries to access auth pages, redirect to dashboard
   if (isAuthenticated && isAuthRoute) {
+    console.log('Middleware: Redirecting authenticated user from', pathname, 'to /dashboard');
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 

@@ -9,16 +9,11 @@ export const setAuthToken = (token: string): void => {
   // Store in localStorage for client-side access
   localStorage.setItem('auth_token', token);
   
-  // Set secure cookie for server-side access
-  const cookieOptions = [
-    `auth_token=${token}`,
-    'path=/',
-    'max-age=3600', // 1 hour
-    'secure',
-    'samesite=strict'
-  ].join('; ');
+  // Set cookie for server-side access (middleware)
+  // Use a simple format that middleware can easily read
+  document.cookie = `auth_token=${token}; path=/; max-age=3600; SameSite=Lax`;
   
-  document.cookie = cookieOptions;
+  console.log('Token stored in localStorage and cookie');
 };
 
 /**
@@ -41,7 +36,9 @@ export const clearAuthData = (): void => {
   localStorage.removeItem('backendUser');
   
   // Clear cookie
-  document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; secure; samesite=strict';
+  document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+  
+  console.log('Auth data cleared');
 };
 
 /**
@@ -50,6 +47,27 @@ export const clearAuthData = (): void => {
 export const isAuthenticated = (): boolean => {
   if (typeof window === 'undefined') return false;
   return !!getAuthToken();
+};
+
+/**
+ * Debug function to check authentication state
+ */
+export const debugAuthState = (): void => {
+  if (typeof window === 'undefined') return;
+  
+  const localStorageToken = localStorage.getItem('auth_token');
+  const cookies = document.cookie.split(';').reduce((acc, cookie) => {
+    const [key, value] = cookie.trim().split('=');
+    acc[key] = value;
+    return acc;
+  }, {} as Record<string, string>);
+  
+  console.log('=== Auth Debug Info ===');
+  console.log('localStorage token:', localStorageToken ? 'Present' : 'Missing');
+  console.log('Cookie token:', cookies.auth_token ? 'Present' : 'Missing');
+  console.log('isAuthenticated():', isAuthenticated());
+  console.log('All cookies:', cookies);
+  console.log('=======================');
 };
 
 /**
