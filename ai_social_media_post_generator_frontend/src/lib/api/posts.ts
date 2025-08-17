@@ -29,25 +29,25 @@ export const postsApi = {
     
     const url = `${POSTS_ENDPOINTS.BASE}?${params.toString()}`;
     const response = await api.get<PostListResponse>(url);
-    return response.data!;
+    return response;
   },
 
   // Get single post by ID
   getPost: async (id: string): Promise<Post> => {
     const response = await api.get<Post>(`${POSTS_ENDPOINTS.BASE}/${id}`);
-    return response.data!;
+    return response;
   },
 
   // Create new post
   createPost: async (postData: CreatePostRequest): Promise<Post> => {
     const response = await api.post<Post>(POSTS_ENDPOINTS.BASE, postData);
-    return response.data!;
+    return response;
   },
 
   // Update post
   updatePost: async (id: string, postData: UpdatePostRequest): Promise<Post> => {
     const response = await api.put<Post>(`${POSTS_ENDPOINTS.BASE}/${id}`, postData);
-    return response.data!;
+    return response;
   },
 
   // Delete post
@@ -58,7 +58,7 @@ export const postsApi = {
   // Regenerate post content
   regenerateContent: async (id: string): Promise<Post> => {
     const response = await api.post<Post>(`${POSTS_ENDPOINTS.BASE}/${id}/regenerate`);
-    return response.data!;
+    return response;
   },
 
   // Get post statistics
@@ -69,14 +69,20 @@ export const postsApi = {
     draft: number;
     archived: number;
   }> => {
-    const response = await api.get(POSTS_ENDPOINTS.STATS);
-    return response.data!;
+    const response = await api.get<{
+      total: number;
+      published: number;
+      scheduled: number;
+      draft: number;
+      archived: number;
+    }>(POSTS_ENDPOINTS.STATS);
+    return response;
   },
 
   // Get scheduled posts
   getScheduledPosts: async (): Promise<Post[]> => {
     const response = await api.get<Post[]>(POSTS_ENDPOINTS.SCHEDULED);
-    return response.data!;
+    return response;
   },
 
   // Bulk operations
@@ -89,7 +95,7 @@ export const postsApi = {
       ids,
       updates,
     });
-    return response.data!;
+    return response;
   },
 
   // Export posts
@@ -104,6 +110,6 @@ export const postsApi = {
     });
     
     const response = await api.get<string>(`${POSTS_ENDPOINTS.BASE}/export?${params.toString()}`);
-    return response.data!;
+    return response;
   },
 };

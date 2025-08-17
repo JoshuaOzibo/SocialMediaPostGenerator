@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL
 // Create axios instance
 const apiClient: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
-  timeout: 10000,
+  timeout: 60000, // Increased to 60 seconds for AI content generation
   headers: {
     'Content-Type': 'application/json',
   },
@@ -42,6 +42,12 @@ apiClient.interceptors.response.use(
         localStorage.removeItem('auth_token');
         window.location.href = '/auth/login';
       }
+    }
+    
+    // Handle timeout errors
+    if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
+      console.error('Request timeout - the operation is taking longer than expected');
+      // Don't redirect on timeout, just show error
     }
     
     // Handle network errors

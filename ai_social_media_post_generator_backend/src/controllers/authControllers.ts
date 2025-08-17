@@ -202,3 +202,37 @@ export const googleAuth = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Internal server error during Google authentication' });
   }
 };
+
+// Get current user endpoint
+export const getCurrentUser = async (req: Request, res: Response) => {
+  try {
+    // The user should be available from the auth middleware
+    const user = (req as any).user;
+    
+    if (!user) {
+      return res.status(401).json({ error: 'User not authenticated' });
+    }
+
+    // Get user details from Supabase
+    const { data: userData, error } = await supabase.auth.admin.getUserById(user.id);
+    
+    if (error) {
+      console.error('Error fetching user:', error);
+      return res.status(500).json({ error: 'Failed to fetch user data' });
+    }
+
+    if (!userData.user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: {
+        user: userData.user
+      }
+    });
+  } catch (error) {
+    console.error('Get current user error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};

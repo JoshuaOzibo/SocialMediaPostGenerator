@@ -53,6 +53,13 @@ const Dashboard = () => {
         scheduled_at: formData.scheduleDate || undefined,
       };
 
+      // Debug: Log the request data
+      console.log('🚀 Sending POST request to /api/v1/posts');
+      console.log('Request data:', JSON.stringify(postData, null, 2));
+      console.log('Platform:', platform);
+      console.log('Tone:', tone);
+      console.log('Input bullets:', inputBullets);
+
       // Call the API to create posts
       const newPost = await createPostMutation.mutateAsync(postData);
       
@@ -62,8 +69,27 @@ const Dashboard = () => {
       toast.success("Posts Generated!", {
         description: "Your social media posts are ready to use.",
       });
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error generating posts:", error);
+      
+      // Debug: Log more details about the error
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response: { status: number; data: unknown } };
+        console.error('Response status:', axiosError.response.status);
+        console.error('Response data:', axiosError.response.data);
+      }
+      
+      // Check if it's a timeout error
+      if (error && typeof error === 'object' && 'code' in error) {
+        const axiosError = error as { code: string; message: string };
+        if (axiosError.code === 'ECONNABORTED' || axiosError.message.includes('timeout')) {
+          toast.error("Request timed out", {
+            description: "The AI is taking longer than expected to generate content. Please try again.",
+          });
+          return;
+        }
+      }
+      
       toast.error("Failed to generate posts", {
         description: "Please try again later.",
       });
@@ -76,7 +102,7 @@ const Dashboard = () => {
     <RouteGuard requireAuth={true}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <div className="container mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8  mx-auto">
             {/* Generator Section */}
             <DashboardGeneratorSection
               setPlatform={setPlatform}

@@ -29,9 +29,11 @@ export class CreatePostController extends BaseController {
         ...request,
         user_id: userId
       });
-      
+
       this.sendSuccess(res, post, 'Post created successfully', 201);
+      console.log(post);
     } catch (error) {
+      console.log(error);
       this.handleError(res, error, 'createPost', 'Failed to create post');
     }
   }

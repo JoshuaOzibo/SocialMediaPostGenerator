@@ -110,8 +110,11 @@ const DashboardGeneratorSection = ({
                         </SelectTrigger>
                         <SelectContent>
                             <SelectItem value="professional">Professional</SelectItem>
-                            <SelectItem value="funny">Funny</SelectItem>
-                            <SelectItem value="educational">Educational</SelectItem>
+                            <SelectItem value="casual">Casual</SelectItem>
+                            <SelectItem value="humorous">Humorous</SelectItem>
+                            <SelectItem value="formal">Formal</SelectItem>
+                            <SelectItem value="friendly">Friendly</SelectItem>
+                            <SelectItem value="enthusiastic">Enthusiastic</SelectItem>
                         </SelectContent>
                         </Select>
                     </div>
