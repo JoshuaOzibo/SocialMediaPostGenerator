@@ -20,42 +20,51 @@ const Dashboard = () => {
   const [generatedPosts, setGeneratedPosts] = useState<PostType[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  // Simulate API call
-  setTimeout(() => {
-    const mockPosts = [
-      {
-        id: 1,
-        content:
-          "🚀 Excited to share some insights on team collaboration! Here are 3 key strategies that have transformed our workflow:\n\n✅ Daily standups with clear goals\n✅ Async communication tools\n✅ Regular feedback sessions\n\nWhat collaboration methods work best for your team?",
-        platform,
-        tone,
-        day: "Day 1",
-      },
-      {
-        id: 2,
-        content:
-          "💡 Pro tip: The best product features come from listening to your users. Here's how we gather feedback:\n\n• User interviews\n• Feature request tracking\n• Beta testing programs\n\nCustomer-driven development = successful products 📈",
-        platform,
-        tone,
-        day: "Day 2",
-      },
-      {
-        id: 3,
-        content:
-          "🎯 Industry insight: The future of remote work is hybrid. Companies that adapt quickly will attract top talent.\n\nKey trends to watch:\n→ Flexible work arrangements\n→ Digital-first processes\n→ Outcome-based performance\n\nThoughts?",
-        platform,
-        tone,
-        day: "Day 3",
-      },
-    ];
+  const handleGenerate = () => {
+    if (!platform || !tone) {
+      toast.error("Please select both platform and tone before generating posts.");
+      return;
+    }
 
-    setGeneratedPosts(mockPosts);
-    setIsGenerating(false);
+    setIsGenerating(true);
 
-    toast.success("Posts Generated!", {
-      description: "Your social media posts are ready to use.",
-    });
-  }, 2000);
+    // Simulate API call
+    setTimeout(() => {
+      const mockPosts = [
+        {
+          id: 1,
+          content:
+            "🚀 Excited to share some insights on team collaboration! Here are 3 key strategies that have transformed our workflow:\n\n✅ Daily standups with clear goals\n✅ Async communication tools\n✅ Regular feedback sessions\n\nWhat collaboration methods work best for your team?",
+          platform,
+          tone,
+          day: "Day 1",
+        },
+        {
+          id: 2,
+          content:
+            "💡 Pro tip: The best product features come from listening to your users. Here's how we gather feedback:\n\n• User interviews\n• Feature request tracking\n• Beta testing programs\n\nCustomer-driven development = successful products 📈",
+          platform,
+          tone,
+          day: "Day 2",
+        },
+        {
+          id: 3,
+          content:
+            "🎯 Industry insight: The future of remote work is hybrid. Companies that adapt quickly will attract top talent.\n\nKey trends to watch:\n→ Flexible work arrangements\n→ Digital-first processes\n→ Outcome-based performance\n\nThoughts?",
+          platform,
+          tone,
+          day: "Day 3",
+        },
+      ];
+
+      setGeneratedPosts(mockPosts);
+      setIsGenerating(false);
+
+      toast.success("Posts Generated!", {
+        description: "Your social media posts are ready to use.",
+      });
+    }, 2000);
+  };
 
   return (
     <RouteGuard requireAuth={true}>
@@ -75,7 +84,7 @@ const Dashboard = () => {
             <DashboardResult
               generatedPosts={generatedPosts}
               isGenerating={isGenerating}
-              handleGenerate={() => {}}
+              handleGenerate={handleGenerate}
             />
           </div>
         </div>
