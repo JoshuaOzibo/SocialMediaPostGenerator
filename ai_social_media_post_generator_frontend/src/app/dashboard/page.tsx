@@ -63,8 +63,19 @@ const Dashboard = () => {
       // Call the API to create posts
       const newPost = await createPostMutation.mutateAsync(postData);
       
+      // Debug: Log the API response
+      console.log('🎉 API Response received:', newPost);
+      console.log('Generated posts:', newPost.generated_posts);
+      console.log('Hashtags:', newPost.hashtags);
+      
+      // Check if response has a data wrapper (backend might return { success: true, data: {...} })
+      const finalPostData = (newPost as { data?: Post }).data || newPost;
+      
+      console.log('📝 Final post data to display:', finalPostData);
+      console.log('Generated posts in final data:', finalPostData.generated_posts);
+      
       // Add the new post to the list (only show current session posts)
-      setGeneratedPosts(prev => [newPost, ...prev]);
+      setGeneratedPosts(prev => [finalPostData, ...prev]);
 
       toast.success("Posts Generated!", {
         description: "Your social media posts are ready to use.",

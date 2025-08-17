@@ -79,7 +79,7 @@ const DashboardResult = ({
                   {post.generated_posts && post.generated_posts.length > 0 ? (
                     <div className="space-y-3">
                       {post.generated_posts.map((content, contentIndex) => (
-                        <div key={contentIndex} className="space-y-2">
+                        <div key={`content-${contentIndex}`} className="space-y-2">
                           <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
                             {content}
                           </p>
@@ -89,7 +89,7 @@ const DashboardResult = ({
                             <div className="flex flex-wrap gap-1">
                               {post.hashtags.map((hashtag, hashtagIndex) => (
                                 <span
-                                  key={hashtagIndex}
+                                  key={`hashtag-${hashtagIndex}`}
                                   className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
                                 >
                                   {hashtag}
@@ -131,7 +131,15 @@ const DashboardResult = ({
                       ))}
                     </div>
                   ) : (
-                    <p className="text-slate-500 italic">No content generated yet</p>
+                    <div>
+                      <p className="text-slate-500 italic">No content generated yet</p>
+                      {/* Debug info */}
+                      <div className="mt-2 text-xs text-gray-400">
+                        <p>Debug: generated_posts length: {post.generated_posts?.length || 0}</p>
+                        <p>Debug: generated_posts exists: {post.generated_posts ? 'Yes' : 'No'}</p>
+                        <p>Debug: Post ID: {post.id}</p>
+                      </div>
+                    </div>
                   )}
                 </CardContent>
               </Card>
