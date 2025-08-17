@@ -5,21 +5,14 @@ import { Button } from "../ui/button";
 import DashboardSkeleton from "./dashboard_skeleton";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
-
-interface PostType {
-  id: number;
-  content: string;
-  platform: string;
-  tone: string;
-  day: string;
-}
+import { Post } from "@/lib/api/types";
 
 const DashboardResult = ({
   generatedPosts,
   isGenerating,
   handleGenerate,
 }: {
-  generatedPosts: PostType[];
+  generatedPosts: Post[];
   isGenerating: boolean;
   handleGenerate: () => void;
 }) => {
@@ -48,6 +41,7 @@ const DashboardResult = ({
           )}
         </div>
 
+        {/* Skeleton loading state */}
         {isGenerating && (
           <div className="space-y-4">
             {[1, 2, 3].map((i) => (
@@ -58,9 +52,10 @@ const DashboardResult = ({
           </div>
         )}
 
+        {/* Display generated posts */}
         {generatedPosts.length > 0 && !isGenerating && (
           <div className="space-y-4">
-            {generatedPosts.map((post: PostType) => (
+            {generatedPosts.map((post: Post, index: number) => (
               <Card
                 key={post.id}
                 className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200"
@@ -69,7 +64,7 @@ const DashboardResult = ({
                   <div className="flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                       <span className="text-sm font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-                        {post.day}
+                        Day {index + 1}
                       </span>
                       <span className="text-sm text-slate-500 capitalize">
                         {post.platform}
@@ -80,45 +75,71 @@ const DashboardResult = ({
                     </div>
                   </div>
 
-                  <p className="text-slate-700 leading-relaxed mb-4 whitespace-pre-wrap">
-                    {post.content}
-                  </p>
+                  {/* Display generated posts content */}
+                  {post.generated_posts && post.generated_posts.length > 0 ? (
+                    <div className="space-y-3">
+                      {post.generated_posts.map((content, contentIndex) => (
+                        <div key={contentIndex} className="space-y-2">
+                          <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+                            {content}
+                          </p>
+                          
+                          {/* Display hashtags if available */}
+                          {post.hashtags && post.hashtags.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {post.hashtags.map((hashtag, hashtagIndex) => (
+                                <span
+                                  key={hashtagIndex}
+                                  className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
+                                >
+                                  {hashtag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
 
-                  <div className="flex gap-2">
-                    <Button
-                      onClick={() => handleCopy(post.content)}
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl"
-                    >
-                      <Copy className="h-4 w-4 mr-1" />
-                      Copy
-                    </Button>
-                    <Button
-                      onClick={handleGenerate}
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl"
-                    >
-                      <RefreshCw className="h-4 w-4 mr-1" />
-                      Regenerate
-                    </Button>
-                    <Button
-                      onClick={handleSave}
-                      variant="outline"
-                      size="sm"
-                      className="rounded-xl"
-                    >
-                      <Save className="h-4 w-4 mr-1" />
-                      Save
-                    </Button>
-                  </div>
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleCopy(content)}
+                              variant="outline"
+                              size="sm"
+                              className="rounded-xl"
+                            >
+                              <Copy className="h-4 w-4 mr-1" />
+                              Copy
+                            </Button>
+                            <Button
+                              onClick={handleGenerate}
+                              variant="outline"
+                              size="sm"
+                              className="rounded-xl"
+                            >
+                              <RefreshCw className="h-4 w-4 mr-1" />
+                              Regenerate
+                            </Button>
+                            <Button
+                              onClick={handleSave}
+                              variant="outline"
+                              size="sm"
+                              className="rounded-xl"
+                            >
+                              <Save className="h-4 w-4 mr-1" />
+                              Save
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 italic">No content generated yet</p>
+                  )}
                 </CardContent>
               </Card>
             ))}
           </div>
         )}
 
+        {/* Empty state */}
         {generatedPosts.length === 0 && !isGenerating && (
           <Card className="border-0 shadow-lg rounded-2xl">
             <CardContent className="p-12 text-center">

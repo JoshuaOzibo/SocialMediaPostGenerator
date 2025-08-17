@@ -51,7 +51,7 @@ export const signIn = async (req: Request, res: Response) => {
   });
   if (error) return res.status(400).json({ error: error.message });
   res.status(200).json({ session: data.session, user: data.user });
-  console.log(data);
+  // console.log(data);
 };
 
 export const googleAuth = async (req: Request, res: Response) => {

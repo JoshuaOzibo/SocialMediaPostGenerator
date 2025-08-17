@@ -1,11 +1,9 @@
-import { useMutation, useQuery, useQueryClient, useInfiniteQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { postsApi } from '@/lib/api';
 import { 
-  Post, 
   CreatePostRequest, 
   UpdatePostRequest, 
   PostFilters, 
-  PostListResponse 
 } from '@/lib/api/types';
 import { queryKeys } from '@/lib/api/types';
 
@@ -15,21 +13,20 @@ export const usePosts = (filters: PostFilters = {}) => {
     queryKey: queryKeys.posts.list(filters),
     queryFn: () => postsApi.getPosts(filters),
     staleTime: 2 * 60 * 1000, // 2 minutes
-    keepPreviousData: true, // Keep previous data while fetching new data
   });
 };
 
 // Hook for infinite scrolling posts
-export const useInfinitePosts = (filters: PostFilters = {}) => {
-  return useInfiniteQuery({
-    queryKey: queryKeys.posts.list(filters),
-    queryFn: ({ pageParam = 1 }) => 
-      postsApi.getPosts({ ...filters, page: pageParam }),
-    getNextPageParam: (lastPage) => 
-      lastPage.hasMore ? lastPage.page + 1 : undefined,
-    staleTime: 2 * 60 * 1000, // 2 minutes
-  });
-};
+// export const useInfinitePosts = (filters: PostFilters = {}) => {
+//   return useInfiniteQuery({
+//     queryKey: queryKeys.posts.list(filters),
+//     queryFn: ({ pageParam = 1 }) => 
+//       postsApi.getPosts({ ...filters, page: pageParam }),
+//     getNextPageParam: (lastPage) => 
+//       lastPage.hasMore ? lastPage.page + 1 : undefined,
+//     staleTime: 2 * 60 * 1000, // 2 minutes
+//   });
+// };
 
 // Hook for getting single post
 export const usePost = (id: string) => {

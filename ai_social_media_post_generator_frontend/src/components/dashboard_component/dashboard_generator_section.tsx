@@ -10,15 +10,34 @@ import { useState } from 'react'
 import { Input } from '@/components/ui/input'
 import { toast } from 'sonner'
 
-const DashboardGeneratorSection = ({ setPlatform, platform, setTone, tone }: { setPlatform: (platform: string) => void, platform: string, setTone: (tone: string) => void, tone: string }) => {
+interface GeneratorFormData {
+  ideas: string;
+  days: string;
+  scheduleDate: string;
+  includeHashtags: boolean;
+  includeImages: boolean;
+}
+
+const DashboardGeneratorSection = ({ 
+  setPlatform, 
+  platform, 
+  setTone, 
+  tone,
+  onGenerate,
+  isGenerating
+}: { 
+  setPlatform: (platform: string) => void, 
+  platform: string, 
+  setTone: (tone: string) => void, 
+  tone: string,
+  onGenerate: (formData: GeneratorFormData) => void,
+  isGenerating: boolean
+}) => {
   const [ideas, setIdeas] = useState('')
   const [days, setDays] = useState('')
   const [scheduleDate, setScheduleDate] = useState('')
   const [includeHashtags, setIncludeHashtags] = useState(true)
   const [includeImages, setIncludeImages] = useState(false)
-  const [isGenerating, setIsGenerating] = useState(false)
-
-
 
   const handleGenerate = async () => {
     if (!ideas.trim() || !platform || !tone) {
@@ -28,15 +47,15 @@ const DashboardGeneratorSection = ({ setPlatform, platform, setTone, tone }: { s
       return;
     }
 
-    setIsGenerating(true);
+    const formData: GeneratorFormData = {
+      ideas,
+      days,
+      scheduleDate,
+      includeHashtags,
+      includeImages
+    };
 
-    // Simulate API call
-    setTimeout(() => {
-      setIsGenerating(false);
-      toast.success("Posts Generated!", {
-        description: "Your social media posts are ready to use.",
-      });
-    }, 2000);
+    onGenerate(formData);
   };
 
   return (

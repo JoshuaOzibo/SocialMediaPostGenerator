@@ -5,22 +5,27 @@ import { toast } from "sonner";
 import RouteGuard from "@/components/middleware/RouteGuard";
 import DashboardGeneratorSection from "@/components/dashboard_component/dashboard_generator_section";
 import DashboardResult from "@/components/dashboard_component/dashboard_result";
+import { useCreatePost } from "@/hooks/api/usePosts";
+import { CreatePostRequest, Post, Platform, Tone } from "@/lib/api/types";
 
-interface PostType {
-  id: number;
-  content: string;
-  platform: string;
-  tone: string;
-  day: string;
+interface GeneratorFormData {
+  ideas: string;
+  days: string;
+  scheduleDate: string;
+  includeHashtags: boolean;
+  includeImages: boolean;
 }
 
 const Dashboard = () => {
   const [platform, setPlatform] = useState("");
   const [tone, setTone] = useState("");
-  const [generatedPosts, setGeneratedPosts] = useState<PostType[]>([]);
+  const [generatedPosts, setGeneratedPosts] = useState<Post[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
 
-  const handleGenerate = () => {
+  // API hooks - only for creating posts
+  const createPostMutation = useCreatePost();
+
+  const handleGenerate = async (formData: GeneratorFormData) => {
     if (!platform || !tone) {
       toast.error("Please select both platform and tone before generating posts.");
       return;
@@ -28,48 +33,48 @@ const Dashboard = () => {
 
     setIsGenerating(true);
 
-    // Simulate API call
-    setTimeout(() => {
-      const mockPosts = [
-        {
-          id: 1,
-          content:
-            "🚀 Excited to share some insights on team collaboration! Here are 3 key strategies that have transformed our workflow:\n\n✅ Daily standups with clear goals\n✅ Async communication tools\n✅ Regular feedback sessions\n\nWhat collaboration methods work best for your team?",
-          platform,
-          tone,
-          day: "Day 1",
-        },
-        {
-          id: 2,
-          content:
-            "💡 Pro tip: The best product features come from listening to your users. Here's how we gather feedback:\n\n• User interviews\n• Feature request tracking\n• Beta testing programs\n\nCustomer-driven development = successful products 📈",
-          platform,
-          tone,
-          day: "Day 2",
-        },
-        {
-          id: 3,
-          content:
-            "🎯 Industry insight: The future of remote work is hybrid. Companies that adapt quickly will attract top talent.\n\nKey trends to watch:\n→ Flexible work arrangements\n→ Digital-first processes\n→ Outcome-based performance\n\nThoughts?",
-          platform,
-          tone,
-          day: "Day 3",
-        },
-      ];
+    try {
+      // Parse ideas into bullet points
+      const inputBullets = formData.ideas
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
+        .map(line => line.replace(/^[•\-\*]\s*/, '')); // Remove bullet point markers
 
-      setGeneratedPosts(mockPosts);
-      setIsGenerating(false);
+      // Create post request data
+      const postData: CreatePostRequest = {
+        platform: platform as Platform,
+        tone: tone as Tone,
+        input_bullets: inputBullets,
+        additionalContext: formData.ideas,
+        includeHashtags: formData.includeHashtags,
+        includeImages: formData.includeImages,
+        days: formData.days ? parseInt(formData.days) : 3,
+        scheduled_at: formData.scheduleDate || undefined,
+      };
+
+      // Call the API to create posts
+      const newPost = await createPostMutation.mutateAsync(postData);
+      
+      // Add the new post to the list (only show current session posts)
+      setGeneratedPosts(prev => [newPost, ...prev]);
 
       toast.success("Posts Generated!", {
         description: "Your social media posts are ready to use.",
       });
-    }, 2000);
+    } catch (error) {
+      console.error("Error generating posts:", error);
+      toast.error("Failed to generate posts", {
+        description: "Please try again later.",
+      });
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   return (
     <RouteGuard requireAuth={true}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-
         <div className="container mx-auto px-4 py-8">
           <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
             {/* Generator Section */}
@@ -78,13 +83,15 @@ const Dashboard = () => {
               platform={platform}
               setTone={setTone}
               tone={tone}
+              onGenerate={handleGenerate}
+              isGenerating={isGenerating || createPostMutation.isPending}
             />
 
             {/* Results Section */}
             <DashboardResult
               generatedPosts={generatedPosts}
-              isGenerating={isGenerating}
-              handleGenerate={handleGenerate}
+              isGenerating={isGenerating || createPostMutation.isPending}
+              handleGenerate={() => handleGenerate({ ideas: '', days: '', scheduleDate: '', includeHashtags: true, includeImages: false })}
             />
           </div>
         </div>
