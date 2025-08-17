@@ -55,94 +55,81 @@ const DashboardResult = ({
         {/* Display generated posts */}
         {generatedPosts.length > 0 && !isGenerating && (
           <div className="space-y-4">
-            {generatedPosts.map((post: Post, index: number) => (
-              <Card
-                key={post.id}
-                className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200"
-              >
-                <CardContent className="p-6">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <span className="text-sm font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
-                        Day {index + 1}
-                      </span>
-                      <span className="text-sm text-slate-500 capitalize">
-                        {post.platform}
-                      </span>
-                      <span className="text-sm text-slate-500 capitalize">
-                        {post.tone}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Display generated posts content */}
-                  {post.generated_posts && post.generated_posts.length > 0 ? (
-                    <div className="space-y-3">
-                      {post.generated_posts.map((content, contentIndex) => (
-                        <div key={`content-${contentIndex}`} className="space-y-2">
-                          <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
-                            {content}
-                          </p>
-                          
-                          {/* Display hashtags if available */}
-                          {post.hashtags && post.hashtags.length > 0 && (
-                            <div className="flex flex-wrap gap-1">
-                              {post.hashtags.map((hashtag, hashtagIndex) => (
-                                <span
-                                  key={`hashtag-${hashtagIndex}`}
-                                  className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
-                                >
-                                  {hashtag}
-                                </span>
-                              ))}
-                            </div>
-                          )}
-
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => handleCopy(content)}
-                              variant="outline"
-                              size="sm"
-                              className="rounded-xl"
-                            >
-                              <Copy className="h-4 w-4 mr-1" />
-                              Copy
-                            </Button>
-                            <Button
-                              onClick={handleGenerate}
-                              variant="outline"
-                              size="sm"
-                              className="rounded-xl"
-                            >
-                              <RefreshCw className="h-4 w-4 mr-1" />
-                              Regenerate
-                            </Button>
-                            <Button
-                              onClick={handleSave}
-                              variant="outline"
-                              size="sm"
-                              className="rounded-xl"
-                            >
-                              <Save className="h-4 w-4 mr-1" />
-                              Save
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div>
-                      <p className="text-slate-500 italic">No content generated yet</p>
-                      {/* Debug info */}
-                      <div className="mt-2 text-xs text-gray-400">
-                        <p>Debug: generated_posts length: {post.generated_posts?.length || 0}</p>
-                        <p>Debug: generated_posts exists: {post.generated_posts ? 'Yes' : 'No'}</p>
-                        <p>Debug: Post ID: {post.id}</p>
+            {generatedPosts.map((post: Post, postIndex: number) => (
+              // Create a separate card for each generated post
+              post.generated_posts && post.generated_posts.map((content, contentIndex) => (
+                <Card
+                  key={`post-${post.id}-content-${contentIndex}`}
+                  className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200"
+                >
+                  <CardContent className="p-6">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium text-blue-600 bg-blue-100 px-2 py-1 rounded-full">
+                          Day {postIndex + 1} - Post {contentIndex + 1}
+                        </span>
+                        <span className="text-sm text-slate-500 capitalize">
+                          {post.platform}
+                        </span>
+                        <span className="text-sm text-slate-500 capitalize">
+                          {post.tone}
+                        </span>
                       </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    {/* Display the single generated post content */}
+                    <div className="space-y-3">
+                      <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
+                        {content}
+                      </p>
+                      
+                      {/* Display hashtags if available */}
+                      {post.hashtags && post.hashtags.length > 0 && (
+                        <div className="flex flex-wrap gap-1">
+                          {post.hashtags.map((hashtag, hashtagIndex) => (
+                            <span
+                              key={`hashtag-${hashtagIndex}`}
+                              className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
+                            >
+                              {hashtag}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex gap-2">
+                        <Button
+                          onClick={() => handleCopy(content)}
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl"
+                        >
+                          <Copy className="h-4 w-4 mr-1" />
+                          Copy
+                        </Button>
+                        <Button
+                          onClick={handleGenerate}
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl"
+                        >
+                          <RefreshCw className="h-4 w-4 mr-1" />
+                          Regenerate
+                        </Button>
+                        <Button
+                          onClick={handleSave}
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl"
+                        >
+                          <Save className="h-4 w-4 mr-1" />
+                          Save
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
             ))}
           </div>
         )}
