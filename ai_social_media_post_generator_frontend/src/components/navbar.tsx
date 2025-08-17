@@ -21,10 +21,10 @@ const Navbar = () => {
   return (
     <header className="mx-auto lg:px-20 px-10 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
       <nav className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
+        {pathname === "/" && <div className="flex items-center space-x-2">
           <Sparkles className="h-8 w-8 text-blue-600" />
           <span className="text-xl font-bold text-slate-900">PostGenius</span>
-        </div>
+        </div>}
         {pathname === "/" && (
           <div className="flex items-center space-x-4">
             
