@@ -1,24 +1,24 @@
-"use client"
+"use client";
 
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Eye, Mail, Lock } from 'lucide-react';
-import GoogleSignInButton from '@/components/googleButton';
-import FloatingLabelInput from '@/components/floatinglabel';
-import Link from 'next/link';
-import { useLogin } from '@/hooks/api/useAuth';
-import { LoginRequest } from '@/lib/api/types';
-import { toast } from 'sonner';
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Eye, Mail, Lock } from "lucide-react";
+import GoogleSignInButton from "@/components/googleButton";
+import FloatingLabelInput from "@/components/floatinglabel";
+import Link from "next/link";
+import { useLogin } from "@/hooks/api/useAuth";
+import { LoginRequest } from "@/lib/api/types";
+import { toast } from "sonner";
 
 const LoginPage = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const { mutate: login, isPending } = useLogin();
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     const credentials: LoginRequest = {
       email,
       password,
@@ -27,7 +27,7 @@ const LoginPage = () => {
   };
 
   const handleGoogleSuccess = () => {
-    toast.success('Google sign-in successful! Check console for user details.');
+    toast.success("Google sign-in successful! Check console for user details.");
   };
 
   const handleGoogleError = (error: string) => {
@@ -40,7 +40,7 @@ const LoginPage = () => {
       <div
         className="absolute inset-0 opacity-30"
         style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`,
         }}
       ></div>
 
@@ -90,16 +90,19 @@ const LoginPage = () => {
             <div className="flex items-center justify-between text-sm">
               <label className="flex items-center space-x-2 cursor-pointer">
                 <input type="checkbox" className="rounded border-gray-300" />
-                <span className="text-gray-600 dark:text-gray-400">Remember me</span>
+                <span className="text-gray-600 dark:text-gray-400">
+                  Remember me
+                </span>
               </label>
-              <a href="#" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+              <a
+                href="#"
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+              >
                 Forgot password?
               </a>
             </div>
 
-
-
-            <Button 
+            <Button
               type="submit"
               disabled={isPending}
               className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
@@ -121,7 +124,7 @@ const LoginPage = () => {
               </div>
             </div>
 
-            <GoogleSignInButton 
+            <GoogleSignInButton
               onSuccess={handleGoogleSuccess}
               onError={handleGoogleError}
             />
@@ -129,15 +132,18 @@ const LoginPage = () => {
 
           <div className="mt-6 text-center">
             <p className="text-gray-600 dark:text-gray-400">
-              Don&apos;t have an account?{' '}
-              <Link href="/auth/signup" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium">
+              Don&apos;t have an account?{" "}
+              <Link
+                href="/auth/signup"
+                className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
+              >
                 Sign up here
               </Link>
             </p>
           </div>
         </CardContent>
       </Card>
-      </div>
+    </div>
   );
 };
 
