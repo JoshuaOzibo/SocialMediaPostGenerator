@@ -1,59 +1,50 @@
 "use client";
 
 import React from "react";
-import { Sparkles, LogOut, User } from "lucide-react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
+import { Sparkles } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import DashBoardNav from "./dashboard_component/dashboard_nav";
+import HistoryNav from "./history_components/history_nav";
+import { Button } from "./ui/button";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Navbar = () => {
-  const { isAuthenticated, logout, isLoading } = useAuth();
   const pathname = usePathname();
-
-    return (
-      <header className="mx-auto lg:px-20 px-10 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-        <nav className="flex items-center justify-between">
-          <div className="flex items-center space-x-2">
-            <Sparkles className="h-8 w-8 text-blue-600" />
-            <span className="text-xl font-bold text-slate-900">PostGenius</span>
-          </div>
-          {pathname === "/" && <div className="flex items-center space-x-4">
-            <Link href="/dashboard">
-              <Button
-                variant="ghost"
-                className="text-slate-600 cursor-pointer hover:text-slate-900 bg-blue-50"
-              >
-                Dashboard
-              </Button>
-            </Link>
-            <Link href="/history">
-              <Button
-                variant="ghost"
-                className="text-slate-600 cursor-pointer hover:text-slate-900"
-              >
-                History
-              </Button>
-            </Link>
-            <div className="flex items-center space-x-2">
-              <User className="h-4 w-4 text-slate-600" />
-            </div>
-            {/* <Button
+  const router = useRouter();
+  const { isLoading } = useAuth();
+  return (
+    <header className="mx-auto lg:px-20 px-10 py-6 border-b border-slate-200 bg-white/80 backdrop-blur-sm sticky top-0 z-10">
+      <nav className="flex items-center justify-between">
+        <div className="flex items-center space-x-2">
+          <Sparkles className="h-8 w-8 text-blue-600" />
+          <span className="text-xl font-bold text-slate-900">PostGenius</span>
+        </div>
+        {pathname === "/" && (
+          <div className="flex items-center space-x-4">
+            <Button
               variant="outline"
-              onClick={logout}
+              onClick={() => router.push("/auth/login")}
               disabled={isLoading}
-              className="text-red-600 border-red-200 hover:bg-red-50 cursor-pointer"
+              className="text-white bg-blue-600 border-blue-200 hover:bg-blue-50 cursor-pointer"
             >
-              <LogOut className="h-4 w-4 mr-2" />
-              Sign Out
-            </Button> */}
+              Login
+            </Button>
+            <Button
+              variant="outline"
+              onClick={() => router.push("/auth/signup")}
+              disabled={isLoading}
+              className="text-white bg-blue-600 border-blue-200 hover:bg-blue-50 cursor-pointer"
+            >
+              Signup
+            </Button>
+          </div>
+        )}
 
-            {pathname === "/dashboard" && (
-              <></>
-            )}
-          </div>}
-        </nav>
-      </header>
-    );
-  }
+        {pathname === "/dashboard" && <DashBoardNav />}
+
+        {pathname === "/history" && <HistoryNav />}
+      </nav>
+    </header>
+  );
+};
 export default Navbar;
