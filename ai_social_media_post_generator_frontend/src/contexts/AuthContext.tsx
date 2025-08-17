@@ -28,7 +28,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 // Protected routes that require authentication
-const PROTECTED_ROUTES = ['/dashboard', '/history', '/'];
+const PROTECTED_ROUTES = ['/dashboard', '/history'];
 // Public routes that should redirect to dashboard if authenticated
 const PUBLIC_ROUTES = ['/auth/login', '/auth/signup', '/auth', '/'];
 

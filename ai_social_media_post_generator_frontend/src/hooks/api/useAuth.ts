@@ -24,7 +24,7 @@ export const useLogin = () => {
       toast.success('Login successful!');
       
       // Navigate to homapage
-      router.push('/');
+      router.push('/dashboard');
     },
     onError: (error: AxiosError) => {
       console.error('Login error:', error);
@@ -69,8 +69,8 @@ export const useSignup = () => {
       // Show success message
       toast.success('Account created successfully!');
       
-      // Navigate to homepage immediately since user is authenticated
-      router.push('/');
+      // Navigate to dashboard immediately since user is authenticated
+      router.push('/dashboard');
     },
 
 

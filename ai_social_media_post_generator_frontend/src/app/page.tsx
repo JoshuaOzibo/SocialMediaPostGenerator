@@ -13,23 +13,8 @@ export default function Home() {
   const { isAuthenticated, isLoading } = useAuth();
 
   // Redirect authenticated users to home
-  useEffect(() => {
-    if (!isLoading && isAuthenticated) {
-      router.push('/');
-    }
-  }, [isAuthenticated, isLoading, router]);
+  useEffect(() => {}, [isAuthenticated, isLoading, router]);
 
-  // Show loading while checking auth
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   // If not authenticated, show the landing page
   if (!isAuthenticated) {
@@ -69,7 +54,4 @@ export default function Home() {
       </div>
     );
   }
-
-  // This should never be reached due to the redirect above
-  return null;
 }
