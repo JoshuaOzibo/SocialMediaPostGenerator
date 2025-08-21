@@ -113,23 +113,27 @@ const Dashboard = () => {
     <RouteGuard requireAuth={true}>
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <div className="container mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-2 gap-8  mx-auto">
-            {/* Generator Section */}
-            <DashboardGeneratorSection
-              setPlatform={setPlatform}
-              platform={platform}
-              setTone={setTone}
-              tone={tone}
-              onGenerate={handleGenerate}
-              isGenerating={isGenerating || createPostMutation.isPending}
-            />
+          <div className="grid lg:grid-cols-2 gap-8 h-[calc(80vh-2rem)]">
+            {/* Generator Section - Fixed */}
+            <div className="lg:sticky lg:top-8 lg:h-fit">
+              <DashboardGeneratorSection
+                setPlatform={setPlatform}
+                platform={platform}
+                setTone={setTone}
+                tone={tone}
+                onGenerate={handleGenerate}
+                isGenerating={isGenerating || createPostMutation.isPending}
+              />
+            </div>
 
-            {/* Results Section */}
-            <DashboardResult
-              generatedPosts={generatedPosts}
-              isGenerating={isGenerating || createPostMutation.isPending}
-              handleGenerate={() => handleGenerate({ ideas: '', days: '', scheduleDate: '', includeHashtags: true, includeImages: false })}
-            />
+            {/* Results Section - Scrollable */}
+            <div className="lg:overflow-y-auto lg:pr-4 scrollbar-hide">
+              <DashboardResult
+                generatedPosts={generatedPosts}
+                isGenerating={isGenerating || createPostMutation.isPending}
+                handleGenerate={() => handleGenerate({ ideas: '', days: '', scheduleDate: '', includeHashtags: true, includeImages: false })}
+              />
+            </div>
           </div>
         </div>
       </div>

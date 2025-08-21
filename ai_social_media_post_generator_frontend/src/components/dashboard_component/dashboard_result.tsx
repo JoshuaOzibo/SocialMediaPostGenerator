@@ -31,7 +31,7 @@ const DashboardResult = ({
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-6 pb-8">
         <div className="flex items-center justify-between">
           <h2 className="text-2xl font-bold text-slate-900">Generated Posts</h2>
           {generatedPosts.length > 0 && (
