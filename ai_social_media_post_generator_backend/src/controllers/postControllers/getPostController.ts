@@ -70,9 +70,11 @@ export class GetPostController extends BaseController {
       const { page, limit } = this.parsePagination(req);
       
       const result = await postService.getScheduledPosts(userId, page, limit);
+      console.log(result);
       
       this.sendSuccess(res, result);
     } catch (error) {
+      console.log(error);
       this.handleError(res, error, 'getScheduledPosts', 'Failed to get scheduled posts');
     }
   }
