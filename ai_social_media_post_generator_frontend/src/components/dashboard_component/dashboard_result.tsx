@@ -92,9 +92,10 @@ const DashboardResult = ({
                       </p>
                       
                       {/* Display hashtags if available */}
-                      {post.hashtags && post.hashtags.length > 0 && (
+                      {(post.hashtags && post.hashtags.length > 0) || 
+                       (post.individual_posts && post.individual_posts[contentIndex]?.hashtags && post.individual_posts[contentIndex].hashtags.length > 0) ? (
                         <div className="flex flex-wrap gap-1">
-                          {post.hashtags.map((hashtag, hashtagIndex) => (
+                          {(post.individual_posts?.[contentIndex]?.hashtags || post.hashtags || []).map((hashtag, hashtagIndex) => (
                             <span
                               key={`hashtag-${hashtagIndex}`}
                               className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
@@ -103,7 +104,7 @@ const DashboardResult = ({
                             </span>
                           ))}
                         </div>
-                      )}
+                      ) : null}
 
                                              {/* Generated Image Display */}
                        
