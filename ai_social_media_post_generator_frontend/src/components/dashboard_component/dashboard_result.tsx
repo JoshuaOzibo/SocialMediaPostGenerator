@@ -37,6 +37,7 @@ const DashboardResult = ({
   };
 
 
+
   return (
     <>
       <div className="space-y-6 pb-8">
@@ -125,7 +126,7 @@ const DashboardResult = ({
                                size="sm"
                                className="bg-white/80 hover:bg-white text-slate-700 rounded-full"
                              >
-                               <ImageIcon className="h-4 w-4" />
+                               <ImageIcon onClick={() => {}} className="h-4 w-4" />
                              </Button>
                            </div>
                          </div>
