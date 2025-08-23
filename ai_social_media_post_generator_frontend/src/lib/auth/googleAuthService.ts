@@ -9,7 +9,7 @@ export class GoogleAuthService {
   private constructor() {
     // You'll need to replace this with your actual Google Client ID
     this.googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || '';
-    this.apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001/api';
+    this.apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080/api/v1';
   }
 
   public static getInstance(): GoogleAuthService {

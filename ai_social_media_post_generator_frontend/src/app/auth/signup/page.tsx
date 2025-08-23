@@ -9,6 +9,7 @@ import FloatingLabelInput from "@/components/floatinglabel";
 import Link from "next/link";
 import { useSignup } from "@/hooks/api/useAuth";
 import { SignupRequest } from "@/lib/api/types";
+import { toast } from "sonner";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
@@ -18,6 +19,22 @@ const SignupPage = () => {
 
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!username || username.length < 3) {
+      toast.error('Username must be at least 3 characters long');
+      return;
+    }
+
+    if (!email || !email.includes('@')) {
+      toast.error('Please enter a valid email address');
+      return;
+    }
+
+    if (!password || password.length < 6) {
+      toast.error('Password must be at least 6 characters long');
+      return;
+    }
 
     const userData: SignupRequest = {
       username,

@@ -30,17 +30,29 @@ export const authApi = {
 
   // Signup user
   signup: async (userData: SignupRequest): Promise<{ user: unknown; session: unknown; message: string }> => {
-    const response = await api.post<{ user: unknown; session: unknown; message: string }>(AUTH_ENDPOINTS.SIGNUP, userData);
+    console.log('Making signup request to:', AUTH_ENDPOINTS.SIGNUP);
+    console.log('With data:', userData);
     
-    // Backend now returns { user, session, message } directly
-    if (response && response.session && (response.session as { access_token: string }).access_token) {
-      const accessToken = (response.session as { access_token: string }).access_token;
+    try {
+      const response = await api.post<{ user: unknown; session: unknown; message: string }>(AUTH_ENDPOINTS.SIGNUP, userData);
+      console.log('Signup response:', response);
       
-      // Store token securely
-      setAuthToken(accessToken);
+      // Backend now returns { user, session, message } directly
+      if (response && response.session && (response.session as { access_token: string }).access_token) {
+        const accessToken = (response.session as { access_token: string }).access_token;
+        
+        // Store token securely
+        setAuthToken(accessToken);
+      }
+      
+      return response;
+    } catch (error) {
+      console.error('Signup API error:', error);
+      console.error('Error response data:', (error as any).response?.data);
+      console.error('Error response status:', (error as any).response?.status);
+      console.error('Error response headers:', (error as any).response?.headers);
+      throw error;
     }
-    
-    return response;
   },
 
   // Logout user

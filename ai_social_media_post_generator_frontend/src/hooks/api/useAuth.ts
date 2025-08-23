@@ -58,7 +58,10 @@ export const useSignup = () => {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (userData: SignupRequest) => authApi.signup(userData),
+    mutationFn: (userData: SignupRequest) => {
+      console.log('Signup data being sent:', userData);
+      return authApi.signup(userData);
+    },
     onSuccess: (data: { user: unknown; session: unknown }) => {
       // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
@@ -87,8 +90,9 @@ export const useSignup = () => {
           description: 'An account with this email already exists.',
         });
       } else if (error.response?.status === 400) {
+        const errorMessage = (error.response?.data as { error?: string })?.error || 'Please check your input and try again.';
         toast.error('Invalid Data', {
-          description: 'Please check your input and try again.',
+          description: errorMessage,
         });
       } else if (error.response?.status === 404) {
         toast.error('Service Unavailable', {

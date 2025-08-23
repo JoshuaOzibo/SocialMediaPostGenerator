@@ -112,6 +112,8 @@ const DashboardResult = ({
                            <Image
                              src={post.individual_posts?.[contentIndex]?.images?.[0] || post.images[0]}
                              alt="Generated post image"
+                             width={400}
+                             height={192}
                              className="w-full h-48 object-cover rounded-lg border border-slate-200"
                              style={{ cursor: 'pointer' }}
                            />
