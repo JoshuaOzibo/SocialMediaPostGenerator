@@ -22,6 +22,7 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
 }) => {
   const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const { replaceImages, addImages, removeImages } = useImageManagement();
@@ -29,17 +30,27 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     
-    // Validate file types
-    const validFiles = files.filter(file => 
-      file.type.startsWith('image/') && 
-      ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type)
-    );
-
-    if (validFiles.length !== files.length) {
-      toast.error('Some files were skipped', {
-        description: 'Only JPEG, PNG, GIF, and WebP images are supported.'
-      });
-    }
+    // Validate file types and sizes
+    const maxFileSize = 10 * 1024 * 1024; // 10MB
+    const validFiles = files.filter(file => {
+      const isValidType = file.type.startsWith('image/') && 
+        ['image/jpeg', 'image/png', 'image/gif', 'image/webp'].includes(file.type);
+      const isValidSize = file.size <= maxFileSize;
+      
+      if (!isValidType) {
+        toast.error(`File ${file.name} skipped`, {
+          description: 'Only JPEG, PNG, GIF, and WebP images are supported.'
+        });
+      }
+      
+      if (!isValidSize) {
+        toast.error(`File ${file.name} skipped`, {
+          description: 'File size must be less than 10MB.'
+        });
+      }
+      
+      return isValidType && isValidSize;
+    });
 
     if (validFiles.length > 0) {
       setSelectedFiles(validFiles);
@@ -67,11 +78,11 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
       return;
     }
 
+    setIsUploading(true);
     try {
-      // Convert files to base64 strings (for demo purposes)
-      // In a real app, you'd upload to a cloud service like AWS S3, Cloudinary, etc.
+      // Compress and convert files to base64 strings
       const imageUrls = await Promise.all(
-        selectedFiles.map(file => convertFileToBase64(file))
+        selectedFiles.map(file => compressAndConvertToBase64(file))
       );
 
       // Replace current images with new ones
@@ -84,6 +95,8 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
       onClose();
     } catch (error) {
       console.error('Error uploading images:', error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -97,6 +110,46 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
     } catch (error) {
       console.error('Error removing images:', error);
     }
+  };
+
+  const compressAndConvertToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      const img = new Image();
+      
+      img.onload = () => {
+        // Calculate new dimensions (max 800px width/height)
+        const maxSize = 800;
+        let { width, height } = img;
+        
+        if (width > height) {
+          if (width > maxSize) {
+            height = (height * maxSize) / width;
+            width = maxSize;
+          }
+        } else {
+          if (height > maxSize) {
+            width = (width * maxSize) / height;
+            height = maxSize;
+          }
+        }
+        
+        // Set canvas dimensions
+        canvas.width = width;
+        canvas.height = height;
+        
+        // Draw and compress image
+        ctx?.drawImage(img, 0, 0, width, height);
+        
+        // Convert to base64 with compression (0.8 quality)
+        const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+        resolve(compressedDataUrl);
+      };
+      
+      img.onerror = reject;
+      img.src = URL.createObjectURL(file);
+    });
   };
 
   const convertFileToBase64 = (file: File): Promise<string> => {
@@ -173,18 +226,21 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
             />
             
             {/* Upload Button */}
-            <Button
-              onClick={openFileDialog}
-              variant="outline"
-              className="w-full h-20 border-dashed border-2 border-gray-300 hover:border-gray-400"
-            >
-              <div className="flex flex-col items-center space-y-2">
-                <Upload className="h-6 w-6 text-gray-400" />
-                <span className="text-sm text-gray-600">
-                  Click to select images or drag and drop
-                </span>
-              </div>
-            </Button>
+                         <Button
+               onClick={openFileDialog}
+               variant="outline"
+               className="w-full h-20 border-dashed border-2 border-gray-300 hover:border-gray-400"
+             >
+               <div className="flex flex-col items-center space-y-2">
+                 <Upload className="h-6 w-6 text-gray-400" />
+                 <span className="text-sm text-gray-600">
+                   Click to select images or drag and drop
+                 </span>
+                 <span className="text-xs text-gray-500">
+                   Max 10MB per file • JPEG, PNG, GIF, WebP
+                 </span>
+               </div>
+             </Button>
           </div>
 
           {/* Preview Selected Files */}
@@ -234,13 +290,13 @@ const ImageEditor: React.FC<ImageEditorProps> = ({
               </Button>
             )}
             
-            <Button
-              onClick={handleUpload}
-              disabled={selectedFiles.length === 0 || replaceImages.isPending}
-              className="flex-1"
-            >
-              {replaceImages.isPending ? 'Uploading...' : 'Upload Images'}
-            </Button>
+                         <Button
+               onClick={handleUpload}
+               disabled={selectedFiles.length === 0 || replaceImages.isPending || isUploading}
+               className="flex-1"
+             >
+               {replaceImages.isPending || isUploading ? 'Uploading...' : 'Upload Images'}
+             </Button>
           </div>
         </CardContent>
       </Card>
