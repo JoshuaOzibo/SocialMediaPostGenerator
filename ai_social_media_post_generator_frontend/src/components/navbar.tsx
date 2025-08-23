@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { Sparkles } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import DashBoardNav from "./dashboard_component/dashboard_nav";
@@ -12,6 +12,11 @@ const Navbar = () => {
   const pathname = usePathname();
   const router = useRouter();
   const { isLoading } = useAuth();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Hide navbar on auth pages
   if (pathname === "/auth/login" || pathname === "/auth/signup" || pathname === "/auth") {
@@ -31,7 +36,7 @@ const Navbar = () => {
             <Button
               variant="outline"
               onClick={() => router.push("/dashboard")}
-              disabled={isLoading}
+              disabled={!isClient || isLoading}
               className="text-white bg-blue-600 border-blue-200 hover:bg-blue-50 cursor-pointer"
             >
               Dashboard

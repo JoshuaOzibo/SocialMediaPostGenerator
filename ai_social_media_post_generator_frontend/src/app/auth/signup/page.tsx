@@ -97,13 +97,16 @@ const SignupPage = () => {
               />
               <span className="text-gray-600 dark:text-gray-400">
                 I agree to the
+                {" "}
                 <a
                   href="#"
                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
                 >
                   Terms of Service
                 </a>
+                {" "}
                 and
+                {" "}
                 <a
                   href="#"
                   className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
@@ -116,7 +119,7 @@ const SignupPage = () => {
             <Button
               type="submit"
               disabled={isPending}
-              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
+              className="w-full bg-gradient-to-r cursor-pointer from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
             >
               {isPending ? "Creating Account..." : "Create Account"}
             </Button>
@@ -144,7 +147,7 @@ const SignupPage = () => {
                 href="/auth/login"
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 font-medium"
               >
-                Sign in here
+                {" "}Sign in here
               </Link>
             </p>
           </div>

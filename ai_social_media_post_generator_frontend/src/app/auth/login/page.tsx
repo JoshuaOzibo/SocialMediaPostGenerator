@@ -105,7 +105,7 @@ const LoginPage = () => {
             <Button
               type="submit"
               disabled={isPending}
-              className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
+              className="w-full bg-gradient-to-r cursor-pointer from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white py-3 rounded-lg font-medium transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50"
             >
               {isPending ? "Signing In..." : "Sign In"}
             </Button>

@@ -12,7 +12,7 @@ export const usePosts = (filters: PostFilters = {}) => {
   return useQuery({
     queryKey: queryKeys.posts.list(filters),
     queryFn: () => postsApi.getPosts(filters),
-    staleTime: 2 * 60 * 1000, // 2 minutes
+    staleTime: 10 * 60 * 1000, // 10 minutes
   });
 };
 

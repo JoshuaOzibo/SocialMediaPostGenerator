@@ -43,7 +43,7 @@ export const useLogin = () => {
           description: 'Authentication service is currently unavailable.',
         });
       } else {
-        const errorMessage = (error.response?.data as any)?.message || 'Login failed. Please try again.';
+        const errorMessage = (error.response?.data as { message?: string })?.message || 'Login failed. Please try again.';
         toast.error('Login Failed', {
           description: errorMessage,
         });
@@ -95,7 +95,7 @@ export const useSignup = () => {
           description: 'Registration service is currently unavailable.',
         });
       } else {
-        const errorMessage = (error.response?.data as any)?.message || 'Signup failed. Please try again.';
+        const errorMessage = (error.response?.data as { message?: string })?.message || 'Signup failed. Please try again.';
         toast.error('Signup Failed', {
           description: errorMessage,
         });
@@ -127,7 +127,7 @@ export const useCurrentUser = () => {
   return useQuery({
     queryKey: queryKeys.auth.user(),
     queryFn: authApi.getCurrentUser,
-    enabled: authApi.isAuthenticated(), // Only run if user is authenticated
+    enabled: typeof window !== 'undefined' && authApi.isAuthenticated(), // Only run on client if user is authenticated
     staleTime: 5 * 60 * 1000, // 5 minutes
     retry: (failureCount, error: unknown) => {
       // Don't retry on 401 errors
@@ -161,6 +161,16 @@ export const useRefreshToken = () => {
 // Hook for checking authentication status
 export const useAuthStatus = () => {
   const { data: user, isLoading, error } = useCurrentUser();
+  
+  // On server-side, always return not authenticated and not loading
+  if (typeof window === 'undefined') {
+    return {
+      isAuthenticated: false,
+      user: null,
+      isLoading: false,
+      error: null,
+    };
+  }
   
   return {
     isAuthenticated: !!user,

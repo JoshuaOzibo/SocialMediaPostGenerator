@@ -38,9 +38,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, user, isLoading, error } = useAuthStatus();
   const logoutMutation = useLogout();
   const [isInitialized, setIsInitialized] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+
+  // Set client flag on mount
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   // Check authentication status on mount and route changes
   useEffect(() => {
+    if (!isClient) return;
+    
     const checkAuth = () => {
       const hasToken = authApi.isAuthenticated();
       
@@ -60,11 +68,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     // Only check auth after initial load to prevent hydration issues
-    if (typeof window !== 'undefined') {
-      checkAuth();
-      setIsInitialized(true);
-    }
-  }, [pathname, router, isAuthenticated]);
+    checkAuth();
+    setIsInitialized(true);
+  }, [pathname, router, isAuthenticated, isClient]);
 
   // Handle authentication state changes
   useEffect(() => {
