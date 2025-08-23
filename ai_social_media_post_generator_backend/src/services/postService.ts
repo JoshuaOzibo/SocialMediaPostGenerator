@@ -42,6 +42,18 @@ export class PostService {
       const imageSuggestions = generatedPosts.flatMap(post => post.imageSuggestions);
       const allImages = generatedPosts.flatMap(post => post.images || []);
 
+      // Create individual post data with their own hashtags and images
+      const individualPosts = generatedPosts.map((post, index) => ({
+        content: post.content,
+        hashtags: post.hashtags,
+        images: post.imageSuggestions,
+        image_metadata: post.images || [],
+        day_number: index + 1,
+        posting_date: request.scheduleDate ? 
+          new Date(new Date(request.scheduleDate).getTime() + index * 24 * 60 * 60 * 1000).toISOString().split('T')[0] : 
+          undefined
+      }));
+
       // Create post data
       const postData: Omit<Post, 'id' | 'created_at' | 'updated_at'> = {
         user_id: request.user_id,
@@ -49,9 +61,10 @@ export class PostService {
         tone: request.tone,
         input_bullets: request.input_bullets,
         generated_posts: generatedContent,
-        hashtags: allHashtags,
-        images: imageSuggestions, // Store image URLs
-        image_metadata: allImages, // Store full image objects
+        hashtags: allHashtags, // Keep for backward compatibility
+        images: imageSuggestions, // Keep for backward compatibility
+        image_metadata: allImages, // Keep for backward compatibility
+        individual_posts: individualPosts, // New field with individual post data
         scheduled_at: request.scheduled_at,
         status: 'draft'
       };
@@ -416,6 +429,7 @@ export class PostService {
       hashtags: post.hashtags,
       images: post.images,
       image_metadata: post.image_metadata,
+      individual_posts: post.individual_posts, // Add individual_posts to the response
       scheduled_at: post.scheduled_at,
       status: post.status,
       created_at: post.created_at,

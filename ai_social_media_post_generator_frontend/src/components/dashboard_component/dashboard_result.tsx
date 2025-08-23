@@ -1,11 +1,12 @@
 import React from "react";
 import { Card, CardContent } from "../ui/card";
-import { RefreshCw, Save, Sparkles } from "lucide-react";
+import { RefreshCw, Save, Sparkles, Edit, Image as ImageIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import DashboardSkeleton from "./dashboard_skeleton";
 import { Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Post } from "@/lib/api/types";
+import Image from "next/image";
 
 const DashboardResult = ({
   generatedPosts,
@@ -28,6 +29,13 @@ const DashboardResult = ({
       description: "Post saved to your history.",
     });
   };
+
+  const handleEdit = () => {
+    toast.info("Edit feature coming soon!", {
+      description: "You'll be able to edit posts in the next update.",
+    });
+  };
+
 
   return (
     <>
@@ -97,6 +105,29 @@ const DashboardResult = ({
                         </div>
                       )}
 
+                                             {/* Generated Image Display */}
+                       
+                        
+                         <div className="relative">
+                           <Image
+                             src={post.individual_posts?.[contentIndex]?.images?.[0] || post.images[0]}
+                             alt="Generated post image"
+                             className="w-full h-48 object-cover rounded-lg border border-slate-200"
+                             style={{ cursor: 'pointer' }}
+                           />
+                           <div className="absolute top-2 right-2">
+                             <Button
+                               onClick={() => {}}
+                               variant="secondary"
+                               size="sm"
+                               className="bg-white/80 hover:bg-white text-slate-700 rounded-full"
+                             >
+                               <ImageIcon className="h-4 w-4" />
+                             </Button>
+                           </div>
+                         </div>
+                       
+
                       <div className="flex gap-2">
                         <Button
                           onClick={() => handleCopy(content)}
@@ -106,6 +137,15 @@ const DashboardResult = ({
                         >
                           <Copy className="h-4 w-4 mr-1" />
                           Copy
+                        </Button>
+                        <Button
+                          onClick={handleEdit}
+                          variant="outline"
+                          size="sm"
+                          className="rounded-xl"
+                        >
+                          <Edit className="h-4 w-4 mr-1" />
+                          Edit
                         </Button>
                         <Button
                           onClick={handleGenerate}

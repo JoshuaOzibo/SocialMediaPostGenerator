@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS public.posts (
     hashtags TEXT[] DEFAULT '{}',
     images TEXT[] DEFAULT '{}',
     image_metadata JSONB DEFAULT '[]',
+    individual_posts JSONB DEFAULT '[]', -- Store individual posts with their own hashtags and images
     scheduled_at TIMESTAMP WITH TIME ZONE,
     status VARCHAR(20) DEFAULT 'draft' CHECK (status IN ('draft', 'scheduled', 'published', 'archived')),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),

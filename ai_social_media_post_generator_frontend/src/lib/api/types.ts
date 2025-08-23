@@ -36,6 +36,16 @@ export type Platform = 'twitter' | 'facebook' | 'instagram' | 'linkedin' | 'tikt
 export type Tone = 'professional' | 'casual' | 'humorous' | 'formal' | 'friendly' | 'enthusiastic';
 export type PostStatus = 'draft' | 'scheduled' | 'published' | 'archived';
 
+// Interface for individual post content with its own hashtags and images
+export interface IndividualPostContent {
+  content: string;
+  hashtags: string[];
+  images: string[];
+  image_metadata?: unknown[];
+  day_number?: number;
+  posting_date?: string;
+}
+
 export interface Post {
   id: string;
   user_id: string;
@@ -46,6 +56,7 @@ export interface Post {
   hashtags: string[];
   images: string[];
   image_metadata?: unknown[];
+  individual_posts?: IndividualPostContent[]; // Individual posts with their own hashtags and images
   scheduled_at?: string;
   status: PostStatus;
   created_at: string;

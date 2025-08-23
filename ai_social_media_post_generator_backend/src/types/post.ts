@@ -9,10 +9,22 @@ export interface Post {
   hashtags: string[];
   images: string[];
   image_metadata?: any[]; // Full image objects with URLs and metadata
+  // New fields for individual post data
+  individual_posts?: IndividualPostContent[];
   scheduled_at?: string; // ISO Date String
   status: 'draft' | 'scheduled' | 'published' | 'archived';
   created_at: string;
   updated_at: string;
+}
+
+// New interface for individual post content with its own hashtags and images
+export interface IndividualPostContent {
+  content: string;
+  hashtags: string[];
+  images: string[];
+  image_metadata?: any[];
+  day_number?: number;
+  posting_date?: string;
 }
 
 export interface CreatePostRequest {
@@ -48,6 +60,7 @@ export interface PostResponse {
   hashtags: string[];
   images: string[];
   image_metadata?: any[]; // Full image objects with URLs and metadata
+  individual_posts?: IndividualPostContent[]; // Individual posts with their own hashtags and images
   scheduled_at?: string;
   status: Post['status'];
   created_at: string;
