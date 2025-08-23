@@ -50,6 +50,37 @@ export class UpdatePostController extends BaseController {
       this.handleError(res, error, 'regenerateContent', 'Failed to regenerate content');
     }
   }
+
+  /**
+   * Update images for a specific post
+   */
+  async updateImages(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userId = this.getUserId(req);
+      const { postId } = req.params;
+      const { contentIndex, images, action } = req.body; // action: 'add', 'remove', 'replace'
+
+      this.validateRequiredParams({ postId }, ['postId']);
+
+      if (!action || !['add', 'remove', 'replace'].includes(action)) {
+        throw new Error('Invalid action. Must be "add", "remove", or "replace"');
+      }
+
+      if (action === 'remove' && contentIndex === undefined) {
+        throw new Error('contentIndex is required for remove action');
+      }
+
+      if ((action === 'add' || action === 'replace') && (!images || !Array.isArray(images))) {
+        throw new Error('images array is required for add/replace actions');
+      }
+
+      const post = await postService.updatePostImages(userId, postId, contentIndex, images, action);
+      
+      this.sendSuccess(res, post, 'Images updated successfully');
+    } catch (error) {
+      this.handleError(res, error, 'updateImages', 'Failed to update images');
+    }
+  }
 }
 
 // Export singleton instance

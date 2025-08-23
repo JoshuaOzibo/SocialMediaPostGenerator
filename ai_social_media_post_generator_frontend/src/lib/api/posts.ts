@@ -61,6 +61,21 @@ export const postsApi = {
     return response;
   },
 
+  // Update post images
+  updateImages: async (
+    id: string, 
+    contentIndex: number, 
+    images: string[], 
+    action: 'add' | 'remove' | 'replace'
+  ): Promise<Post> => {
+    const response = await api.put<Post>(`${POSTS_ENDPOINTS.BASE}/${id}/images`, {
+      contentIndex,
+      images,
+      action
+    });
+    return response;
+  },
+
   // Get post statistics
   getStats: async (): Promise<{
     total: number;

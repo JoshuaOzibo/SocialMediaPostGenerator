@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, CardContent } from "../ui/card";
 import { RefreshCw, Save, Sparkles, Edit, Image as ImageIcon } from "lucide-react";
 import { Button } from "../ui/button";
@@ -7,6 +7,7 @@ import { Copy } from "lucide-react";
 import { toast } from "sonner";
 import { Post } from "@/lib/api/types";
 import Image from "next/image";
+import ImageEditor from "./ImageEditor";
 
 const DashboardResult = ({
   generatedPosts,
@@ -17,6 +18,10 @@ const DashboardResult = ({
   isGenerating: boolean;
   handleGenerate: () => void;
 }) => {
+  const [imageEditorOpen, setImageEditorOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>('');
+  const [selectedContentIndex, setSelectedContentIndex] = useState<number>(0);
+  const [selectedImages, setSelectedImages] = useState<string[]>([]);
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content);
     toast.success("Copied!", {
@@ -34,6 +39,20 @@ const DashboardResult = ({
     toast.info("Edit feature coming soon!", {
       description: "You'll be able to edit posts in the next update.",
     });
+  };
+
+  const handleEditImages = (postId: string, contentIndex: number, currentImages: string[]) => {
+    setSelectedPostId(postId);
+    setSelectedContentIndex(contentIndex);
+    setSelectedImages(currentImages);
+    setImageEditorOpen(true);
+  };
+
+  const handleCloseImageEditor = () => {
+    setImageEditorOpen(false);
+    setSelectedPostId('');
+    setSelectedContentIndex(0);
+    setSelectedImages([]);
   };
 
 
@@ -119,16 +138,20 @@ const DashboardResult = ({
                              className="w-full h-48 object-cover rounded-lg border border-slate-200"
                              style={{ cursor: 'pointer' }}
                            />
-                           <div className="absolute top-2 right-2">
-                             <Button
-                               onClick={() => {}}
-                               variant="secondary"
-                               size="sm"
-                               className="bg-white/80 hover:bg-white text-slate-700 rounded-full"
-                             >
-                               <ImageIcon onClick={() => {}} className="h-4 w-4" />
-                             </Button>
-                           </div>
+                                                       <div className="absolute top-2 right-2">
+                              <Button
+                                onClick={() => handleEditImages(
+                                  post.id || '',
+                                  contentIndex,
+                                  post.individual_posts?.[contentIndex]?.images || post.images || []
+                                )}
+                                variant="secondary"
+                                size="sm"
+                                className="bg-white/80 hover:bg-white text-slate-700 rounded-full"
+                              >
+                                <ImageIcon className="h-4 w-4" />
+                              </Button>
+                            </div>
                          </div>
                        
 
@@ -191,10 +214,20 @@ const DashboardResult = ({
               </p>
             </CardContent>
           </Card>
-        )}
-      </div>
-    </>
-  );
-};
+                 )}
+       </div>
+
+       {/* Image Editor Modal */}
+       {imageEditorOpen && (
+         <ImageEditor
+           postId={selectedPostId}
+           contentIndex={selectedContentIndex}
+           currentImages={selectedImages}
+           onClose={handleCloseImageEditor}
+         />
+       )}
+     </>
+   );
+ };
 
 export default DashboardResult;

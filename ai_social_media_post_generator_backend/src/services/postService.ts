@@ -339,6 +339,77 @@ export class PostService {
   }
 
   /**
+   * Update images for a specific post
+   */
+  async updatePostImages(userId: string, postId: string, contentIndex: number, images: string[], action: 'add' | 'remove' | 'replace'): Promise<PostResponse> {
+    try {
+      // Get existing post
+      const existingPost = await this.getPostById(userId, postId);
+      if (!existingPost) {
+        throw new Error('Post not found');
+      }
+
+      // Get current individual posts
+      const individualPosts = existingPost.individual_posts || [];
+      
+      if (contentIndex >= individualPosts.length) {
+        throw new Error('Invalid content index');
+      }
+
+      // Update the specific individual post
+      const updatedIndividualPosts = [...individualPosts];
+      
+      switch (action) {
+        case 'add':
+          // Add new images to existing ones
+          updatedIndividualPosts[contentIndex] = {
+            ...updatedIndividualPosts[contentIndex],
+            images: [...(updatedIndividualPosts[contentIndex].images || []), ...images]
+          };
+          break;
+          
+        case 'replace':
+          // Replace all images with new ones
+          updatedIndividualPosts[contentIndex] = {
+            ...updatedIndividualPosts[contentIndex],
+            images: images
+          };
+          break;
+          
+        case 'remove':
+          // Remove all images for this content
+          updatedIndividualPosts[contentIndex] = {
+            ...updatedIndividualPosts[contentIndex],
+            images: []
+          };
+          break;
+          
+        default:
+          throw new Error('Invalid action');
+      }
+
+      // Update the post in the database
+      const { data, error } = await supabase
+        .from('posts')
+        .update({
+          individual_posts: updatedIndividualPosts,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', postId)
+        .eq('user_id', userId)
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      return this.mapToPostResponse(data as Post);
+    } catch (error) {
+      console.error('Error updating post images:', error);
+      throw new Error('Failed to update post images');
+    }
+  }
+
+  /**
    * Get post statistics for a user
    */
   async getPostStats(userId: string): Promise<{
