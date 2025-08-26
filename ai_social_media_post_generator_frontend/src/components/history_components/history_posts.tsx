@@ -10,14 +10,17 @@ import { toast } from "sonner";
 import { useDeletePost } from "@/hooks/api/usePosts";
 import { Post } from "@/lib/api/types";
 import Image from "next/image";
-import DashboardSkeleton from "../dashboard_component/dashboard_skeleton";
+import HistoryPostsSkeleton from "./history_posts_skeleton";
+import EmptyCard from "./empty_card";
 
 interface HistoryPostsProps {
   filteredPosts: Post[];
   isLoading: boolean;
-  }
+  filterPlatform: string;
+  filterDate: string;
+}
 
-const HistoryPosts = ({ filteredPosts, isLoading }: HistoryPostsProps) => {
+const HistoryPosts = ({ filteredPosts, isLoading, filterPlatform, filterDate }: HistoryPostsProps) => {
   console.log("filteredPosts", filteredPosts);
   const deletePostMutation = useDeletePost();
   
@@ -109,11 +112,20 @@ const HistoryPosts = ({ filteredPosts, isLoading }: HistoryPostsProps) => {
     return post.input_bullets.join(" ");
   };
 
+  // Show skeleton while loading
+  if (isLoading) {
+    return <HistoryPostsSkeleton />;
+  }
+
+  // Show empty state when no posts
+  if (!filteredPosts || filteredPosts.length === 0) {
+    return <EmptyCard filterPlatform={filterPlatform} filterDate={filterDate} />;
+  }
+
   return filteredPosts.map((post: Post) => {
     const currentImageIndex = currentImageIndexes[post.id] || 0;
     const totalImages = post.images?.length || 0;
     const hasMultipleImages = totalImages > 1;
-
 
     return (
       <Card
@@ -125,7 +137,7 @@ const HistoryPosts = ({ filteredPosts, isLoading }: HistoryPostsProps) => {
             src={post.images[currentImageIndex] || post.images[0]}
             alt={`Generated post image ${currentImageIndex + 1} of ${totalImages}`}
             width={350}
-            height={300}
+            height={250}
             className="w-full object-cover rounded-lg border border-slate-200 transition-all duration-300 ease-in-out"
           />
           
@@ -226,8 +238,6 @@ const HistoryPosts = ({ filteredPosts, isLoading }: HistoryPostsProps) => {
           </div>
         </CardContent>
       </Card>
-
-      
     );
   });
 };

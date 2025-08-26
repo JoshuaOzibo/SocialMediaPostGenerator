@@ -6,7 +6,6 @@ import { Post, PostFilters } from "@/lib/api/types";
 import RouteGuard from "@/components/middleware/RouteGuard";
 import HistoryFilterCard from "@/components/history_components/histoty_filter_card";
 import HistoryPosts from "@/components/history_components/history_posts";
-import EmptyCard from "@/components/history_components/empty_card";
 
 const History = () => {
   const [filterPlatform, setFilterPlatform] = useState("all");
@@ -65,17 +64,12 @@ const History = () => {
 
               {/* Posts List */}
               <div className="space-y-4">
-                {posts && posts.length > 0 ? (
-                  <HistoryPosts
-                    isLoading={isLoading}
-                    filteredPosts={posts}
-                  />
-                ) : (
-                  <EmptyCard
-                    filterPlatform={filterPlatform}
-                    filterDate={filterDate}
-                  />
-                )}
+                <HistoryPosts
+                  isLoading={isLoading}
+                  filteredPosts={posts || []}
+                  filterPlatform={filterPlatform}
+                  filterDate={filterDate}
+                />
               </div>
             </div>
           </div>
