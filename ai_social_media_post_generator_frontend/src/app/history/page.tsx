@@ -7,7 +7,6 @@ import RouteGuard from "@/components/middleware/RouteGuard";
 import HistoryFilterCard from "@/components/history_components/histoty_filter_card";
 import HistoryPosts from "@/components/history_components/history_posts";
 import EmptyCard from "@/components/history_components/empty_card";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const History = () => {
   const [filterPlatform, setFilterPlatform] = useState("all");
@@ -49,10 +48,6 @@ const History = () => {
     }
   }, [postsData, error]);
 
-  if (isLoading) {
-      return <Skeleton className="w-full h-full" />;
-  }
-
   return (
     <>
       <RouteGuard requireAuth={true}>
@@ -72,6 +67,7 @@ const History = () => {
               <div className="space-y-4">
                 {posts && posts.length > 0 ? (
                   <HistoryPosts
+                    isLoading={isLoading}
                     filteredPosts={posts}
                   />
                 ) : (

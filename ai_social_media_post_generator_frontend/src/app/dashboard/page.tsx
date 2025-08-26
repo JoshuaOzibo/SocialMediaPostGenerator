@@ -39,7 +39,7 @@ const Dashboard = () => {
         .split('\n')
         .map(line => line.trim())
         .filter(line => line.length > 0)
-        .map(line => line.replace(/^[•\-\*]\s*/, '')); // Remove bullet point markers
+        .map(line => line.replace(/^[•\-\*]\s*/, ''));
 
       // Create post request data
       const postData: CreatePostRequest = {

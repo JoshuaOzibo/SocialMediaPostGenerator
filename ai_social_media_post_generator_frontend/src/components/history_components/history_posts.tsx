@@ -10,12 +10,14 @@ import { toast } from "sonner";
 import { useDeletePost } from "@/hooks/api/usePosts";
 import { Post } from "@/lib/api/types";
 import Image from "next/image";
+import DashboardSkeleton from "../dashboard_component/dashboard_skeleton";
 
 interface HistoryPostsProps {
   filteredPosts: Post[];
-}
+  isLoading: boolean;
+  }
 
-const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
+const HistoryPosts = ({ filteredPosts, isLoading }: HistoryPostsProps) => {
   console.log("filteredPosts", filteredPosts);
   const deletePostMutation = useDeletePost();
   
@@ -111,6 +113,7 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
     const currentImageIndex = currentImageIndexes[post.id] || 0;
     const totalImages = post.images?.length || 0;
     const hasMultipleImages = totalImages > 1;
+
 
     return (
       <Card
@@ -223,6 +226,8 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
           </div>
         </CardContent>
       </Card>
+
+      
     );
   });
 };
