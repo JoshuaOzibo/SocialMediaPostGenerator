@@ -29,6 +29,7 @@ export const postsApi = {
     
     const url = `${POSTS_ENDPOINTS.BASE}?${params.toString()}`;
     const response = await api.get<PostListResponse>(url);
+    console.log(response);
     return response;
   },
 

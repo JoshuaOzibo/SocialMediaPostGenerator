@@ -8,10 +8,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "../ui/select";
+import { Post } from "@/lib/api/types";
 
 interface HistoryFilterCardProps {
-  filteredPosts: any;
-  savedPosts: any;
+  filteredPosts: Post[];
   filterPlatform: string;
   setFilterPlatform: (platform: string) => void;
   filterDate: string;
@@ -19,13 +19,13 @@ interface HistoryFilterCardProps {
 }
 
 const HistoryFilterCard = ({
-  filteredPosts,
-  savedPosts,
+  filteredPosts,  
   filterPlatform,
   setFilterPlatform,
   filterDate,
   setFilterDate,
 }: HistoryFilterCardProps) => {
+  console.log('filteredPosts', filteredPosts);
   return (
     <Card className="border-0 shadow-lg rounded-2xl">
       <CardHeader className="pb-4">
@@ -34,9 +34,9 @@ const HistoryFilterCard = ({
             <Filter className="h-5 w-5 mr-2" />
             Filters
           </CardTitle>
-          <span className="text-sm text-slate-600">
-            {filteredPosts.length} of {savedPosts.length} posts
-          </span>
+          {/* <span className="text-sm text-slate-600">
+            {filteredPosts.length} of {filteredPosts.length} posts
+          </span> */}
         </div>
       </CardHeader>
       <CardContent>
@@ -54,6 +54,8 @@ const HistoryFilterCard = ({
                 <SelectItem value="linkedin">LinkedIn</SelectItem>
                 <SelectItem value="twitter">Twitter</SelectItem>
                 <SelectItem value="instagram">Instagram</SelectItem>
+                <SelectItem value="facebook">Facebook</SelectItem>
+                <SelectItem value="tiktok">TikTok</SelectItem>
               </SelectContent>
             </Select>
           </div>

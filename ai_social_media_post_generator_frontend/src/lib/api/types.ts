@@ -48,7 +48,7 @@ export interface IndividualPostContent {
 
 export interface Post {
   id: string;
-  user_id: string;
+  user_id?: string; // Optional since it's not always present in backend response
   platform: Platform;
   tone: Tone;
   input_bullets: string[];
@@ -98,11 +98,14 @@ export interface PostFilters {
 }
 
 export interface PostListResponse {
-  posts: Post[];
-  total: number;
-  page: number;
-  limit: number;
-  hasMore: boolean;
+  success: boolean;
+  data: {
+    posts: Post[];
+    total: number;
+    page: number;
+    limit: number;
+    hasMore: boolean;
+  };
 }
 
 // Query Keys for React Query

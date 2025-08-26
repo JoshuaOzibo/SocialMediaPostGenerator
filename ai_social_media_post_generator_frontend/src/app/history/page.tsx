@@ -1,5 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
+import { usePosts } from "@/hooks/api/usePosts";
+import { Post, PostFilters } from "@/lib/api/types";
 
 import RouteGuard from "@/components/middleware/RouteGuard";
 import HistoryFilterCard from "@/components/history_components/histoty_filter_card";
@@ -8,71 +10,47 @@ import EmptyCard from "@/components/history_components/empty_card";
 
 const History = () => {
   const [filterPlatform, setFilterPlatform] = useState("all");
-  const [filterDate, setFilterDate] = useState("all");
+  const [filterDate, setFilterDate] = useState("all");  
+  const [posts, setPosts] = useState<Post[]>([]);
 
-  // Mock data for post history
-  const savedPosts = [
-    {
-      id: 1,
-      content:
-        "🚀 Excited to share some insights on team collaboration! Here are 3 key strategies that have transformed our workflow...",
-      platform: "linkedin",
-      tone: "professional",
-      createdAt: "2024-01-15",
-      status: "published",
-    },
-    {
-      id: 2,
-      content:
-        "💡 Pro tip: The best product features come from listening to your users. Here's how we gather feedback...",
-      platform: "twitter",
-      tone: "educational",
-      createdAt: "2024-01-14",
-      status: "draft",
-    },
-    {
-      id: 3,
-      content:
-        "🎯 Industry insight: The future of remote work is hybrid. Companies that adapt quickly will attract top talent...",
-      platform: "instagram",
-      tone: "professional",
-      createdAt: "2024-01-13",
-      status: "scheduled",
-    },
-    {
-      id: 4,
-      content:
-        "🔥 Just shipped a new feature! Here's what our users are saying about the improved workflow...",
-      platform: "linkedin",
-      tone: "funny",
-      createdAt: "2024-01-12",
-      status: "published",
-    },
-    {
-      id: 5,
-      content:
-        "📚 Learning in public: My journey from junior to senior developer in 2 years...",
-      platform: "twitter",
-      tone: "educational",
-      createdAt: "2024-01-11",
-      status: "draft",
-    },
-  ];
+  // Build filters for API
+  const filters: PostFilters = useMemo(() => {
+    const apiFilters: PostFilters = {};
+    
+    if (filterPlatform !== "all") {
+      apiFilters.platform = filterPlatform as "twitter" | "facebook" | "instagram" | "linkedin" | "tiktok";
+    }
+    
+    if (filterDate !== "all") {
+      const now = new Date();
+      if (filterDate === "week") {
+        const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+        apiFilters.startDate = weekAgo.toISOString();
+      } else if (filterDate === "month") {
+        const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+        apiFilters.startDate = monthAgo.toISOString();
+      }
+    }
+    
+    console.log("API Filters:", apiFilters);
+    return apiFilters;
+  }, [filterPlatform, filterDate]);
 
-  const filteredPosts = savedPosts.filter((post) => {
-    const platformMatch =
-      filterPlatform === "all" || post.platform === filterPlatform;
-    const dateMatch =
-      filterDate === "all" ||
-      (filterDate === "week" &&
-        new Date(post.createdAt) >
-          new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)) ||
-      (filterDate === "month" &&
-        new Date(post.createdAt) >
-          new Date(Date.now() - 30 * 24 * 60 * 60 * 1000));
+  // Fetch posts using the API
+  const { data: postsData, isLoading, error } = usePosts(filters);
 
-    return platformMatch && dateMatch;
-  });
+  useEffect(() => {    
+    if (postsData) {
+      setPosts(postsData.data.posts);
+    }
+    if (error) {
+      console.error("❌ Posts fetch error:", error);
+    }
+  }, [postsData, error]);
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <>
@@ -82,8 +60,7 @@ const History = () => {
             <div className="max-w-4xl mx-auto space-y-6">
               {/* Filters */}
               <HistoryFilterCard
-                filteredPosts={filteredPosts}
-                savedPosts={savedPosts}
+                filteredPosts={posts || []}
                 filterPlatform={filterPlatform}
                 setFilterPlatform={setFilterPlatform}
                 filterDate={filterDate}
@@ -92,9 +69,9 @@ const History = () => {
 
               {/* Posts List */}
               <div className="space-y-4">
-                {filteredPosts.length > 0 ? (
+                {posts && posts.length > 0 ? (
                   <HistoryPosts
-                    filteredPosts={filteredPosts}
+                    filteredPosts={posts}
                   />
                 ) : (
                   <EmptyCard

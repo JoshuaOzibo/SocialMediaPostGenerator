@@ -22,6 +22,9 @@ apiClient.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
     }
     
+    // Log request for debugging
+    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+    
     return config;
   },
   (error) => {
@@ -35,6 +38,16 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Log error details for debugging
+    console.error('❌ API Error:', {
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      url: error.config?.url,
+      method: error.config?.method,
+      message: error.message,
+      data: error.response?.data
+    });
+    
     // Handle authentication errors
     if (error.response?.status === 401) {
       // Clear token and redirect to login

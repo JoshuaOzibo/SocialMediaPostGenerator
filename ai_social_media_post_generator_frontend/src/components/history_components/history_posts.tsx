@@ -6,27 +6,37 @@ import { Copy } from "lucide-react";
 import { Edit3 } from "lucide-react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
+import { useDeletePost } from "@/hooks/api/usePosts";
+import { Post } from "@/lib/api/types";
 
 interface HistoryPostsProps {
-  filteredPosts: any;
+  filteredPosts: Post[];
 }
 
 const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
+  console.log('filteredPosts', filteredPosts);
+  const deletePostMutation = useDeletePost();
+
   const handleCopy = (content: string) => {
     navigator.clipboard.writeText(content);
     toast.success("Copied to clipboard");
   };
 
-  const handleDelete = (id: number) => {
-    toast.success("Deleted!", {
-      description: "Post removed from history.",
-    });
+  const handleDelete = async (id: string) => {
+    try {
+      await deletePostMutation.mutateAsync(id);
+      toast.success("Post deleted successfully!");
+    } catch (error) {
+      toast.error("Failed to delete post");
+      console.error("Delete error:", error);
+    }
   };
 
-  const handleEdit = (id: number) => {
+  const handleEdit = () => {
     toast.success("Edit Mode", {
       description: "Redirecting to edit this post...",
     });
+    // TODO: Implement navigation to edit page
   };
 
   const getPlatformEmoji = (platform: string) => {
@@ -37,6 +47,10 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
         return "🐦";
       case "facebook":
         return "💬";
+      case "instagram":
+        return "📸";
+      case "tiktok":
+        return "🎵";
       default:
         return "📝";
     }
@@ -44,17 +58,36 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "pending":
+      case "draft":
         return "bg-yellow-100 text-yellow-800";
       case "published":
         return "bg-green-100 text-green-800";
-      case "draft":
+      case "scheduled":
+        return "bg-blue-100 text-blue-800";
+      case "archived":
         return "bg-gray-100 text-gray-800";
       default:
         return "bg-gray-100 text-gray-800";
     }
   };
-  return filteredPosts.map((post: any) => (
+
+  // Helper function to get the main content from a post
+  const getPostContent = (post: Post): string => {
+    // If there are individual posts, use the first one's content
+    if (post.individual_posts && post.individual_posts.length > 0) {
+      return post.individual_posts[0].content;
+    }
+    
+    // If there are generated posts, use the first one
+    if (post.generated_posts && post.generated_posts.length > 0) {
+      return post.generated_posts[0];
+    }
+    
+    // Fallback to input bullets joined
+    return post.input_bullets.join(" ");
+  };
+
+  return filteredPosts.map((post: Post) => (
     <Card
       key={post.id}
       className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200"
@@ -76,7 +109,7 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
               <div className="flex items-center space-x-2">
                 <Clock className="h-3 w-3 text-slate-400" />
                 <span className="text-xs text-slate-500">
-                  {new Date(post.createdAt).toLocaleDateString()}
+                  {new Date(post.created_at).toLocaleDateString()}
                 </span>
                 <span
                   className={`text-xs px-2 py-1 rounded-full font-medium ${getStatusColor(
@@ -91,13 +124,13 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
         </div>
 
         <p className="text-slate-700 leading-relaxed mb-4 line-clamp-3">
-          {post.content}
+          {getPostContent(post)}
         </p>
 
         <div className="flex items-center justify-between">
           <div className="flex gap-2">
             <Button
-              onClick={() => handleCopy(post.content)}
+              onClick={() => handleCopy(getPostContent(post))}
               variant="outline"
               size="sm"
               className="rounded-xl"
@@ -106,7 +139,7 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
               Copy
             </Button>
             <Button
-              onClick={() => handleEdit(post.id)}
+              onClick={handleEdit}
               variant="outline"
               size="sm"
               className="rounded-xl"
@@ -120,6 +153,7 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
             variant="outline"
             size="sm"
             className="rounded-xl text-red-600 border-red-200 hover:bg-red-50"
+            disabled={deletePostMutation.isPending}
           >
             <Trash2 className="h-4 w-4" />
           </Button>

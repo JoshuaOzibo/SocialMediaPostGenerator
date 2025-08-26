@@ -40,9 +40,11 @@ export class GetPostController extends BaseController {
       const filters = ValidationService.buildFiltersFromQuery(req);
 
       const result = await postService.getPosts(userId, page, limit, filters);
-      
+      console.log(result);
       this.sendSuccess(res, result);
+
     } catch (error) {
+      console.log(error);
       this.handleError(res, error, 'getPosts', 'Failed to get posts');
     }
   }
