@@ -8,13 +8,14 @@ import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { useDeletePost } from "@/hooks/api/usePosts";
 import { Post } from "@/lib/api/types";
+import Image from "next/image";
 
 interface HistoryPostsProps {
   filteredPosts: Post[];
 }
 
 const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
-  console.log('filteredPosts', filteredPosts);
+  console.log("filteredPosts", filteredPosts);
   const deletePostMutation = useDeletePost();
 
   const handleCopy = (content: string) => {
@@ -77,12 +78,12 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
     if (post.individual_posts && post.individual_posts.length > 0) {
       return post.individual_posts[0].content;
     }
-    
+
     // If there are generated posts, use the first one
     if (post.generated_posts && post.generated_posts.length > 0) {
       return post.generated_posts[0];
     }
-    
+
     // Fallback to input bullets joined
     return post.input_bullets.join(" ");
   };
@@ -90,8 +91,17 @@ const HistoryPosts = ({ filteredPosts }: HistoryPostsProps) => {
   return filteredPosts.map((post: Post) => (
     <Card
       key={post.id}
-      className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200"
+      className="border-0 px-4 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200"
     >
+      <Image
+        src={
+          post.images[0]
+        }
+        alt="Generated post image"
+        width={350}
+        height={300}
+        className="w-full object-cover rounded-lg border border-slate-200"
+      />
       <CardContent className="p-6">
         <div className="flex items-start justify-between mb-4">
           <div className="flex items-center space-x-3">

@@ -7,6 +7,7 @@ import RouteGuard from "@/components/middleware/RouteGuard";
 import HistoryFilterCard from "@/components/history_components/histoty_filter_card";
 import HistoryPosts from "@/components/history_components/history_posts";
 import EmptyCard from "@/components/history_components/empty_card";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const History = () => {
   const [filterPlatform, setFilterPlatform] = useState("all");
@@ -44,12 +45,12 @@ const History = () => {
       setPosts(postsData.data.posts);
     }
     if (error) {
-      console.error("❌ Posts fetch error:", error);
+      console.error(" Posts fetch error:", error);
     }
   }, [postsData, error]);
 
   if (isLoading) {
-    return <div>Loading...</div>;
+      return <Skeleton className="w-full h-full" />;
   }
 
   return (
