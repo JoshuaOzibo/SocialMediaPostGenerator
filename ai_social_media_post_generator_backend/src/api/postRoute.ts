@@ -13,7 +13,7 @@ const route = Router();
 // Apply authentication middleware to all post routes
 route.use(protectRoute);
 
-// 📝 Post Management Routes
+//  Post Management Routes
 route.post('/', validatePostRequest, (req, res) => createPostController.execute(req, res));                    // Create new post
 
 route.get('/', validateQueryParams, (req, res) => getPostController.getList(req, res));                      // Get all posts with filters

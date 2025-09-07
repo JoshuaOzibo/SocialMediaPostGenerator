@@ -58,6 +58,8 @@ const DashboardGeneratorSection = ({
     onGenerate(formData);
   };
 
+  const isInputLengthEmpty = ideas.length <= 0 || days.length <=0 || scheduleDate.length <=0;
+
   return (
     <div className="space-y-6">
             <Card className="border-0 shadow-lg rounded-2xl">
@@ -182,7 +184,7 @@ const DashboardGeneratorSection = ({
 
                 <Button
                   onClick={handleGenerate}
-                  disabled={isGenerating}
+                  disabled={isGenerating || isInputLengthEmpty}
                   className="w-full bg-blue-600 hover:bg-blue-700 text-white rounded-xl py-6 text-lg font-semibold shadow-lg hover:shadow-xl transition-all duration-200"
                 >
                   {isGenerating ? (
