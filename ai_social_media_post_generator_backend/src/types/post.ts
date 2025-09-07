@@ -19,6 +19,7 @@ export interface Post {
 
 // New interface for individual post content with its own hashtags and images
 export interface IndividualPostContent {
+  id: string; // Unique ID for each individual post
   content: string;
   hashtags: string[];
   images: string[];
@@ -47,6 +48,7 @@ export interface UpdatePostRequest {
   generated_posts?: string[];
   hashtags?: string[];
   images?: string[];
+  individual_posts?: IndividualPostContent[];
   scheduled_at?: string;
   status?: Post['status'];
 }

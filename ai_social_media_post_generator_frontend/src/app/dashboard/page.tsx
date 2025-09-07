@@ -122,17 +122,16 @@ const Dashboard = () => {
     }
   };
 
-  const handleReGenerate = async (postId: string, contentIndex: number) => {
+  const handleReGenerate = async (postId: string, individualPostId: string) => {
     if (!postId) {
       toast.error("Post ID is required for regeneration");
       return;
     }
 
-    const contentId = `${postId}-${contentIndex}`;
-    setRegeneratingContentId(contentId);
+    setRegeneratingContentId(individualPostId);
 
     try {
-      console.log("🔄 Regenerating post with ID:", postId, "content index:", contentIndex);
+      console.log("🔄 Regenerating post with ID:", postId, "individual post ID:", individualPostId);
       
       // Call the regeneration API
       const updatedPost = await regenerateSinglePostMutation.mutateAsync(postId);

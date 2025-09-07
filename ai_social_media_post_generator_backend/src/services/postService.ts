@@ -44,6 +44,7 @@ export class PostService {
 
       // Create individual post data with their own hashtags and images
       const individualPosts = generatedPosts.map((post, index) => ({
+        id: `post_${Date.now()}_${index}`, // Generate unique ID for each individual post
         content: post.content,
         hashtags: post.hashtags,
         images: post.imageSuggestions,
@@ -322,11 +323,23 @@ export class PostService {
       console.log('Extracted hashtags:', allHashtags);
       console.log('Extracted images:', allImages);
 
+      // Create new individual posts with unique IDs
+      const newIndividualPosts = generatedPosts.map((post, index) => ({
+        id: `post_${Date.now()}_${index}`, // Generate unique ID for each individual post
+        content: post.content,
+        hashtags: post.hashtags,
+        images: post.imageSuggestions,
+        image_metadata: post.images || [],
+        day_number: index + 1,
+        posting_date: undefined
+      }));
+
       // Update post with new content
       const updates: UpdatePostRequest = {
         generated_posts: generatedContent,
         hashtags: allHashtags,
-        images: imageSuggestions
+        images: imageSuggestions,
+        individual_posts: newIndividualPosts
       };
 
       console.log('Update request:', JSON.stringify(updates, null, 2));

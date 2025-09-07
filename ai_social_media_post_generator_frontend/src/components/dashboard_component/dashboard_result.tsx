@@ -18,7 +18,7 @@ const DashboardResult = ({
 }: {
   generatedPosts: Post[];
   isGenerating: boolean;
-  handleReGenerate: (postId: string, contentIndex: number) => void;
+  handleReGenerate: (postId: string, individualPostId: string) => void;
   regeneratingContentId: string | null;
 }) => {
   const [imageEditorOpen, setImageEditorOpen] = useState(false);
@@ -90,13 +90,13 @@ const DashboardResult = ({
           <div className="space-y-4">
             {generatedPosts.map(
               (post: Post, postIndex: number) =>
-                // Create a separate card for each generated post
-                post.generated_posts &&
-                post.generated_posts.map((content, contentIndex) => (
+                // Create a separate card for each individual post
+                post.individual_posts &&
+                post.individual_posts.map((individualPost, contentIndex) => (
                   <Card
-                    key={`post-${post.id}-content-${contentIndex}`}
+                    key={`individual-post-${individualPost.id}`}
                     className={`border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200 ${
-                      regeneratingContentId === `${post.id}-${contentIndex}` ? 'opacity-75 bg-blue-50/30' : ''
+                      regeneratingContentId === individualPost.id ? 'opacity-75 bg-blue-50/30' : ''
                     }`}
                   >
                     <CardContent className="p-6">
@@ -117,21 +117,13 @@ const DashboardResult = ({
                       {/* Display the single generated post content */}
                       <div className="space-y-3">
                         <p className="text-slate-700 leading-relaxed whitespace-pre-wrap">
-                          {content}
+                          {individualPost.content}
                         </p>
 
                         {/* Display hashtags if available */}
-                        {(post.hashtags && post.hashtags.length > 0) ||
-                        (post.individual_posts &&
-                          post.individual_posts[contentIndex]?.hashtags &&
-                          post.individual_posts[contentIndex].hashtags.length >
-                            0) ? (
+                        {individualPost.hashtags && individualPost.hashtags.length > 0 ? (
                           <div className="flex flex-wrap gap-1">
-                            {(
-                              post.individual_posts?.[contentIndex]?.hashtags ||
-                              post.hashtags ||
-                              []
-                            ).map((hashtag, hashtagIndex) => (
+                            {individualPost.hashtags.map((hashtag, hashtagIndex) => (
                               <span
                                 key={`hashtag-${hashtagIndex}`}
                                 className="text-sm text-blue-600 bg-blue-50 px-2 py-1 rounded-full"
@@ -143,43 +135,37 @@ const DashboardResult = ({
                         ) : null}
 
                         {/* Generated Image Display */}
-
-                        {!post.individual_posts?.[contentIndex]
-                                ?.images && post.images.length > 0 && <div className="relative">
-                          <Image
-                            src={
-                              post.individual_posts?.[contentIndex]
-                                ?.images?.[0] || post.images[0]
-                            }
-                            alt="Generated post image"
-                            width={400}
-                            height={192}
-                            className="w-full h-48 object-cover rounded-lg border border-slate-200"
-                          />
-                          <div className="absolute top-2 right-2">
-                            <Button
-                              onClick={() =>
-                                handleEditImages(
-                                  post.id || "",
-                                  contentIndex,
-                                  post.individual_posts?.[contentIndex]
-                                    ?.images ||
-                                    post.images ||
-                                    []
-                                )
-                              }
-                              variant="secondary"
-                              size="sm"
-                              className="bg-white/80 hover:bg-white text-slate-700 rounded-full"
-                            >
-                              <ImageIcon className="h-4 w-4" />
-                            </Button>
+                        {individualPost.images && individualPost.images.length > 0 && (
+                          <div className="relative">
+                            <Image
+                              src={individualPost.images[0]}
+                              alt="Generated post image"
+                              width={400}
+                              height={192}
+                              className="w-full h-48 object-cover rounded-lg border border-slate-200"
+                            />
+                            <div className="absolute top-2 right-2">
+                              <Button
+                                onClick={() =>
+                                  handleEditImages(
+                                    post.id || "",
+                                    contentIndex,
+                                    individualPost.images || []
+                                  )
+                                }
+                                variant="secondary"
+                                size="sm"
+                                className="bg-white/80 hover:bg-white text-slate-700 rounded-full"
+                              >
+                                <ImageIcon className="h-4 w-4" />
+                              </Button>
+                            </div>
                           </div>
-                        </div>}
+                        )}
 
                         <div className="flex gap-2">
                           <Button
-                            onClick={() => handleCopy(content)}
+                            onClick={() => handleCopy(individualPost.content)}
                             variant="outline"
                             size="sm"
                             className="rounded-xl"
@@ -197,18 +183,19 @@ const DashboardResult = ({
                             Edit
                           </Button>
                           <Button
-                            onClick={() => handleReGenerate(post.id || "", contentIndex)}
+                            onClick={() => handleReGenerate(post.id || "", individualPost.id)}
                             variant="outline"
                             size="sm"
-                            className="rounded-xl"
-                            disabled={regeneratingContentId === `${post.id}-${contentIndex}`}
+                            className="rounde
+                            d-xl"
+                            disabled={regeneratingContentId === individualPost.id}
                           >
                             <RefreshCw 
                               className={`h-4 w-4 mr-1 ${
-                                regeneratingContentId === `${post.id}-${contentIndex}` ? 'animate-spin' : ''
+                                regeneratingContentId === individualPost.id ? 'animate-spin' : ''
                               }`} 
                             />
-                            {regeneratingContentId === `${post.id}-${contentIndex}` ? 'Regenerating...' : 'Regenerate'}
+                            {regeneratingContentId === individualPost.id ? 'Regenerating...' : 'Regenerate'}
                           </Button>
                           <Button
                             onClick={handleSave}
