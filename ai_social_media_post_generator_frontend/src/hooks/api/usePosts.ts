@@ -124,6 +124,28 @@ export const useRegenerateContent = () => {
   });
 };
 
+export const useRegenerateIndividualPost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ postId, individualPostId }: { postId: string; individualPostId: string }) => 
+      postsApi.regenerateIndividualPost(postId, individualPostId),
+    onSuccess: (updatedPost) => {
+      // Invalidate posts list queries
+      queryClient.invalidateQueries({ queryKey: queryKeys.posts.lists() });
+      
+      // Update post in cache
+      queryClient.setQueryData(
+        queryKeys.posts.detail(updatedPost.id),
+        updatedPost
+      );
+    },
+    onError: (error) => {
+      console.error('Regenerate individual post error:', error);
+    },
+  });
+};
+
 // Hook for getting post statistics
 export const usePostStats = () => {
   return useQuery({

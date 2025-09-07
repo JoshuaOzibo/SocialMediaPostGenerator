@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import RouteGuard from "@/components/middleware/RouteGuard";
 import DashboardGeneratorSection from "@/components/dashboard_component/dashboard_generator_section";
 import DashboardResult from "@/components/dashboard_component/dashboard_result";
-import { useCreatePost, useRegenerateContent } from "@/hooks/api/usePosts";
+import { useCreatePost, useRegenerateIndividualPost } from "@/hooks/api/usePosts";
 import { CreatePostRequest, Post, Platform, Tone } from "@/lib/api/types";
 
 interface GeneratorFormData {
@@ -25,7 +25,7 @@ const Dashboard = () => {
 
   // API hooks - only for creating posts
   const createPostMutation = useCreatePost();
-  const regenerateSinglePostMutation = useRegenerateContent();
+  const regenerateIndividualPostMutation = useRegenerateIndividualPost();
 
   const handleGenerate = async (formData: GeneratorFormData) => {
     if (!platform || !tone) {
@@ -123,20 +123,23 @@ const Dashboard = () => {
   };
 
   const handleReGenerate = async (postId: string, individualPostId: string) => {
-    if (!postId) {
-      toast.error("Post ID is required for regeneration");
+    if (!postId || !individualPostId) {
+      toast.error("Post ID and individual post ID are required for regeneration");
       return;
     }
 
     setRegeneratingContentId(individualPostId);
 
     try {
-      console.log("🔄 Regenerating post with ID:", postId, "individual post ID:", individualPostId);
+      console.log("🔄 Regenerating individual post with ID:", individualPostId, "for post:", postId);
       
-      // Call the regeneration API
-      const updatedPost = await regenerateSinglePostMutation.mutateAsync(postId);
+      // Call the individual post regeneration API
+      const updatedPost = await regenerateIndividualPostMutation.mutateAsync({ 
+        postId, 
+        individualPostId 
+      });
       
-      console.log("✅ Post regenerated successfully:", updatedPost);
+      console.log("✅ Individual post regenerated successfully:", updatedPost);
       
       // Check if response has a data wrapper (backend might return { success: true, data: {...} })
       const finalPostData = (updatedPost as { data?: Post }).data || updatedPost;
@@ -149,10 +152,10 @@ const Dashboard = () => {
       );
       
       toast.success("Post regenerated!", {
-        description: "The post content has been updated with new AI-generated content.",
+        description: "The individual post content has been updated with new AI-generated content.",
       });
     } catch (error) {
-      console.error("❌ Error regenerating post:", error);
+      console.error("❌ Error regenerating individual post:", error);
       toast.error("Failed to regenerate post", {
         description: "Please try again later.",
       });

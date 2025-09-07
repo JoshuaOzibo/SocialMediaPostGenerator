@@ -52,6 +52,24 @@ export class UpdatePostController extends BaseController {
   }
 
   /**
+   * Regenerate a specific individual post content
+   */
+  async regenerateIndividualPost(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userId = this.getUserId(req);
+      const { postId, individualPostId } = req.params;
+
+      this.validateRequiredParams({ postId, individualPostId }, ['postId', 'individualPostId']);
+
+      const post = await postService.regenerateIndividualPost(userId, postId, individualPostId);
+      
+      this.sendSuccess(res, post, 'Individual post regenerated successfully');
+    } catch (error) {
+      this.handleError(res, error, 'regenerateIndividualPost', 'Failed to regenerate individual post');
+    }
+  }
+
+  /**
    * Update images for a specific post
    */
   async updateImages(req: AuthenticatedRequest, res: Response): Promise<void> {

@@ -62,6 +62,12 @@ export const postsApi = {
     return response;
   },
 
+  // Regenerate individual post content
+  regenerateIndividualPost: async (postId: string, individualPostId: string): Promise<Post> => {
+    const response = await api.post<Post>(`${POSTS_ENDPOINTS.BASE}/${postId}/regenerate/${individualPostId}`);
+    return response;
+  },
+
   // Update post images
   updateImages: async (
     id: string, 

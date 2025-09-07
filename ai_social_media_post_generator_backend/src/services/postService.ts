@@ -283,7 +283,90 @@ export class PostService {
   }
 
   /**
-   * Regenerate content for an existing post
+   * Regenerate a specific individual post content
+   */
+  async regenerateIndividualPost(userId: string, postId: string, individualPostId: string): Promise<PostResponse> {
+    try {
+      // Get existing post
+      const existingPost = await this.getPostById(userId, postId);
+      if (!existingPost) {
+        throw new Error('Post not found');
+      }
+
+      console.log('Regenerating individual post:', individualPostId, 'for post:', postId);
+      console.log('Existing post data:', JSON.stringify(existingPost, null, 2));
+
+      // Find the specific individual post to regenerate
+      const individualPosts = existingPost.individual_posts || [];
+      const targetPostIndex = individualPosts.findIndex(post => post.id === individualPostId);
+      
+      if (targetPostIndex === -1) {
+        throw new Error('Individual post not found');
+      }
+
+      const targetPost = individualPosts[targetPostIndex];
+      console.log('Target individual post:', JSON.stringify(targetPost, null, 2));
+
+      // Generate new content for just this one post
+      const generateRequest: PostGenerationRequest = {
+        inputBullets: existingPost.input_bullets,
+        platform: existingPost.platform,
+        tone: existingPost.tone,
+        additionalContext: '', // Not stored in database, use empty string
+        days: 1, // Generate only 1 post
+        includeHashtags: true, // Default to true
+        includeImages: true // Default to true
+      };
+
+      console.log('Generation request:', JSON.stringify(generateRequest, null, 2));
+
+      const generatedPosts = await contentGenerationService.generatePosts(generateRequest);
+      
+      if (generatedPosts.length === 0) {
+        throw new Error('Failed to generate new content');
+      }
+
+      const newPost = generatedPosts[0]; // Take only the first generated post
+      console.log('Generated new post:', JSON.stringify(newPost, null, 2));
+
+      // Create new individual post with the same ID but new content
+      const updatedIndividualPost = {
+        ...targetPost,
+        content: newPost.content,
+        hashtags: newPost.hashtags,
+        images: newPost.imageSuggestions,
+        image_metadata: newPost.images || []
+      };
+
+      // Update the specific individual post in the array
+      const updatedIndividualPosts = [...individualPosts];
+      updatedIndividualPosts[targetPostIndex] = updatedIndividualPost;
+
+      console.log('Updated individual posts:', JSON.stringify(updatedIndividualPosts, null, 2));
+
+      // Update the main post's generated_posts array to maintain consistency
+      const updatedGeneratedPosts = updatedIndividualPosts.map(post => post.content);
+
+      // Update post with new individual post data
+      const updates: UpdatePostRequest = {
+        generated_posts: updatedGeneratedPosts,
+        individual_posts: updatedIndividualPosts
+      };
+
+      console.log('Update request:', JSON.stringify(updates, null, 2));
+
+      const result = await this.updatePost(userId, postId, updates);
+      console.log('Update result:', JSON.stringify(result, null, 2));
+      
+      return result;
+    } catch (error) {
+      console.error('Error regenerating individual post:', error);
+      throw new Error('Failed to regenerate individual post');
+    }
+  }
+
+  /**
+   * Regenerate content for an existing post (all posts)
    */
   async regenerateContent(userId: string, postId: string): Promise<PostResponse> {
     try {

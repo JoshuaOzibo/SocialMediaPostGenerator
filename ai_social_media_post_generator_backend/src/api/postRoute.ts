@@ -22,6 +22,7 @@ route.get('/scheduled', (req, res) => getPostController.getScheduledPosts(req, r
 route.get('/:postId', (req, res) => getPostController.getById(req, res));                                 // Get single post
 route.put('/:postId', validateUpdateRequest, (req, res) => updatePostController.execute(req, res));           // Update post
 route.post('/:postId/regenerate', (req, res) => updatePostController.regenerateContent(req, res));               // Regenerate content
+route.post('/:postId/regenerate/:individualPostId', (req, res) => updatePostController.regenerateIndividualPost(req, res)); // Regenerate individual post
 route.put('/:postId/images', (req, res) => updatePostController.updateImages(req, res));                        // Update post images
 route.delete('/:postId', (req, res) => deletePostController.execute(req, res));                               // Delete post
 
