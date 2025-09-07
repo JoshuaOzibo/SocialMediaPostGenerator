@@ -21,6 +21,7 @@ const Dashboard = () => {
   const [tone, setTone] = useState("");
   const [generatedPosts, setGeneratedPosts] = useState<Post[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [regeneratingPostId, setRegeneratingPostId] = useState<string | null>(null);
 
   // API hooks - only for creating posts
   const createPostMutation = useCreatePost();
@@ -121,12 +122,43 @@ const Dashboard = () => {
     }
   };
 
-  const handleReGenerate = async (formData: GeneratorFormData) => {
-    console.log(formData);
+  const handleReGenerate = async (postId: string) => {
+    if (!postId) {
+      toast.error("Post ID is required for regeneration");
+      return;
+    }
 
-    const reGenerate = await regenerateSinglePostMutation;
-    
-    console.log(reGenerate);
+    setRegeneratingPostId(postId);
+
+    try {
+      console.log("🔄 Regenerating post with ID:", postId);
+      
+      // Call the regeneration API
+      const updatedPost = await regenerateSinglePostMutation.mutateAsync(postId);
+      
+      console.log("✅ Post regenerated successfully:", updatedPost);
+      
+      // Check if response has a data wrapper (backend might return { success: true, data: {...} })
+      const finalPostData = (updatedPost as { data?: Post }).data || updatedPost;
+      
+      // Update the post in the local state
+      setGeneratedPosts((prev) => 
+        prev.map((post) => 
+          post.id === postId ? finalPostData : post
+        )
+      );
+      
+      toast.success("Post regenerated!", {
+        description: "The post content has been updated with new AI-generated content.",
+      });
+    } catch (error) {
+      console.error("❌ Error regenerating post:", error);
+      toast.error("Failed to regenerate post", {
+        description: "Please try again later.",
+      });
+    } finally {
+      setRegeneratingPostId(null);
+    }
   };
 
   return (
@@ -151,15 +183,8 @@ const Dashboard = () => {
               <DashboardResult
                 generatedPosts={generatedPosts}
                 isGenerating={isGenerating || createPostMutation.isPending}
-                handleReGenerate={() =>
-                  handleReGenerate({
-                    ideas: "",
-                    days: "",
-                    scheduleDate: "",
-                    includeHashtags: true,
-                    includeImages: false,
-                  })
-                }
+                handleReGenerate={handleReGenerate}
+                regeneratingPostId={regeneratingPostId}
               />
             </div>
           </div>

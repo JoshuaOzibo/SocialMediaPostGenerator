@@ -14,10 +14,12 @@ const DashboardResult = ({
   generatedPosts,
   isGenerating,
   handleReGenerate,
+  regeneratingPostId,
 }: {
   generatedPosts: Post[];
   isGenerating: boolean;
-  handleReGenerate: () => void;
+  handleReGenerate: (postId: string) => void;
+  regeneratingPostId: string | null;
 }) => {
   const [imageEditorOpen, setImageEditorOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>("");
@@ -93,7 +95,9 @@ const DashboardResult = ({
                 post.generated_posts.map((content, contentIndex) => (
                   <Card
                     key={`post-${post.id}-content-${contentIndex}`}
-                    className="border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200"
+                    className={`border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200 ${
+                      regeneratingPostId === post.id ? 'opacity-75 bg-blue-50/30' : ''
+                    }`}
                   >
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
@@ -193,13 +197,18 @@ const DashboardResult = ({
                             Edit
                           </Button>
                           <Button
-                            onClick={handleReGenerate}
+                            onClick={() => handleReGenerate(post.id || "")}
                             variant="outline"
                             size="sm"
                             className="rounded-xl"
+                            disabled={regeneratingPostId === post.id}
                           >
-                            <RefreshCw className="h-4 w-4 mr-1" />
-                            Regenerate
+                            <RefreshCw 
+                              className={`h-4 w-4 mr-1 ${
+                                regeneratingPostId === post.id ? 'animate-spin' : ''
+                              }`} 
+                            />
+                            {regeneratingPostId === post.id ? 'Regenerating...' : 'Regenerate'}
                           </Button>
                           <Button
                             onClick={handleSave}
