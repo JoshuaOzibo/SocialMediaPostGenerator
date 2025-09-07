@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { Card, CardContent } from "../ui/card";
-import {
-  RefreshCw,
-  Save,
-  Sparkles,
-  Edit,
-  Image as ImageIcon,
-} from "lucide-react";
+import { RefreshCw, Save, Edit, Image as ImageIcon } from "lucide-react";
 import { Button } from "../ui/button";
 import DashboardSkeleton from "./dashboard_skeleton";
 import { Copy } from "lucide-react";
@@ -14,15 +8,16 @@ import { toast } from "sonner";
 import { Post } from "@/lib/api/types";
 import Image from "next/image";
 import ImageEditor from "./ImageEditor";
+import EmptyPostCard from "./empty_post";
 
 const DashboardResult = ({
   generatedPosts,
   isGenerating,
-  handleGenerate,
+  handleReGenerate,
 }: {
   generatedPosts: Post[];
   isGenerating: boolean;
-  handleGenerate: () => void;
+  handleReGenerate: () => void;
 }) => {
   const [imageEditorOpen, setImageEditorOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>("");
@@ -197,7 +192,7 @@ const DashboardResult = ({
                             Edit
                           </Button>
                           <Button
-                            onClick={handleGenerate}
+                            onClick={handleReGenerate}
                             variant="outline"
                             size="sm"
                             className="rounded-xl"
@@ -224,19 +219,7 @@ const DashboardResult = ({
         )}
 
         {/* Empty state */}
-        {generatedPosts.length === 0 && !isGenerating && (
-          <Card className="border-0 shadow-lg rounded-2xl">
-            <CardContent className="p-12 text-center">
-              <Sparkles className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-slate-900 mb-2">
-                No posts yet
-              </h3>
-              <p className="text-slate-600">
-                Fill in your ideas and generate your first set of posts
-              </p>
-            </CardContent>
-          </Card>
-        )}
+        {generatedPosts.length === 0 && !isGenerating && <EmptyPostCard />}
       </div>
 
       {/* Image Editor Modal */}

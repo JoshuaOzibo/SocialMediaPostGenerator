@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import RouteGuard from "@/components/middleware/RouteGuard";
 import DashboardGeneratorSection from "@/components/dashboard_component/dashboard_generator_section";
 import DashboardResult from "@/components/dashboard_component/dashboard_result";
-import { useCreatePost } from "@/hooks/api/usePosts";
+import { useCreatePost, useRegenerateContent } from "@/hooks/api/usePosts";
 import { CreatePostRequest, Post, Platform, Tone } from "@/lib/api/types";
 
 interface GeneratorFormData {
@@ -24,10 +24,13 @@ const Dashboard = () => {
 
   // API hooks - only for creating posts
   const createPostMutation = useCreatePost();
+  const regenerateSinglePostMutation = useRegenerateContent();
 
   const handleGenerate = async (formData: GeneratorFormData) => {
     if (!platform || !tone) {
-      toast.error("Please select both platform and tone before generating posts.");
+      toast.error(
+        "Please select both platform and tone before generating posts."
+      );
       return;
     }
 
@@ -36,10 +39,10 @@ const Dashboard = () => {
     try {
       // Parse ideas into bullet points
       const inputBullets = formData.ideas
-        .split('\n')
-        .map(line => line.trim())
-        .filter(line => line.length > 0)
-        .map(line => line.replace(/^[•\-\*]\s*/, ''));
+        .split("\n")
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+        .map((line) => line.replace(/^[•\-\*]\s*/, ""));
 
       // Create post request data
       const postData: CreatePostRequest = {
@@ -49,64 +52,81 @@ const Dashboard = () => {
         additionalContext: formData.ideas,
         includeHashtags: formData.includeHashtags,
         includeImages: formData.includeImages,
-        days: formData.days ? parseInt(formData.days) : 3,
+        days: formData.days ? parseInt(formData.days) : 1,
         scheduled_at: formData.scheduleDate || undefined,
       };
 
       // Debug: Log the request data
-      console.log('🚀 Sending POST request to /api/v1/posts');
-      console.log('Request data:', JSON.stringify(postData, null, 2));
-      console.log('Platform:', platform);
-      console.log('Tone:', tone);
-      console.log('Input bullets:', inputBullets);
+      console.log("🚀 Sending POST request to /api/v1/posts");
+      console.log("Request data:", JSON.stringify(postData, null, 2));
+      console.log("Platform:", platform);
+      console.log("Tone:", tone);
+      console.log("Input bullets:", inputBullets);
 
       // Call the API to create posts
       const newPost = await createPostMutation.mutateAsync(postData);
-      
+
       // Debug: Log the API response
-      console.log('🎉 API Response received:', newPost);
-      console.log('Generated posts:', newPost.generated_posts);
-      console.log('Hashtags:', newPost.hashtags);
-      
+      console.log("🎉 API Response received:", newPost);
+      console.log("Generated posts:", newPost.generated_posts);
+      console.log("Hashtags:", newPost.hashtags);
+
       // Check if response has a data wrapper (backend might return { success: true, data: {...} })
       const finalPostData = (newPost as { data?: Post }).data || newPost;
-      
-      console.log('📝 Final post data to display:', finalPostData);
-      console.log('Generated posts in final data:', finalPostData.generated_posts);
-      
+
+      console.log("📝 Final post data to display:", finalPostData);
+      console.log(
+        "Generated posts in final data:",
+        finalPostData.generated_posts
+      );
+
       // Add the new post to the list (only show current session posts)
-      setGeneratedPosts(prev => [finalPostData, ...prev]);
+      setGeneratedPosts((prev) => [finalPostData, ...prev]);
 
       toast.success("Posts Generated!", {
         description: "Your social media posts are ready to use.",
       });
     } catch (error: unknown) {
       console.error("Error generating posts:", error);
-      
+
       // Debug: Log more details about the error
-      if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response: { status: number; data: unknown } };
-        console.error('Response status:', axiosError.response.status);
-        console.error('Response data:', axiosError.response.data);
+      if (error && typeof error === "object" && "response" in error) {
+        const axiosError = error as {
+          response: { status: number; data: unknown };
+        };
+        console.error("Response status:", axiosError.response.status);
+        console.error("Response data:", axiosError.response.data);
       }
-      
+
       // Check if it's a timeout error
-      if (error && typeof error === 'object' && 'code' in error) {
+      if (error && typeof error === "object" && "code" in error) {
         const axiosError = error as { code: string; message: string };
-        if (axiosError.code === 'ECONNABORTED' || axiosError.message.includes('timeout')) {
+        if (
+          axiosError.code === "ECONNABORTED" ||
+          axiosError.message.includes("timeout")
+        ) {
           toast.error("Request timed out", {
-            description: "The AI is taking longer than expected to generate content. Please try again.",
+            description:
+              "The AI is taking longer than expected to generate content. Please try again.",
           });
           return;
         }
       }
-      
+
       toast.error("Failed to generate posts", {
         description: "Please try again later.",
       });
     } finally {
       setIsGenerating(false);
     }
+  };
+
+  const handleReGenerate = async (formData: GeneratorFormData) => {
+    console.log(formData);
+
+    const reGenerate = await regenerateSinglePostMutation;
+    
+    console.log(reGenerate);
   };
 
   return (
@@ -131,7 +151,15 @@ const Dashboard = () => {
               <DashboardResult
                 generatedPosts={generatedPosts}
                 isGenerating={isGenerating || createPostMutation.isPending}
-                handleGenerate={() => handleGenerate({ ideas: '', days: '', scheduleDate: '', includeHashtags: true, includeImages: false })}
+                handleReGenerate={() =>
+                  handleReGenerate({
+                    ideas: "",
+                    days: "",
+                    scheduleDate: "",
+                    includeHashtags: true,
+                    includeImages: false,
+                  })
+                }
               />
             </div>
           </div>
