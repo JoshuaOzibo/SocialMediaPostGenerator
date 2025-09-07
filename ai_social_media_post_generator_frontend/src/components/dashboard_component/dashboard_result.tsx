@@ -140,7 +140,8 @@ const DashboardResult = ({
 
                         {/* Generated Image Display */}
 
-                        <div className="relative">
+                        {!post.individual_posts?.[contentIndex]
+                                ?.images && post.images.length > 0 && <div className="relative">
                           <Image
                             src={
                               post.individual_posts?.[contentIndex]
@@ -170,7 +171,7 @@ const DashboardResult = ({
                               <ImageIcon className="h-4 w-4" />
                             </Button>
                           </div>
-                        </div>
+                        </div>}
 
                         <div className="flex gap-2">
                           <Button
