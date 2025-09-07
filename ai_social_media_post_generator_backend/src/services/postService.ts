@@ -292,19 +292,35 @@ export class PostService {
         throw new Error('Post not found');
       }
 
-      // Generate new content
+      console.log('Regenerating content for post:', existingPost.id);
+      console.log('Existing post data:', JSON.stringify(existingPost, null, 2));
+
+      // Generate new content with all the original parameters
       const generateRequest: PostGenerationRequest = {
         inputBullets: existingPost.input_bullets,
         platform: existingPost.platform,
-        tone: existingPost.tone
+        tone: existingPost.tone,
+        additionalContext: '', // Not stored in database, use empty string
+        days: 1, // Default to 1 day
+        includeHashtags: true, // Default to true
+        includeImages: true // Default to true
       };
 
+      console.log('Generation request:', JSON.stringify(generateRequest, null, 2));
+
       const generatedPosts = await contentGenerationService.generatePosts(generateRequest);
+      
+      console.log('Generated posts:', JSON.stringify(generatedPosts, null, 2));
       
       // Extract new content and hashtags
       const generatedContent = generatedPosts.map(post => post.content);
       const allHashtags = generatedPosts.flatMap(post => post.hashtags);
       const imageSuggestions = generatedPosts.flatMap(post => post.imageSuggestions);
+      const allImages = generatedPosts.flatMap(post => post.images || []);
+
+      console.log('Extracted content:', generatedContent);
+      console.log('Extracted hashtags:', allHashtags);
+      console.log('Extracted images:', allImages);
 
       // Update post with new content
       const updates: UpdatePostRequest = {
@@ -313,7 +329,12 @@ export class PostService {
         images: imageSuggestions
       };
 
-      return await this.updatePost(userId, postId, updates);
+      console.log('Update request:', JSON.stringify(updates, null, 2));
+
+      const result = await this.updatePost(userId, postId, updates);
+      console.log('Update result:', JSON.stringify(result, null, 2));
+      
+      return result;
     } catch (error) {
       console.error('Error regenerating content:', error);
       throw new Error('Failed to regenerate content');

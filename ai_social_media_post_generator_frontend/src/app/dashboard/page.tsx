@@ -21,7 +21,7 @@ const Dashboard = () => {
   const [tone, setTone] = useState("");
   const [generatedPosts, setGeneratedPosts] = useState<Post[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [regeneratingPostId, setRegeneratingPostId] = useState<string | null>(null);
+  const [regeneratingContentId, setRegeneratingContentId] = useState<string | null>(null);
 
   // API hooks - only for creating posts
   const createPostMutation = useCreatePost();
@@ -122,16 +122,17 @@ const Dashboard = () => {
     }
   };
 
-  const handleReGenerate = async (postId: string) => {
+  const handleReGenerate = async (postId: string, contentIndex: number) => {
     if (!postId) {
       toast.error("Post ID is required for regeneration");
       return;
     }
 
-    setRegeneratingPostId(postId);
+    const contentId = `${postId}-${contentIndex}`;
+    setRegeneratingContentId(contentId);
 
     try {
-      console.log("🔄 Regenerating post with ID:", postId);
+      console.log("🔄 Regenerating post with ID:", postId, "content index:", contentIndex);
       
       // Call the regeneration API
       const updatedPost = await regenerateSinglePostMutation.mutateAsync(postId);
@@ -157,7 +158,7 @@ const Dashboard = () => {
         description: "Please try again later.",
       });
     } finally {
-      setRegeneratingPostId(null);
+      setRegeneratingContentId(null);
     }
   };
 
@@ -184,7 +185,7 @@ const Dashboard = () => {
                 generatedPosts={generatedPosts}
                 isGenerating={isGenerating || createPostMutation.isPending}
                 handleReGenerate={handleReGenerate}
-                regeneratingPostId={regeneratingPostId}
+                regeneratingContentId={regeneratingContentId}
               />
             </div>
           </div>

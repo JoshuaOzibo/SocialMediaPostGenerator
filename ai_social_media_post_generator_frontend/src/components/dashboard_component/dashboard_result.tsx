@@ -14,12 +14,12 @@ const DashboardResult = ({
   generatedPosts,
   isGenerating,
   handleReGenerate,
-  regeneratingPostId,
+  regeneratingContentId,
 }: {
   generatedPosts: Post[];
   isGenerating: boolean;
-  handleReGenerate: (postId: string) => void;
-  regeneratingPostId: string | null;
+  handleReGenerate: (postId: string, contentIndex: number) => void;
+  regeneratingContentId: string | null;
 }) => {
   const [imageEditorOpen, setImageEditorOpen] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>("");
@@ -96,7 +96,7 @@ const DashboardResult = ({
                   <Card
                     key={`post-${post.id}-content-${contentIndex}`}
                     className={`border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200 ${
-                      regeneratingPostId === post.id ? 'opacity-75 bg-blue-50/30' : ''
+                      regeneratingContentId === `${post.id}-${contentIndex}` ? 'opacity-75 bg-blue-50/30' : ''
                     }`}
                   >
                     <CardContent className="p-6">
@@ -197,18 +197,18 @@ const DashboardResult = ({
                             Edit
                           </Button>
                           <Button
-                            onClick={() => handleReGenerate(post.id || "")}
+                            onClick={() => handleReGenerate(post.id || "", contentIndex)}
                             variant="outline"
                             size="sm"
                             className="rounded-xl"
-                            disabled={regeneratingPostId === post.id}
+                            disabled={regeneratingContentId === `${post.id}-${contentIndex}`}
                           >
                             <RefreshCw 
                               className={`h-4 w-4 mr-1 ${
-                                regeneratingPostId === post.id ? 'animate-spin' : ''
+                                regeneratingContentId === `${post.id}-${contentIndex}` ? 'animate-spin' : ''
                               }`} 
                             />
-                            {regeneratingPostId === post.id ? 'Regenerating...' : 'Regenerate'}
+                            {regeneratingContentId === `${post.id}-${contentIndex}` ? 'Regenerating...' : 'Regenerate'}
                           </Button>
                           <Button
                             onClick={handleSave}
