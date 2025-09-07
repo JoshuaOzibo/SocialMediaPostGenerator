@@ -8,9 +8,12 @@ export interface Post {
   generated_posts: string[];
   hashtags: string[];
   images: string[];
-  image_metadata?: any[]; // Full image objects with URLs and metadata
-  // New fields for individual post data
+  image_metadata?: any[];
   individual_posts?: IndividualPostContent[];
+  includeHashtags?: boolean;
+  includeImages?: boolean;
+  days?: number;
+  additionalContext?: string;
   scheduled_at?: string; // ISO Date String
   status: 'draft' | 'scheduled' | 'published' | 'archived';
   created_at: string;
@@ -35,10 +38,10 @@ export interface CreatePostRequest {
   input_bullets: string[];
   additionalContext?: string;
   scheduled_at?: string;
-  days?: number; // Number of days to generate posts for
-  includeHashtags?: boolean; // Whether to include hashtags
-  includeImages?: boolean; // Whether to include image suggestions
-  scheduleDate?: string; // The start date for posting (YYYY-MM-DD format)
+  days?: number;
+  includeHashtags?: boolean;
+  includeImages?: boolean;
+  scheduleDate?: string;
 }
 
 export interface UpdatePostRequest {
@@ -61,8 +64,13 @@ export interface PostResponse {
   generated_posts: string[];
   hashtags: string[];
   images: string[];
-  image_metadata?: any[]; // Full image objects with URLs and metadata
-  individual_posts?: IndividualPostContent[]; // Individual posts with their own hashtags and images
+  image_metadata?: any[];
+  individual_posts?: IndividualPostContent[];
+ 
+  includeHashtags?: boolean;
+  includeImages?: boolean;
+  days?: number;
+  additionalContext?: string;
   scheduled_at?: string;
   status: Post['status'];
   created_at: string;

@@ -62,10 +62,14 @@ export class PostService {
         tone: request.tone,
         input_bullets: request.input_bullets,
         generated_posts: generatedContent,
-        hashtags: allHashtags, // Keep for backward compatibility
-        images: imageSuggestions, // Keep for backward compatibility
-        image_metadata: allImages, // Keep for backward compatibility
-        individual_posts: individualPosts, // New field with individual post data
+        hashtags: allHashtags,
+        images: imageSuggestions,
+        image_metadata: allImages,
+        individual_posts: individualPosts,
+        includeHashtags: request.includeHashtags,
+        includeImages: request.includeImages,
+        days: request.days,
+        additionalContext: request.additionalContext,
         scheduled_at: request.scheduled_at,
         status: 'draft'
       };
@@ -110,11 +114,9 @@ export class PostService {
       return this.mapToPostResponse(data as Post);
     } catch (error) {
       console.error('Error creating post:', error);
-      // Throw the actual error message instead of a generic one
       if (error instanceof Error) {
         throw error;
       } else {
-        // Handle objects and other types properly
         const errorMessage = typeof error === 'object' && error !== null 
           ? JSON.stringify(error, null, 2) 
           : String(error);
@@ -293,9 +295,6 @@ export class PostService {
         throw new Error('Post not found');
       }
 
-      console.log('Regenerating individual post:', individualPostId, 'for post:', postId);
-      console.log('Existing post data:', JSON.stringify(existingPost, null, 2));
-
       // Find the specific individual post to regenerate
       const individualPosts = existingPost.individual_posts || [];
       const targetPostIndex = individualPosts.findIndex(post => post.id === individualPostId);
@@ -307,15 +306,15 @@ export class PostService {
       const targetPost = individualPosts[targetPostIndex];
       console.log('Target individual post:', JSON.stringify(targetPost, null, 2));
 
-      // Generate new content for just this one post
+      // Generate new content for just this one post using original parameters
       const generateRequest: PostGenerationRequest = {
         inputBullets: existingPost.input_bullets,
         platform: existingPost.platform,
         tone: existingPost.tone,
-        additionalContext: '', // Not stored in database, use empty string
-        days: 1, // Generate only 1 post
-        includeHashtags: true, // Default to true
-        includeImages: true // Default to true
+        additionalContext: existingPost.additionalContext || '', 
+        days: 1,
+        includeHashtags: existingPost.includeHashtags !== false,
+        includeImages: existingPost.includeImages == false,
       };
 
       console.log('Generation request:', JSON.stringify(generateRequest, null, 2));
@@ -326,7 +325,7 @@ export class PostService {
         throw new Error('Failed to generate new content');
       }
 
-      const newPost = generatedPosts[0]; // Take only the first generated post
+      const newPost = generatedPosts[0]; 
       console.log('Generated new post:', JSON.stringify(newPost, null, 2));
 
       // Create new individual post with the same ID but new content
@@ -341,8 +340,6 @@ export class PostService {
       // Update the specific individual post in the array
       const updatedIndividualPosts = [...individualPosts];
       updatedIndividualPosts[targetPostIndex] = updatedIndividualPost;
-
-      console.log('Updated individual posts:', JSON.stringify(updatedIndividualPosts, null, 2));
 
       // Update the main post's generated_posts array to maintain consistency
       const updatedGeneratedPosts = updatedIndividualPosts.map(post => post.content);
@@ -599,8 +596,7 @@ export class PostService {
       }
     } catch (error) {
       console.error('Error creating scheduled post records:', error);
-      // Don't throw here as the main post was already created
-      // Just log the error for debugging
+      
     }
   }
 
@@ -617,7 +613,12 @@ export class PostService {
       hashtags: post.hashtags,
       images: post.images,
       image_metadata: post.image_metadata,
-      individual_posts: post.individual_posts, // Add individual_posts to the response
+      individual_posts: post.individual_posts,
+      // Include original request parameters
+      includeHashtags: post.includeHashtags,
+      includeImages: post.includeImages,
+      days: post.days,
+      additionalContext: post.additionalContext,
       scheduled_at: post.scheduled_at,
       status: post.status,
       created_at: post.created_at,

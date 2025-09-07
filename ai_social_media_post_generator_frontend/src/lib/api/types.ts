@@ -58,6 +58,11 @@ export interface Post {
   images: string[];
   image_metadata?: unknown[];
   individual_posts?: IndividualPostContent[]; // Individual posts with their own hashtags and images
+  // Original request parameters for regeneration
+  includeHashtags?: boolean;
+  includeImages?: boolean;
+  days?: number;
+  additionalContext?: string;
   scheduled_at?: string;
   status: PostStatus;
   created_at: string;
