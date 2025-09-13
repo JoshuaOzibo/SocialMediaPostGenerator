@@ -118,7 +118,45 @@ ${includeHashtags ? '#hashtag1 #hashtag2 #hashtag3' : ''}`).join('\n\n')}
   }
 
   /**
-   * Build detailed image prompts for AI image generation
+   * Build image search terms prompt for better image matching
+   */
+  buildImageSearchTermsPrompt(content: string, platform: string, tone: string): string {
+    return `
+      Analyze this social media post content and generate 3-5 specific, searchable image search terms that would find the most relevant and visually appealing images for this post.
+
+      Post Content: "${content}"
+      Platform: ${platform}
+      Tone: ${tone}
+
+      Requirements:
+      1. Extract the MAIN TOPIC/SUBJECT of the post
+      2. Identify KEY VISUAL ELEMENTS that would represent this content
+      3. Consider the PLATFORM STYLE (${platform})
+      4. Match the TONE (${tone})
+      5. Think about what images would make someone stop scrolling and engage
+
+      Guidelines:
+      - Use specific, concrete terms that work well in image search engines
+      - Focus on visual concepts, not abstract ideas
+      - Include relevant objects, scenes, or activities mentioned
+      - Consider the emotional tone and visual mood
+      - Make terms broad enough to find good images but specific enough to be relevant
+
+      Examples of good search terms:
+      - "puppy training" (not "dog advice")
+      - "mobile app development" (not "technology")
+      - "team meeting" (not "collaboration")
+      - "startup office" (not "entrepreneurship")
+
+      Return ONLY the search terms, separated by commas, like this:
+      search term 1, search term 2, search term 3, search term 4, search term 5
+
+      Do not include any other text or explanations.
+    `;
+  }
+
+  /**
+   * Build detailed image prompts for AI image generation (legacy method)
    */
   buildImagePrompt(content: string, platform: string, tone: string): string {
     const platformStyles: Record<string, string> = {

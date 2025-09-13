@@ -27,31 +27,47 @@ export class ImageService {
       }
 
       const results: ImageResult[] = [];
+      const usedIds = new Set<string>(); // Track used image IDs to avoid duplicates
 
-      for (const searchTerm of searchTerms.slice(0, count)) {
+      // Try each search term and collect unique results
+      for (const searchTerm of searchTerms) {
+        if (results.length >= count) break;
+        
         try {
+          console.log(`Searching Unsplash for: "${searchTerm}"`);
+          
           const response = await unsplash.search.getPhotos({
             query: searchTerm,
             page: 1,
-            perPage: 1,
+            perPage: 3, // Get multiple options per search term
             orientation: 'landscape',
+            orderBy: 'relevant', // Get most relevant images first
           });
 
           if (response.response && response.response.results.length > 0) {
-            const photo = response.response.results[0];
-            results.push({
-              id: photo.id,
-              url: photo.urls.regular,
-              alt: photo.alt_description || searchTerm,
-              photographer: photo.user.name,
-              downloadUrl: photo.links.download_location,
-            });
+            // Find the first unique image we haven't used yet
+            for (const photo of response.response.results) {
+              if (!usedIds.has(photo.id) && results.length < count) {
+                usedIds.add(photo.id);
+                results.push({
+                  id: photo.id,
+                  url: photo.urls.regular,
+                  alt: photo.alt_description || searchTerm,
+                  photographer: photo.user.name,
+                  downloadUrl: photo.links.download_location,
+                });
+                console.log(`Found image: ${photo.alt_description || searchTerm} by ${photo.user.name}`);
+                break; // Move to next search term after finding one image
+              }
+            }
           }
         } catch (error) {
           console.error(`Error fetching image for "${searchTerm}":`, error);
           // Continue with next search term
         }
       }
+
+      console.log(`Total images found: ${results.length} for search terms: ${searchTerms.join(', ')}`);
 
       return results.length > 0 ? results : this.getPlaceholderImages(searchTerms, count);
     } catch (error) {
@@ -65,11 +81,11 @@ export class ImageService {
    */
   async generateImageSearchTerms(content: string, platform: string, tone: string): Promise<string[]> {
     try {
-      // Build detailed image prompt
-      const imagePrompt = promptBuilder.buildImagePrompt(content, platform, tone);
+      // Build improved image search terms prompt
+      const searchTermsPrompt = promptBuilder.buildImageSearchTermsPrompt(content, platform, tone);
       
       // Get AI response for image search terms
-      const aiResponse = await geminiClient.generateContent(imagePrompt);
+      const aiResponse = await geminiClient.generateContent(searchTermsPrompt);
       
       if (!aiResponse.success) {
         console.error('Error generating image search terms:', aiResponse.error);
@@ -78,6 +94,8 @@ export class ImageService {
       
       // Parse the AI response to extract search terms
       const searchTerms = this.parseImageSearchTerms(aiResponse.text);
+      
+      console.log(`AI generated search terms:`, searchTerms);
       
       return searchTerms.length > 0 ? searchTerms : this.extractSearchTerms(content, platform);
     } catch (error) {
@@ -91,22 +109,44 @@ export class ImageService {
    */
   private parseImageSearchTerms(aiResponse: string): string[] {
     try {
-      // Clean the response and extract key terms
-      const cleanResponse = aiResponse.toLowerCase()
-        .replace(/[^\w\s,]/g, ' ')
-        .replace(/\s+/g, ' ')
+      console.log('Raw AI response for search terms:', aiResponse);
+      
+      // Look for comma-separated terms (the expected format)
+      const lines = aiResponse.split('\n');
+      let searchTermsText = '';
+      
+      // Find the line that contains comma-separated terms
+      for (const line of lines) {
+        if (line.includes(',') && line.length > 10) {
+          searchTermsText = line.trim();
+          break;
+        }
+      }
+      
+      // If no comma-separated line found, use the entire response
+      if (!searchTermsText) {
+        searchTermsText = aiResponse.trim();
+      }
+      
+      // Clean and split by commas
+      const cleanText = searchTermsText
+        .replace(/^[^a-zA-Z]*/, '') // Remove leading non-letters
+        .replace(/[^a-zA-Z0-9\s,]/g, ' ') // Keep only letters, numbers, spaces, and commas
+        .replace(/\s+/g, ' ') // Replace multiple spaces with single space
         .trim();
       
-      // Split into potential search terms
-      const terms = cleanResponse.split(/[,.]/).map(term => term.trim()).filter(term => term.length > 2);
+      // Split by commas and clean each term
+      const terms = cleanText.split(',')
+        .map(term => term.trim())
+        .filter(term => {
+          // Filter out very short terms and common words
+          const commonWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'this', 'that', 'these', 'those', 'a', 'an', 'as', 'if', 'so', 'no', 'not', 'here', 'there', 'where', 'when', 'why', 'how', 'what', 'who'];
+          return term.length >= 3 && !commonWords.includes(term.toLowerCase());
+        });
       
-      // Filter out common words and keep relevant terms
-      const relevantTerms = terms.filter(term => {
-        const commonWords = ['the', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should', 'may', 'might', 'can', 'this', 'that', 'these', 'those'];
-        return !commonWords.includes(term) && term.length > 3;
-      });
+      console.log('Parsed search terms:', terms);
       
-      return relevantTerms.slice(0, 3); // Return top 3 terms
+      return terms.slice(0, 5); // Return top 5 terms
     } catch (error) {
       console.error('Error parsing image search terms:', error);
       return [];
@@ -149,6 +189,8 @@ export class ImageService {
    */
   async generateImagesForPost(content: string, platform: string, tone: string, count: number = 3): Promise<ImageResult[]> {
     try {
+      console.log(`Generating images for post content: "${content.substring(0, 100)}..."`);
+      
       // Generate AI-powered search terms based on post content
       const searchTerms = await this.generateImageSearchTerms(content, platform, tone);
       
@@ -156,13 +198,17 @@ export class ImageService {
       
       // If we have AI-generated search terms, use them
       if (searchTerms.length > 0) {
-        return await this.fetchImages(searchTerms, count);
+        const images = await this.fetchImages(searchTerms, count);
+        console.log(`Successfully generated ${images.length} images for post`);
+        return images;
       }
 
       // Fallback to basic extraction if AI fails
       const fallbackTerms = this.extractSearchTerms(content, platform);
       console.log(`Using fallback search terms:`, fallbackTerms);
-      return await this.fetchImages(fallbackTerms, count);
+      const images = await this.fetchImages(fallbackTerms, count);
+      console.log(`Successfully generated ${images.length} fallback images for post`);
+      return images;
     } catch (error) {
       console.error('Error generating images for post:', error);
       return this.getPlaceholderImages(['social media'], count);
@@ -170,41 +216,73 @@ export class ImageService {
   }
 
   /**
-   * Extract search terms from post content
+   * Extract search terms from post content (improved fallback)
    */
   private extractSearchTerms(content: string, platform: string): string[] {
     const terms: string[] = [];
     
-    // Remove emojis and special characters
+    // Remove emojis and special characters, keep spaces
     const cleanContent = content.replace(/[^\w\s]/g, ' ').toLowerCase();
     
     // Extract potential keywords
     const words = cleanContent.split(/\s+/).filter(word => word.length > 3);
     
-    // Common business/tech terms that work well for images
-    const businessTerms = [
-      'business', 'technology', 'innovation', 'success', 'team', 'collaboration',
-      'product', 'launch', 'growth', 'strategy', 'leadership', 'development',
-      'startup', 'entrepreneur', 'professional', 'workplace', 'meeting'
-    ];
+    // Enhanced keyword mapping for better image search results
+    const keywordMap: Record<string, string[]> = {
+      // Technology & Development
+      'flutter': ['mobile app development', 'flutter development', 'app programming'],
+      'react': ['react development', 'web development', 'javascript programming'],
+      'native': ['mobile development', 'app development', 'programming'],
+      'development': ['software development', 'programming', 'coding'],
+      'programming': ['coding', 'software development', 'programming'],
+      'coding': ['programming', 'software development', 'coding'],
+      
+      // Business & Professional
+      'business': ['business meeting', 'professional', 'corporate'],
+      'startup': ['startup office', 'entrepreneurship', 'business'],
+      'team': ['team collaboration', 'team meeting', 'teamwork'],
+      'leadership': ['leadership', 'management', 'professional'],
+      'strategy': ['business strategy', 'planning', 'professional'],
+      
+      // Lifestyle & Personal
+      'puppy': ['puppy', 'dog training', 'puppy care'],
+      'dog': ['dog', 'pet care', 'dog training'],
+      'training': ['training', 'learning', 'education'],
+      'tips': ['tips', 'advice', 'help'],
+      'help': ['help', 'support', 'assistance'],
+      
+      // General
+      'innovation': ['innovation', 'technology', 'modern'],
+      'success': ['success', 'achievement', 'professional'],
+      'growth': ['growth', 'development', 'progress'],
+      'creative': ['creative', 'design', 'artistic'],
+      'lifestyle': ['lifestyle', 'modern living', 'personal']
+    };
 
-    // Find matching terms
+    // Find matching terms and their related image search terms
     for (const word of words) {
-      if (businessTerms.includes(word) && !terms.includes(word)) {
-        terms.push(word);
+      if (keywordMap[word]) {
+        terms.push(...keywordMap[word].slice(0, 2)); // Add top 2 related terms
       }
     }
 
-    // Add platform-specific terms
-    if (platform === 'linkedin') {
-      terms.push('professional', 'business');
-    } else if (platform === 'instagram') {
-      terms.push('lifestyle', 'creative');
-    } else if (platform === 'twitter') {
-      terms.push('news', 'trending');
+    // Add platform-specific terms if we don't have enough terms
+    if (terms.length < 3) {
+      const platformTerms: Record<string, string[]> = {
+        linkedin: ['professional business', 'corporate meeting', 'business networking'],
+        twitter: ['social media', 'digital marketing', 'trending topics'],
+        instagram: ['lifestyle', 'creative design', 'visual content'],
+        facebook: ['social networking', 'community', 'social engagement'],
+        tiktok: ['trending', 'viral content', 'social media']
+      };
+      
+      const platformSpecific = platformTerms[platform] || ['social media', 'digital marketing'];
+      terms.push(...platformSpecific.slice(0, 2));
     }
 
-    return terms.slice(0, 3); // Limit to 3 terms
+    // Remove duplicates and limit results
+    const uniqueTerms = [...new Set(terms)];
+    return uniqueTerms.slice(0, 4); // Return top 4 terms
   }
 
   /**
