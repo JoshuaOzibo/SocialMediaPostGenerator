@@ -66,10 +66,10 @@ export class PostService {
         images: imageSuggestions,
         image_metadata: allImages,
         individual_posts: individualPosts,
-        includeHashtags: request.includeHashtags,
-        includeImages: request.includeImages,
+        include_hashtags: request.includeHashtags,
+        include_images: request.includeImages,
         days: request.days,
-        additionalContext: request.additionalContext,
+        additional_context: request.additionalContext,
         scheduled_at: request.scheduled_at,
         status: 'draft'
       };
@@ -381,10 +381,10 @@ export class PostService {
         inputBullets: existingPost.input_bullets,
         platform: existingPost.platform,
         tone: existingPost.tone,
-        additionalContext: '', // Not stored in database, use empty string
-        days: 1, // Default to 1 day
-        includeHashtags: true, // Default to true
-        includeImages: true // Default to true
+        additionalContext: existingPost.additionalContext || '', 
+        days: existingPost.days || 1,
+        includeHashtags: existingPost.includeHashtags !== false,
+        includeImages: existingPost.includeImages !== false
       };
 
       console.log('Generation request:', JSON.stringify(generateRequest, null, 2));
@@ -615,10 +615,10 @@ export class PostService {
       image_metadata: post.image_metadata,
       individual_posts: post.individual_posts,
       // Include original request parameters
-      includeHashtags: post.includeHashtags,
-      includeImages: post.includeImages,
+      includeHashtags: post.include_hashtags,
+      includeImages: post.include_images,
       days: post.days,
-      additionalContext: post.additionalContext,
+      additionalContext: post.additional_context,
       scheduled_at: post.scheduled_at,
       status: post.status,
       created_at: post.created_at,

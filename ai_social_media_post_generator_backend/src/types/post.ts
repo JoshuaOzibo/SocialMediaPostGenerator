@@ -10,10 +10,10 @@ export interface Post {
   images: string[];
   image_metadata?: any[];
   individual_posts?: IndividualPostContent[];
-  includeHashtags?: boolean;
-  includeImages?: boolean;
+  include_hashtags?: boolean;
+  include_images?: boolean;
   days?: number;
-  additionalContext?: string;
+  additional_context?: string;
   scheduled_at?: string; // ISO Date String
   status: 'draft' | 'scheduled' | 'published' | 'archived';
   created_at: string;
