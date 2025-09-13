@@ -61,6 +61,68 @@ export class ContentGenerationService {
   }
 
   /**
+   * Generate posts with regeneration focus (for regenerating existing content)
+   */
+  async generateRegeneratedPosts(request: PostGenerationRequest, existingContent?: string): Promise<GeneratedPost[]> {
+    try {
+      console.log('Starting post regeneration for request:', JSON.stringify(request, null, 2));
+      
+      const prompt = promptBuilder.buildRegenerationPrompt(request, existingContent);
+      console.log('Generated regeneration prompt:', prompt);
+      
+      const aiResponse = await geminiClient.generateContent(prompt);
+      console.log('AI Regeneration Response:', JSON.stringify(aiResponse, null, 2));
+      
+      if (!aiResponse.success) {
+        throw new Error(aiResponse.error || 'Failed to regenerate posts');
+      }
+      
+      const posts = contentParser.parseGeneratedPosts(aiResponse.text);
+      console.log('Parsed regenerated posts:', JSON.stringify(posts, null, 2));
+      
+      // Generate real images for each post if requested
+      if (request.includeImages !== false) { // Default to true if not specified
+        for (const post of posts) {
+          const images = await imageService.generateImagesForPost(post.content, request.platform, request.tone, 3);
+          post.imageSuggestions = images.map(img => img.url); // Store image URLs
+          post.images = images; // Store full image objects
+        }
+      } else {
+        // Clear image suggestions if not requested
+        for (const post of posts) {
+          post.imageSuggestions = [];
+          post.images = [];
+        }
+      }
+      
+      // Generate hashtags for each post if requested
+      if (request.includeHashtags !== false) { // Default to true if not specified
+        for (const post of posts) {
+          if (!post.hashtags || post.hashtags.length === 0) {
+            const hashtagPrompt = promptBuilder.buildHashtagPrompt(post.content, request.platform);
+            const hashtagResponse = await geminiClient.generateContent(hashtagPrompt);
+            
+            if (hashtagResponse.success && hashtagResponse.text) {
+              const hashtags = contentParser.parseHashtags(hashtagResponse.text);
+              post.hashtags = hashtags;
+            }
+          }
+        }
+      } else {
+        // Clear hashtags if not requested
+        for (const post of posts) {
+          post.hashtags = [];
+        }
+      }
+      
+      return posts;
+    } catch (error) {
+      console.error('Error regenerating posts:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Generate scheduled posts for multiple days
    */
   async generateScheduledPosts(request: PostGenerationRequest, scheduleDate: string): Promise<ScheduledPost[]> {

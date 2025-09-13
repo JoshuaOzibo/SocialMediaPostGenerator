@@ -319,7 +319,7 @@ export class PostService {
 
       console.log('Generation request:', JSON.stringify(generateRequest, null, 2));
 
-      const generatedPosts = await contentGenerationService.generatePosts(generateRequest);
+      const generatedPosts = await contentGenerationService.generateRegeneratedPosts(generateRequest, targetPost.content);
       
       if (generatedPosts.length === 0) {
         throw new Error('Failed to generate new content');
@@ -389,7 +389,9 @@ export class PostService {
 
       console.log('Generation request:', JSON.stringify(generateRequest, null, 2));
 
-      const generatedPosts = await contentGenerationService.generatePosts(generateRequest);
+      // Use the first generated post content as reference for regeneration
+      const existingContent = existingPost.generated_posts[0] || '';
+      const generatedPosts = await contentGenerationService.generateRegeneratedPosts(generateRequest, existingContent);
       
       console.log('Generated posts:', JSON.stringify(generatedPosts, null, 2));
       
