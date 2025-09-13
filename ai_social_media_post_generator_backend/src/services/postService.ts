@@ -314,7 +314,7 @@ export class PostService {
         additionalContext: existingPost.additionalContext || '', 
         days: 1,
         includeHashtags: existingPost.includeHashtags !== false,
-        includeImages: existingPost.includeImages == false,
+        includeImages: existingPost.includeImages !== false,
       };
 
       console.log('Generation request:', JSON.stringify(generateRequest, null, 2));
