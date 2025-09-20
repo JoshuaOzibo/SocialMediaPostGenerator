@@ -27,7 +27,7 @@ export class ImageService {
       }
 
       const results: ImageResult[] = [];
-      const usedIds = new Set<string>(); // Track used image IDs to avoid duplicates
+      const usedIds = new Set<string>();
 
       // Try each search term and collect unique results
       for (const searchTerm of searchTerms) {
