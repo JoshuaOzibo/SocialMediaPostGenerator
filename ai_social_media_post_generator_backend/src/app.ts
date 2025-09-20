@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import { Request, Response } from "express";
 dotenv.config();
 import express from "express";
 // import supabase from "./lib/config/supabaseClient.js";
@@ -18,7 +19,7 @@ app.use(cors({
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-app.get("/", (req, res) => {
+app.get("/", (req: Request, res: Response) => {
   res.send("🚀 AI Post Generator Backend is Live!");
 });
 
