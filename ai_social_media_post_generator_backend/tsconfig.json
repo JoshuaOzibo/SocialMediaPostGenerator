@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "module": "NodeNext",
-    "target": "ESNext",
-    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "Node",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
@@ -11,8 +11,9 @@
     "outDir": "./dist",
     "rootDir": "./src",
     "resolveJsonModule": true,
-    "paths": {
-      "*": ["./src/*"]
-    }
-  }
+    "types": ["node"],
+    "baseUrl": "./src"
+  },
+  "include": ["src"],
+  "exclude": ["node_modules", "dist"]
 }
