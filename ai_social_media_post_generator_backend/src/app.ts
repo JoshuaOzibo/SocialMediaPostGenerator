@@ -11,9 +11,17 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL || process.env.FRONTEND_URL_TWO || "*",
+  origin: (origin, callback) => {
+    callback(null, origin || "*");
+  },
   credentials: true,
 }));
+
+
+// app.use(cors({
+//   origin: process.env.FRONTEND_URL || process.env.FRONTEND_URL_TWO || "*",
+//   credentials: true,
+// }));
 
 // Configure body parsing with larger limits for image uploads
 app.use(express.json({ limit: "50mb" }));
