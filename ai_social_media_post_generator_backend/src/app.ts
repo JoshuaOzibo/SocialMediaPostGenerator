@@ -5,6 +5,8 @@ import express from "express";
 // import supabase from "./lib/config/supabaseClient.js";
 import authRoute from "./api/authRoute.js";
 import postRoute from "./api/postRoute.js";
+import healthRoute from "./api/healthRoute.js";
+import keepAliveService from "./services/keepAliveService.js";
 import cors from "cors";
 
 const app = express();
@@ -34,7 +36,24 @@ app.get("/", (req: Request, res: Response) => {
 // API Routes
 app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/posts", postRoute);
+app.use("/api/v1/health", healthRoute);
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
+  
+  // Start the Keep Alive Service to prevent Supabase suspension
+  keepAliveService.start();
+  
+  // Graceful shutdown handling
+  process.on('SIGINT', () => {
+    console.log('\n🛑 Received SIGINT. Gracefully shutting down...');
+    keepAliveService.stop();
+    process.exit(0);
+  });
+  
+  process.on('SIGTERM', () => {
+    console.log('\n🛑 Received SIGTERM. Gracefully shutting down...');
+    keepAliveService.stop();
+    process.exit(0);
+  });
 });
