@@ -58,28 +58,28 @@ const Dashboard = () => {
       };
 
       // Debug: Log the request data
-      console.log("🚀 Sending POST request to /api/v1/posts");
-      console.log("Request data:", JSON.stringify(postData, null, 2));
-      console.log("Platform:", platform);
-      console.log("Tone:", tone);
-      console.log("Input bullets:", inputBullets);
+        // console.log("🚀 Sending POST request to /api/v1/posts");
+        // console.log("Request data:", JSON.stringify(postData, null, 2));
+        // console.log("Platform:", platform);
+        // console.log("Tone:", tone);
+        // console.log("Input bullets:", inputBullets);
 
       // Call the API to create posts
       const newPost = await createPostMutation.mutateAsync(postData);
 
       // Debug: Log the API response
-      console.log("🎉 API Response received:", newPost);
-      console.log("Generated posts:", newPost.generated_posts);
-      console.log("Hashtags:", newPost.hashtags);
+      // console.log(" API Response received:", newPost);
+      // console.log("Generated posts:", newPost.generated_posts);
+      // console.log("Hashtags:", newPost.hashtags);
 
       // Check if response has a data wrapper (backend might return { success: true, data: {...} })
       const finalPostData = (newPost as { data?: Post }).data || newPost;
 
-      console.log("📝 Final post data to display:", finalPostData);
-      console.log(
-        "Generated posts in final data:",
-        finalPostData.generated_posts
-      );
+      // console.log("📝 Final post data to display:", finalPostData);
+      // console.log(
+      //   "Generated posts in final data:",
+      //   finalPostData.generated_posts
+      // );
 
       // Add the new post to the list (only show current session posts)
       setGeneratedPosts((prev) => [finalPostData, ...prev]);
@@ -131,7 +131,7 @@ const Dashboard = () => {
     setRegeneratingContentId(individualPostId);
 
     try {
-      console.log("🔄 Regenerating individual post with ID:", individualPostId, "for post:", postId);
+        // console.log("🔄 Regenerating individual post with ID:", individualPostId, "for post:", postId);
       
       // Call the individual post regeneration API
       const updatedPost = await regenerateIndividualPostMutation.mutateAsync({ 
@@ -139,7 +139,7 @@ const Dashboard = () => {
         individualPostId 
       });
       
-      console.log("✅ Individual post regenerated successfully:", updatedPost);
+        // console.log("✅ Individual post regenerated successfully:", updatedPost);
       
       // Check if response has a data wrapper (backend might return { success: true, data: {...} })
       const finalPostData = (updatedPost as { data?: Post }).data || updatedPost;

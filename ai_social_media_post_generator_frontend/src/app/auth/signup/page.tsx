@@ -20,7 +20,6 @@ const SignupPage = () => {
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Basic validation
     if (!username || username.length < 3) {
       toast.error('Username must be at least 3 characters long');
       return;

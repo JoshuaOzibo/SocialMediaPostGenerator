@@ -31,7 +31,7 @@ const History = () => {
       }
     }
     
-    console.log("API Filters:", apiFilters);
+    // console.log("API Filters:", apiFilters);
     return apiFilters;
   }, [filterPlatform, filterDate]);
 
