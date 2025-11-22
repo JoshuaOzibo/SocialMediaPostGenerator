@@ -59,7 +59,7 @@ export const signUp = async (req: Request, res: Response) => {
     session: signInData.session,
     message: 'User created and signed in successfully'
   });
-  console.log(signInData);
+  // console.log(signInData);
 };
 
 export const signIn = async (req: Request, res: Response) => {
