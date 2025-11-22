@@ -51,9 +51,4 @@ app.listen(PORT, () => {
     process.exit(0);
   });
   
-  process.on('SIGTERM', () => {
-    console.log('\n🛑 Received SIGTERM. Gracefully shutting down...');
-    keepAliveService.stop();
-    process.exit(0);
-  });
 });

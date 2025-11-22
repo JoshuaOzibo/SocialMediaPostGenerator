@@ -19,48 +19,61 @@ router.get('/health', async (req: Request, res: Response) => {
           posts: false,
           scheduled_posts: false
         },
-        error: null as string | null
+        error: null as string | null,
+        warnings: [] as string[]
       }
     };
     
-    // Test 1: Basic connection test using a simple query
+    // Test tables in order: posts (most likely to exist), then user_profiles, then scheduled_posts
+    const tablesToTest = [
+      { name: 'posts', key: 'posts' as const },
+      { name: 'user_profiles', key: 'user_profiles' as const },
+      { name: 'scheduled_posts', key: 'scheduled_posts' as const }
+    ];
+    
     const connectionStart = Date.now();
-    const { data: connectionData, error: connectionError } = await supabase
-      .from('user_profiles')
-      .select('id')
-      .limit(1);
+    let firstSuccessfulTable = false;
     
-    healthCheckResults.database.responseTime = Date.now() - connectionStart;
-    
-    if (connectionError) {
-      healthCheckResults.database.error = connectionError.message;
-      console.error('Database connection test failed:', connectionError);
-    } else {
-      healthCheckResults.database.connected = true;
-      healthCheckResults.database.tables.user_profiles = true;
+    // Test each table
+    for (const table of tablesToTest) {
+      const { data, error } = await supabase
+        .from(table.name)
+        .select('id')
+        .limit(1);
+      
+      if (!error) {
+        healthCheckResults.database.tables[table.key] = true;
+        if (!firstSuccessfulTable) {
+          healthCheckResults.database.connected = true;
+          firstSuccessfulTable = true;
+          healthCheckResults.database.responseTime = Date.now() - connectionStart;
+        }
+      } else {
+        // Handle specific PostgREST errors
+        if (error.code === 'PGRST205') {
+          healthCheckResults.database.warnings.push(
+            `Table '${table.name}' not found in PostgREST schema cache. This usually means:` +
+            `\n  1. The table hasn't been created yet in Supabase (run database_schema.sql)` +
+            `\n  2. PostgREST schema cache needs to be refreshed (restart Supabase or wait a few minutes)` +
+            `\n  3. The table exists but isn't exposed to the API`
+          );
+        } else if (error.code === '42P01') {
+          healthCheckResults.database.warnings.push(
+            `Table '${table.name}' does not exist in the database. Run database_schema.sql in Supabase SQL Editor.`
+          );
+        }
+      }
     }
     
-    // Test 2: Test other tables if basic connection works
-    if (healthCheckResults.database.connected) {
-      // Test posts table
-      const { error: postsError } = await supabase
-        .from('posts')
-        .select('id')
-        .limit(1);
-      
-      if (!postsError) {
-        healthCheckResults.database.tables.posts = true;
-      }
-      
-      // Test scheduled_posts table
-      const { error: scheduledError } = await supabase
-        .from('scheduled_posts')
-        .select('id')
-        .limit(1);
-      
-      if (!scheduledError) {
-        healthCheckResults.database.tables.scheduled_posts = true;
-      }
+    // If no tables are accessible, set the error
+    if (!healthCheckResults.database.connected) {
+      healthCheckResults.database.responseTime = Date.now() - connectionStart;
+      healthCheckResults.database.error = 'No database tables are accessible. ' +
+        'Please ensure the database schema has been created in Supabase and PostgREST has been refreshed.';
+      console.error('Database connection test failed:', {
+        message: healthCheckResults.database.error,
+        warnings: healthCheckResults.database.warnings
+      });
     }
     
     const totalResponseTime = Date.now() - startTime;
@@ -76,7 +89,20 @@ router.get('/health', async (req: Request, res: Response) => {
         message: 'Database connectivity issues detected',
         timestamp: new Date().toISOString(),
         responseTime: `${totalResponseTime}ms`,
-        details: healthCheckResults
+        details: healthCheckResults,
+        troubleshooting: {
+          steps: [
+            '1. Go to your Supabase Dashboard → SQL Editor',
+            '2. Run the SQL from database_schema.sql to create all tables',
+            '3. Run the SQL from database_migration_add_original_params.sql (if not already applied)',
+            '4. Wait 1-2 minutes for PostgREST to refresh its schema cache',
+            '5. If issues persist, try restarting your Supabase project or contact Supabase support'
+          ],
+          errorCode: healthCheckResults.database.error?.includes('PGRST205') ? 'PGRST205' : 'UNKNOWN',
+          meaning: healthCheckResults.database.error?.includes('PGRST205') 
+            ? 'PostgREST cannot find the table in its schema cache. The table may not exist or the cache needs refreshing.'
+            : 'Database connection issue'
+        }
       });
     }
     

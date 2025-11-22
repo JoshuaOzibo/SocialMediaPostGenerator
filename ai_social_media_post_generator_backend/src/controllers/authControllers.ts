@@ -1,5 +1,6 @@
 import supabase from '../lib/config/supabaseClient.js';
 import type { Request, Response } from 'express';
+import jwt from 'jsonwebtoken';
 
 export const signUp = async (req: Request, res: Response) => {
     console.log('Signup request received:', req.body);
@@ -73,93 +74,194 @@ export const signIn = async (req: Request, res: Response) => {
 };
 
 export const googleAuth = async (req: Request, res: Response) => {
+  console.log('🔵 [Google Auth] Request received');
+  console.log('🔵 [Google Auth] Request body:', JSON.stringify(req.body, null, 2));
+  
   try {
     const { user, accessToken } = req.body;
     
-    if (!user || !accessToken) {
-      return res.status(400).json({ error: 'User data and access token are required' });
+    // Validate user data (accessToken is optional)
+    if (!user) {
+      console.error('❌ [Google Auth] Missing user data');
+      return res.status(400).json({ error: 'User data is required' });
     }
 
     const { id, name, email, picture, emailVerified } = user;
 
+    // Validate required user fields
+    if (!id || !email) {
+      console.error('❌ [Google Auth] Missing required user fields:', { id: !!id, email: !!email });
+      return res.status(400).json({ error: 'User ID and email are required' });
+    }
+
+    console.log('🔵 [Google Auth] Processing user:', { id, email, name });
+
     // Check if user already exists by email
+    console.log('🔵 [Google Auth] Checking for existing user...');
     const { data: existingUsers, error: listError } = await supabase.auth.admin.listUsers();
-    if (listError) return res.status(500).json({ error: listError.message });
+    
+    if (listError) {
+      console.error('❌ [Google Auth] Error listing users:', listError);
+      return res.status(500).json({ error: listError.message });
+    }
+    
+    console.log('🔵 [Google Auth] Total users found:', existingUsers?.users?.length || 0);
     
     const existingUser = existingUsers?.users?.find((u) => u.email === email);
+    
+    if (existingUser) {
+      console.log('🔵 [Google Auth] Existing user found:', {
+        id: existingUser.id,
+        email: existingUser.email,
+        metadata: existingUser.user_metadata
+      });
+    } else {
+      console.log('🔵 [Google Auth] No existing user found, will create new user');
+    }
     
     let authUser;
     let session;
 
     if (existingUser) {
-      // User exists - check if it's a Google user
-      const isGoogleUser = existingUser.user_metadata?.auth_provider === 'google' || 
-                          existingUser.user_metadata?.google_id === id;
+      // User exists - link Google account to existing user (regardless of original auth method)
+      console.log('🔵 [Google Auth] User exists, linking Google account...');
+      console.log('🔵 [Google Auth] Existing user metadata:', existingUser.user_metadata);
       
-      if (isGoogleUser) {
-        // This is a Google user, we need to handle this differently
-        // Since we can't sign in with Google token directly, we'll update the user metadata
-        // and create a new session using admin API
-        
-        const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(
-          existingUser.id,
-          {
-            user_metadata: {
-              ...existingUser.user_metadata,
-              google_id: id,
-              full_name: name,
-              avatar_url: picture,
-              email_verified: emailVerified,
-              auth_provider: 'google',
-              last_login: new Date().toISOString()
-            }
+      // Update user metadata to include Google auth info
+      const { data: updateData, error: updateError } = await supabase.auth.admin.updateUserById(
+        existingUser.id,
+        {
+          user_metadata: {
+            ...existingUser.user_metadata,
+            google_id: id,
+            full_name: name,
+            avatar_url: picture,
+            email_verified: emailVerified,
+            auth_provider: 'google',
+            last_login: new Date().toISOString()
           }
-        );
-        console.log(updateData);
-        
-        if (updateError) {
-          console.error('Error updating user metadata:', updateError);
-          // Continue anyway, don't fail the request
         }
-        
-        authUser = updateData?.user || existingUser;
-        
-        // Create a new session for the user
-        const { data: sessionData, error: sessionError } = await supabase.auth.admin.generateLink({
-          type: 'magiclink',
-          email: email,
-          options: {
-            redirectTo: `${process.env.FRONTEND_URL}`
-          }
-        });
-        
-        if (sessionError) {
-          console.error('Error creating session:', sessionError);
-          // For now, we'll return the user without a session
-          // In a production app, you'd want to implement proper session management
-        }
-        
-        // For now, we'll create a mock session since we can't easily create a real one
-        session = {
-          access_token: `mock_${Date.now()}`,
-          refresh_token: `mock_refresh_${Date.now()}`,
-          expires_in: 3600,
-          token_type: 'bearer',
-          user: authUser
-        };
-        console.log(session);
-        
+      );
+      
+      if (updateError) {
+        console.error('❌ [Google Auth] Error updating user metadata:', updateError);
+        // Continue anyway, don't fail the request
       } else {
-        // This is a regular user, not a Google user
-        return res.status(400).json({ 
-          error: 'A user with this email address has already been registered with a different authentication method.' 
-        });
+        console.log('✅ [Google Auth] User metadata updated with Google info');
       }
+      
+      authUser = updateData?.user || existingUser;
+      console.log('🔵 [Google Auth] Using existing user:', authUser.id);
+      
+      // Generate a Google password pattern and update user's password
+      // This allows them to sign in with Google in the future
+      const googlePassword = `google_${id}_${Date.now()}`;
+      
+      console.log('🔵 [Google Auth] Updating user password for Google sign-in...');
+      const { error: updatePasswordError } = await supabase.auth.admin.updateUserById(
+        existingUser.id,
+        {
+          password: googlePassword
+        }
+      );
+      
+      if (updatePasswordError) {
+        console.error('❌ [Google Auth] Error updating password:', updatePasswordError);
+        // Fallback: generate JWT token
+        const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        
+        if (serviceKey) {
+          try {
+            // Create a JWT token that Supabase will accept
+            const token = jwt.sign(
+              {
+                aud: 'authenticated',
+                exp: Math.floor(Date.now() / 1000) + 3600,
+                sub: authUser.id,
+                email: authUser.email,
+                role: 'authenticated'
+              },
+              serviceKey,
+              { algorithm: 'HS256' }
+            );
+            
+            session = {
+              access_token: token,
+              refresh_token: `refresh_${Date.now()}`,
+              expires_in: 3600,
+              token_type: 'bearer',
+              user: authUser
+            };
+            
+            console.log('✅ [Google Auth] JWT token generated as fallback');
+          } catch (tokenError) {
+            console.error('❌ [Google Auth] Error generating JWT:', tokenError);
+            return res.status(500).json({ error: 'Failed to create session' });
+          }
+        } else {
+          return res.status(500).json({ error: 'Service role key not configured' });
+        }
+      } else {
+        // Sign in with the updated password to get a real session
+        console.log('🔵 [Google Auth] Signing in with updated password...');
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password: googlePassword
+        });
+        
+        if (signInError || !signInData?.session) {
+          console.error('❌ [Google Auth] Could not sign in after password update:', signInError);
+          // Fallback: generate JWT token
+          const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+          
+          if (serviceKey) {
+            try {
+              const token = jwt.sign(
+                {
+                  aud: 'authenticated',
+                  exp: Math.floor(Date.now() / 1000) + 3600,
+                  sub: authUser.id,
+                  email: authUser.email,
+                  role: 'authenticated'
+                },
+                serviceKey,
+                { algorithm: 'HS256' }
+              );
+              
+              session = {
+                access_token: token,
+                refresh_token: `refresh_${Date.now()}`,
+                expires_in: 3600,
+                token_type: 'bearer',
+                user: authUser
+              };
+              
+              console.log('✅ [Google Auth] JWT token generated as fallback');
+            } catch (tokenError) {
+              console.error('❌ [Google Auth] Error generating JWT:', tokenError);
+              return res.status(500).json({ error: 'Failed to create session' });
+            }
+          } else {
+            return res.status(500).json({ error: 'Service role key not configured' });
+          }
+        } else {
+          // Successfully signed in, use the real session
+          session = signInData.session;
+          console.log('✅ [Google Auth] Real session created via signInWithPassword');
+        }
+      }
+      
+      console.log('✅ [Google Auth] Session created for existing user');
+      
     } else {
       // Create new Google user
+      console.log('🔵 [Google Auth] Creating new Google user...');
+      
+      const googlePassword = `google_${id}_${Date.now()}`;
+      
       const { data: adminData, error: adminError } = await supabase.auth.admin.createUser({
         email,
-        password: `google_${id}_${Date.now()}`, // Generate a unique password
+        password: googlePassword,
         email_confirm: true,
         user_metadata: {
           google_id: id,
@@ -172,28 +274,37 @@ export const googleAuth = async (req: Request, res: Response) => {
       });
       
       if (adminError) {
-        // Check if the error is about existing user
-        if (adminError.message.includes('already been registered')) {
-          return res.status(400).json({ 
-            error: 'A user with this email address has already been registered with a different authentication method.' 
-          });
-        }
+        console.error('❌ [Google Auth] Error creating user:', adminError);
         return res.status(400).json({ error: adminError.message });
       }
       
       authUser = adminData.user;
+      console.log('✅ [Google Auth] New Google user created:', authUser.id);
       
-      // Create a mock session for new users
-      session = {
-        access_token: `mock_${Date.now()}`,
-        refresh_token: `mock_refresh_${Date.now()}`,
-        expires_in: 3600,
-        token_type: 'bearer',
-        user: authUser
-      };
+      // Sign in the newly created user to get a real session
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password: googlePassword
+      });
+      
+      if (signInError || !signInData?.session) {
+        console.warn('⚠️ [Google Auth] Could not sign in new user, creating fallback session');
+        // Fallback session
+        session = {
+          access_token: `mock_${Date.now()}`,
+          refresh_token: `mock_refresh_${Date.now()}`,
+          expires_in: 3600,
+          token_type: 'bearer',
+          user: authUser
+        };
+      } else {
+        session = signInData.session;
+        console.log('✅ [Google Auth] Real session created for new user');
+      }
     }
 
     // Create or update user profile
+    console.log('🔵 [Google Auth] Creating/updating user profile...');
     const { error: profileError } = await supabase
       .from('user_profiles')
       .upsert({
@@ -205,10 +316,13 @@ export const googleAuth = async (req: Request, res: Response) => {
       });
 
     if (profileError) {
-      console.error('Profile creation error:', profileError);
+      console.error('❌ [Google Auth] Profile creation error:', profileError);
       // Don't fail the request if profile creation fails
+    } else {
+      console.log('✅ [Google Auth] User profile created/updated');
     }
 
+    console.log('✅ [Google Auth] Success! Returning response');
     res.status(200).json({ 
       user: authUser, 
       session,
@@ -216,7 +330,8 @@ export const googleAuth = async (req: Request, res: Response) => {
     });
 
   } catch (error) {
-    console.error('Google auth error:', error);
+    console.error('❌ [Google Auth] Unexpected error:', error);
+    console.error('❌ [Google Auth] Error stack:', error instanceof Error ? error.stack : 'No stack trace');
     res.status(500).json({ error: 'Internal server error during Google authentication' });
   }
 };

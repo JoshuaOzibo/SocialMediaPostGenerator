@@ -42,7 +42,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
       <GoogleLogin
         onSuccess={handleGoogleSuccess}
         onError={handleGoogleError}
-        useOneTap={false} // Disable One Tap to avoid FedCM issues
+        useOneTap={false}
         theme="outline"
         size="large"
         type="standard"
