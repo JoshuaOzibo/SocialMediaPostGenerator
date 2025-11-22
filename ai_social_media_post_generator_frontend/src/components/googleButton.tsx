@@ -1,6 +1,7 @@
 "use client"
 
 import React from 'react';
+import { useRouter } from 'next/navigation';
 import { useGoogleAuth } from '@/hooks/api/useGoogleAuth';
 import { GoogleLogin, CredentialResponse } from '@react-oauth/google';
 
@@ -13,26 +14,30 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   onSuccess, 
   onError 
 }) => {
+  const router = useRouter();
   const { signInWithGoogle, error } = useGoogleAuth();
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     try {
-      console.log('Google OAuth success, credential received');
+      // console.log('Google OAuth success, credential received');
       if (credentialResponse.credential) {
         await signInWithGoogle(credentialResponse.credential);
+        router.push('/');
+        
+        // Call the onSuccess callback if provided
         onSuccess?.();
       } else {
         throw new Error('No credential received from Google');
       }
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Google sign-in failed';
-      console.error('Google sign-in error:', err);
+      // console.error('Google sign-in error:', err);
       onError?.(errorMessage);
     }
   };
 
   const handleGoogleError = () => {
-    console.error('Google OAuth error occurred');
+    // console.error('Google OAuth error occurred');
     const errorMessage = 'Google sign-in was cancelled or failed. Please try again.';
     onError?.(errorMessage);
   };

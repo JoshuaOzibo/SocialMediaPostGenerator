@@ -21,7 +21,7 @@ interface HistoryPostsProps {
 }
 
 const HistoryPosts = ({ filteredPosts, isLoading, filterPlatform, filterDate }: HistoryPostsProps) => {
-  console.log("filteredPosts", filteredPosts);
+  // console.log("filteredPosts", filteredPosts);
   const deletePostMutation = useDeletePost();
   
   // State to track current image index for each post
@@ -36,9 +36,9 @@ const HistoryPosts = ({ filteredPosts, isLoading, filterPlatform, filterDate }: 
     try {
       await deletePostMutation.mutateAsync(id);
       toast.success("Post deleted successfully!");
-    } catch (error) {
-      toast.error("Failed to delete post");
-      console.error("Delete error:", error);
+    } catch {
+      toast.error("Failed to delete post! Please try again.");
+      // console.error("Delete error:", error);
     }
   };
 

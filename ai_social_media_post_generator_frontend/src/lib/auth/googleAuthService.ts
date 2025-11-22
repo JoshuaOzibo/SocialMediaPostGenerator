@@ -1,5 +1,6 @@
 import { GoogleUser, GoogleAuthResponse } from '@/lib/api/types';
 import { decodeJwtToken, formatUserData } from '@/lib/utils';
+import { setAuthToken } from '@/lib/utils/auth';
 
 export class GoogleAuthService {
   private static instance: GoogleAuthService;
@@ -108,6 +109,15 @@ export class GoogleAuthService {
       if (data.session) {
         localStorage.setItem('backendSession', JSON.stringify(data.session));
         localStorage.setItem('backendUser', JSON.stringify(data.user));
+        
+        // Extract and store the access token for authentication
+        const accessToken = (data.session as { access_token?: string })?.access_token;
+        if (accessToken) {
+          setAuthToken(accessToken);
+          console.log('✅ Backend access token stored successfully');
+        } else {
+          console.warn('⚠️ No access token found in backend session');
+        }
       }
 
     } catch (error) {

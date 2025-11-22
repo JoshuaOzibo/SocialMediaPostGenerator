@@ -27,11 +27,11 @@ const LoginPage = () => {
   };
 
   const handleGoogleSuccess = () => {
-    toast.success("Google sign-in successful! Check console for user details.");
+    toast.success("Google sign-in successful!");
   };
 
-  const handleGoogleError = (error: string) => {
-    toast.error(`Google sign-in failed: ${error}`);
+  const handleGoogleError = () => {
+    toast.error(`Google sign-in failed! Please try again.`);
   };
 
   return (
