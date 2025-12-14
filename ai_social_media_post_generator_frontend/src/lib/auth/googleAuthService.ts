@@ -42,13 +42,13 @@ export class GoogleAuthService {
       const response: GoogleAuthResponse = {
         user,
         access_token: credential,
-        expires_at: Date.now() + 3600000, // 1 hour from now
+        expires_at: Date.now() + 3600000,
       };
 
       // Log user details as requested
       console.log('Google Sign-In Successful:', {
         user: formatUserData(user),
-        accessToken: credential.substring(0, 20) + '...', // Log partial token for security
+        accessToken: credential.substring(0, 20) + '...',
         expiresAt: new Date(response.expires_at).toISOString(),
       });
 
@@ -66,10 +66,10 @@ export class GoogleAuthService {
     try {
       const formattedUser = formatUserData(user);
       
-      console.log('Sending to backend:', {
-        user: formattedUser,
-        apiUrl: `${this.apiUrl}/auth/google`
-      });
+      // console.log('Sending to backend:', {
+      //   user: formattedUser,
+      //   apiUrl: `${this.apiUrl}/auth/google`
+      // });
       
       const response = await fetch(`${this.apiUrl}/auth/google`, {
         method: 'POST',
@@ -85,11 +85,11 @@ export class GoogleAuthService {
       const data = await response.json();
 
       if (!response.ok) {
-        console.error('Backend authentication failed:', {
-          status: response.status,
-          statusText: response.statusText,
-          error: data.error
-        });
+        // console.error('Backend authentication failed:', {
+        //   status: response.status,
+        //   statusText: response.statusText,
+        //   error: data.error
+        // });
         
         // Handle specific backend errors
         if (data.error?.includes('already been registered')) {
@@ -99,11 +99,11 @@ export class GoogleAuthService {
         throw new Error(data.error || 'Failed to authenticate with backend');
       }
 
-      console.log('Backend authentication successful:', {
-        message: data.message,
-        userId: data.user?.id,
-        session: data.session ? 'Session created' : 'No session'
-      });
+      // console.log('Backend authentication successful:', {
+      //   message: data.message,
+      //   userId: data.user?.id,
+      //   session: data.session ? 'Session created' : 'No session'
+      // });
 
       // Store backend session data
       if (data.session) {
@@ -114,9 +114,9 @@ export class GoogleAuthService {
         const accessToken = (data.session as { access_token?: string })?.access_token;
         if (accessToken) {
           setAuthToken(accessToken);
-          console.log('✅ Backend access token stored successfully');
+          // console.log('✅ Backend access token stored successfully');
         } else {
-          console.warn('⚠️ No access token found in backend session');
+          // console.warn('⚠️ No access token found in backend session');
         }
       }
 

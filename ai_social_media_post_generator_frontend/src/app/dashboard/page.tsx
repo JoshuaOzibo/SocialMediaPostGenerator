@@ -88,15 +88,18 @@ const Dashboard = () => {
         description: "Your social media posts are ready to use.",
       });
     } catch (error: unknown) {
-      console.error("Error generating posts:", error);
+      // console.error("Error generating posts:", error);
 
       // Debug: Log more details about the error
       if (error && typeof error === "object" && "response" in error) {
         const axiosError = error as {
           response: { status: number; data: unknown };
         };
-        console.error("Response status:", axiosError.response.status);
-        console.error("Response data:", axiosError.response.data);
+      toast.error("Failed to generate posts", {
+        description: "Please try again later. Error: " + axiosError.response.data,
+      });
+        // console.error("Response status:", axiosError.response.status);
+        // console.error("Response data:", axiosError.response.data);
       }
 
       // Check if it's a timeout error
@@ -155,9 +158,9 @@ const Dashboard = () => {
         description: "The individual post content has been updated with new AI-generated content.",
       });
     } catch (error) {
-      console.error("❌ Error regenerating individual post:", error);
+      // console.error("❌ Error regenerating individual post:", error);
       toast.error("Failed to regenerate post", {
-        description: "Please try again later.",
+        description: "Please try again later. Error: " + error,
       });
     } finally {
       setRegeneratingContentId(null);
@@ -169,7 +172,6 @@ const Dashboard = () => {
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
         <div className="container mx-auto px-4 py-8">
           <div className="grid lg:grid-cols-2 gap-8 h-[calc(80vh-2rem)]">
-            {/* Generator Section - Fixed */}
             <div className="lg:sticky lg:top-8 lg:h-fit">
               <DashboardGeneratorSection
                 setPlatform={setPlatform}
@@ -181,7 +183,6 @@ const Dashboard = () => {
               />
             </div>
 
-            {/* Results Section - Scrollable */}
             <div className="lg:overflow-y-auto lg:pr-4 scrollbar-hide">
               <DashboardResult
                 generatedPosts={generatedPosts}
