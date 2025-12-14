@@ -34,9 +34,9 @@ const HistoryFilterCard = ({
             <Filter className="h-5 w-5 mr-2" />
             Filters
           </CardTitle>
-          {/* <span className="text-sm text-slate-600">
-            {filteredPosts.length} of {filteredPosts.length} posts
-          </span> */}
+          <span className="text-sm text-slate-600">
+            {filteredPosts.length} posts
+          </span>
         </div>
       </CardHeader>
       <CardContent>
@@ -44,9 +44,9 @@ const HistoryFilterCard = ({
           <div>
             <label className="text-sm font-medium text-slate-700 mb-2 block">
               Platform
-            </label>
+            </label>  
             <Select value={filterPlatform} onValueChange={setFilterPlatform}>
-              <SelectTrigger className="rounded-xl border-slate-200">
+              <SelectTrigger className="w-full sm:w-[50%] rounded-xl border-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -65,7 +65,7 @@ const HistoryFilterCard = ({
               Date Range
             </label>
             <Select value={filterDate} onValueChange={setFilterDate}>
-              <SelectTrigger className="rounded-xl border-slate-200">
+              <SelectTrigger className="w-full sm:w-[50%] rounded-xl border-slate-200">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

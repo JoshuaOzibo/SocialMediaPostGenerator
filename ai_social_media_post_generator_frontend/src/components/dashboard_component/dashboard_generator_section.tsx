@@ -85,13 +85,13 @@ const DashboardGeneratorSection = ({
                   />
                 </div>
 
-                <div className="grid sm:grid-cols-2 gap-8">
+                <div className="grid sm:grid-cols-2 gap-4 sm:gap-8">
                   <div>
                     <Label className="text-sm font-medium text-slate-700 mb-2 block">
                       Platform
                     </Label>
                     <Select value={platform} onValueChange={setPlatform}>
-                      <SelectTrigger className="rounded-xl border-slate-200">
+                      <SelectTrigger className="w-full rounded-xl border-slate-200">
                         <SelectValue placeholder="Choose platform" />
                       </SelectTrigger>
                       <SelectContent>
@@ -107,7 +107,7 @@ const DashboardGeneratorSection = ({
                         Tone
                         </Label>
                         <Select value={tone} onValueChange={setTone}>
-                        <SelectTrigger className="rounded-xl border-slate-200">
+                        <SelectTrigger className="w-full rounded-xl border-slate-200">
                             <SelectValue placeholder="Select tone" />
                         </SelectTrigger>
                         <SelectContent>
@@ -129,7 +129,7 @@ const DashboardGeneratorSection = ({
                         value={days}
                         onValueChange={setDays}
                         >
-                        <SelectTrigger className="rounded-xl sm:w-[50%] w-[40%] border-slate-200">
+                        <SelectTrigger className="w-full sm:w-[50%] rounded-xl border-slate-200">
                             <SelectValue placeholder="Select days to start posting" />
                         </SelectTrigger>
                         <SelectContent> 
@@ -152,7 +152,7 @@ const DashboardGeneratorSection = ({
                       type="date"
                       value={scheduleDate}
                       onChange={(e: React.ChangeEvent<HTMLInputElement>) => setScheduleDate(e.target.value)}
-                      className="rounded-xl sm:w-[70%] w-[40%] border-slate-200"
+                      className="w-full sm:w-[70%] rounded-xl border-slate-200"
                     />
                   </div>
 
