@@ -37,6 +37,7 @@ const Hero = () => {
           <Button
             variant="outline"
             size="lg"
+            disabled={true}            
             className="rounded-2xl px-8 py-6 text-lg font-semibold border-slate-200 hover:border-slate-300 transition-all duration-200"
           >
             Watch Demo
