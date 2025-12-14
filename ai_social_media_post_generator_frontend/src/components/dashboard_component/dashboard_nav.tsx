@@ -17,40 +17,44 @@ const DashBoardNav = () => {
   };
 
   return (
-    <header className="container mx-auto bg-white/80 backdrop-blur-sm sticky top-0 z-10">
-      <nav className="flex items-center justify-between">
-        <div className="flex items-center space-x-4">
-          <Link href="/">
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-slate-600 hover:text-slate-900"
-            >
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back
-            </Button>
-          </Link>
-          <div className="flex items-center space-x-2">
-            <Sparkles className="h-6 w-6 text-blue-600" />
-            <span className="text-lg font-semibold text-slate-900">
-              Dashboard
-            </span>
-          </div>
+    <nav className="w-full flex items-center justify-between gap-2 sm:gap-4">
+      <div className="flex items-center space-x-2 sm:space-x-4 flex-shrink-0">
+        <Link href="/">
+          <Button
+            variant="ghost"
+            size="sm"
+            className="text-slate-600 hover:text-slate-900 px-2 sm:px-3"
+          >
+            <ArrowLeft className="h-4 w-4 sm:mr-2" />
+            <span className="hidden sm:inline">Back</span>
+          </Button>
+        </Link>
+        <div className="hidden md:flex items-center space-x-2">
+          <Sparkles className="h-6 w-6 text-blue-600" />
+          <span className="text-lg font-semibold text-slate-900">
+            Dashboard
+          </span>
         </div>
-        <div className="flex items-center space-x-2">
+      </div>
+      <div className="flex items-center space-x-1 sm:space-x-2 flex-shrink-0">
         <Link href="/history">
-          <Button variant="outline" className="rounded-xl">
-            View History
+          <Button variant="outline" size="sm" className="rounded-xl text-xs sm:text-sm px-2 sm:px-4">
+            <span className="hidden sm:inline">View History</span>
+            <span className="sm:hidden">History</span>
           </Button>
         </Link>
 
-        <Button variant="outline" className="rounded-xl hover:bg-red-500 hover:text-white text-red-500" onClick={handleLogout}>
+        <Button 
+          variant="outline" 
+          size="sm"
+          className="rounded-xl hover:bg-red-500 hover:text-white text-red-500 px-2 sm:px-3" 
+          onClick={handleLogout}
+        >
           <LogOut className="h-4 w-4" />
-          Logout
+          <span className="hidden sm:inline ml-2">Logout</span>
         </Button>
-        </div>
-      </nav>
-    </header>
+      </div>
+    </nav>
   );
 };
 

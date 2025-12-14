@@ -50,8 +50,8 @@ const History = () => {
   return (
     <>
       <RouteGuard requireAuth={true}>
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-          <div className="container mx-auto px-4 py-8">
+        <div className="w-full bg-gradient-to-br from-slate-50 via-white to-slate-50">
+          <div className="container mx-auto px-4 py-4 sm:py-8">
             <div className="max-w-4xl mx-auto space-y-6">
               {/* Filters */}
               <HistoryFilterCard

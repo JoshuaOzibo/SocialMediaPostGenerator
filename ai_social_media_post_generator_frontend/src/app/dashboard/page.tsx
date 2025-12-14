@@ -169,10 +169,10 @@ const Dashboard = () => {
 
   return (
     <RouteGuard requireAuth={true}>
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid lg:grid-cols-2 gap-8 h-[calc(80vh-2rem)]">
-            <div className="lg:sticky lg:top-8 lg:h-fit">
+      <div className="w-full bg-gradient-to-br from-slate-50 via-white to-slate-50">
+        <div className="container mx-auto px-4 py-4 sm:py-8">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-8 lg:h-[calc(80vh-2rem)]">
+            <div className="lg:sticky lg:top-24 lg:h-fit">
               <DashboardGeneratorSection
                 setPlatform={setPlatform}
                 platform={platform}
