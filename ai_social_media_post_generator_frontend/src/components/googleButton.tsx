@@ -10,20 +10,24 @@ interface GoogleSignInButtonProps {
   onError?: (error: string) => void;
 }
 
-const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({ 
-  onSuccess, 
-  onError 
+const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
+  onSuccess,
+  onError
 }) => {
   const router = useRouter();
   const { signInWithGoogle, error } = useGoogleAuth();
+
+  React.useEffect(() => {
+    router.prefetch('/dashboard');
+  }, [router]);
 
   const handleGoogleSuccess = async (credentialResponse: CredentialResponse) => {
     try {
       // console.log('Google OAuth success, credential received');
       if (credentialResponse.credential) {
         await signInWithGoogle(credentialResponse.credential);
-        router.push('/');
-        
+        router.push('/dashboard');
+
         // Call the onSuccess callback if provided
         onSuccess?.();
       } else {
@@ -58,7 +62,7 @@ const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
         locale="en"
         context="signin"
       />
-      
+
       {error && (
         <div className="mt-2 text-red-600 text-sm text-center">
           {error}

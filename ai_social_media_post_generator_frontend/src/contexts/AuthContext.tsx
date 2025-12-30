@@ -48,21 +48,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Check authentication status on mount and route changes
   useEffect(() => {
     if (!isClient) return;
-    
+
     const checkAuth = () => {
       const hasToken = authApi.isAuthenticated();
-      
+
       if (!hasToken && PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
         // User is not authenticated but trying to access protected route
         router.push('/auth/login');
         return;
       }
-      
-      if (hasToken && PUBLIC_ROUTES.some(route => pathname.startsWith(route))) {
-        // User is authenticated but on public route, redirect to hom
-        if (pathname === '/') {
-          router.push('/');
-        }
+
+      const isAuthRoute = ['/auth/login', '/auth/signup', '/auth'].some(route => pathname.startsWith(route));
+
+      if (hasToken && isAuthRoute) {
+        // User is authenticated but on auth page, redirect to dashboard
+        router.push('/dashboard');
         return;
       }
     };

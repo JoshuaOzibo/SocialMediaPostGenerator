@@ -7,6 +7,7 @@ import { Eye, Mail, Lock, User } from "lucide-react";
 import GoogleSignInButton from "@/components/googleButton";
 import FloatingLabelInput from "@/components/floatinglabel";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useSignup } from "@/hooks/api/useAuth";
 import { SignupRequest } from "@/lib/api/types";
 import { toast } from "sonner";
@@ -15,7 +16,13 @@ const SignupPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { mutate: signup, isPending } = useSignup();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    router.prefetch("/dashboard");
+  }, [router]);
 
   const handleSignup = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -40,7 +47,11 @@ const SignupPage = () => {
       email,
       password,
     };
-    signup(userData);
+    signup(userData, {
+      onSuccess: () => {
+        setIsRedirecting(true);
+      }
+    });
   };
 
   return (
@@ -153,7 +164,13 @@ const SignupPage = () => {
               </div>
             </div>
 
-            <GoogleSignInButton />
+            <GoogleSignInButton
+              onSuccess={() => {
+                setIsRedirecting(true);
+                toast.success("Google sign-in successful!");
+              }}
+              onError={(err) => toast.error(err)}
+            />
           </div>
 
           <div className="mt-6 text-center">
@@ -168,6 +185,15 @@ const SignupPage = () => {
             </p>
           </div>
         </CardContent>
+        {/* Redirecting Overlay */}
+        {isRedirecting && (
+          <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-lg">
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-200">Redirecting to Dashboard...</p>
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );

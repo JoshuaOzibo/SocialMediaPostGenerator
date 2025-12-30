@@ -7,6 +7,7 @@ import { Eye, Mail, Lock } from "lucide-react";
 import GoogleSignInButton from "@/components/googleButton";
 import FloatingLabelInput from "@/components/floatinglabel";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useLogin } from "@/hooks/api/useAuth";
 import { LoginRequest } from "@/lib/api/types";
 import { toast } from "sonner";
@@ -14,7 +15,14 @@ import { toast } from "sonner";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isRedirecting, setIsRedirecting] = useState(false);
   const { mutate: login, isPending } = useLogin();
+  const router = useRouter();
+
+  React.useEffect(() => {
+    router.prefetch("/dashboard");
+  }, [router]);
+
 
   const handleLogin = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -23,10 +31,15 @@ const LoginPage = () => {
       email,
       password,
     };
-    login(credentials);
+    login(credentials, {
+      onSuccess: () => {
+        setIsRedirecting(true);
+      }
+    });
   };
 
   const handleGoogleSuccess = () => {
+    setIsRedirecting(true);
     toast.success("Google sign-in successful!");
   };
 
@@ -142,6 +155,16 @@ const LoginPage = () => {
             </p>
           </div>
         </CardContent>
+
+        {/* Redirecting Overlay */}
+        {isRedirecting && (
+          <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-lg">
+            <div className="flex flex-col items-center">
+              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+              <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-200">Redirecting to Dashboard...</p>
+            </div>
+          </div>
+        )}
       </Card>
     </div>
   );

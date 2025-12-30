@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
-import { GoogleAuthResponse, BackendUser, BackendSession } from '@/lib/api/types';
+import { useQueryClient } from '@tanstack/react-query';
+import { GoogleAuthResponse, BackendUser, BackendSession, queryKeys } from '@/lib/api/types';
 import GoogleAuthService from '@/lib/auth/googleAuthService';
 
 interface UseGoogleAuthReturn {
@@ -20,6 +21,7 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [backendUser, setBackendUser] = useState<BackendUser | null>(null);
   const [backendSession, setBackendSession] = useState<BackendSession | null>(null);
+  const queryClient = useQueryClient();
 
   const googleAuthService = GoogleAuthService.getInstance();
 
@@ -49,38 +51,43 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
 
     try {
       const response = await googleAuthService.handleGoogleSignIn(credential);
-      
+
       setUser(response.user);
       setIsAuthenticated(true);
-      
+
       // Store user data in localStorage for persistence
       localStorage.setItem('googleUser', JSON.stringify(response.user));
       localStorage.setItem('googleAccessToken', response.access_token);
       localStorage.setItem('googleTokenExpiry', response.expires_at.toString());
-      
+
       // Check for backend session data
       const storedBackendUser = localStorage.getItem('backendUser');
       const storedBackendSession = localStorage.getItem('backendSession');
-      
+
       if (storedBackendUser) {
         setBackendUser(JSON.parse(storedBackendUser));
       }
-      
+
       if (storedBackendSession) {
         setBackendSession(JSON.parse(storedBackendSession));
       }
-      
+
+      // Update React Query Cache immediately to prevent refetch on Dashboard
+      // Ideally we should use the backend user if available
+      const userToCache = storedBackendUser ? JSON.parse(storedBackendUser) : response.user;
+      queryClient.setQueryData(queryKeys.auth.user(), userToCache);
+
     } catch (err) {
       const errorMessage = err instanceof Error ? err.message : 'Google sign-in failed';
       setError(errorMessage);
       console.error('Google Sign-In Hook Error:', err);
-      
+
       // Clear any partial state on error
       setUser(null);
       setIsAuthenticated(false);
       setBackendUser(null);
       setBackendSession(null);
-      
+
       // Clear localStorage on error
       localStorage.removeItem('googleUser');
       localStorage.removeItem('googleAccessToken');
@@ -98,14 +105,14 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
     setError(null);
     setBackendUser(null);
     setBackendSession(null);
-    
+
     // Clear localStorage
     localStorage.removeItem('googleUser');
     localStorage.removeItem('googleAccessToken');
     localStorage.removeItem('googleTokenExpiry');
     localStorage.removeItem('backendUser');
     localStorage.removeItem('backendSession');
-    
+
     console.log('Google Sign-Out Successful');
   }, []);
 
