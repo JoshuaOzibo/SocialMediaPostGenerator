@@ -3,10 +3,9 @@ import supabase from '../lib/config/supabaseClient.js';
 class KeepAliveService {
   private intervalId: NodeJS.Timeout | null = null;
   private isRunning = false;
-  private isInsertMode = true; 
 
   constructor() {
-    console.log('🔄 Keep Alive Service initialized - will alternate between insert and delete every 4 days');
+    console.log('🔄 Keep Alive Service initialized - will maintain single activity record every 4 days');
   }
 
   public start(): void {
@@ -54,51 +53,73 @@ class KeepAliveService {
    */
   private async performKeepAlive(): Promise<void> {
     try {
-      if (this.isInsertMode) {
-        // Insert mode: Insert "goodmorning db" into the database
-        const { data, error } = await supabase
-          .from('db_keepalive')
-          .insert([{ message: 'goodmorning db' }])
-          .select();
+      // Check for existing records
+      const { data: existingRecords, error: fetchError } = await supabase
+        .from('db_keepalive')
+        .select('id, created_at')
+        .eq('message', 'goodmorning db')
+        .order('created_at', { ascending: false });
 
-        if (error) {
-          console.error('❌ Keep Alive INSERT failed:', error.message);
+      if (fetchError) {
+        // console.error('❌ Keep Alive CHECK failed:', fetchError.message);
+        return;
+      }
+
+      if (existingRecords && existingRecords.length > 0) {
+        // Records exist - use the most recent one
+        const recordToKeep = existingRecords[0];
+
+        // Update the timestamp of the existing record to keep DB active
+        const { error: updateError } = await supabase
+          .from('db_keepalive')
+          .update({ created_at: new Date().toISOString() })
+          .eq('id', recordToKeep.id);
+
+        if (updateError) {
+          console.error('❌ Keep Alive UPDATE failed:', updateError.message);
+        } else {
+          console.log(`✅ Keep Alive UPDATE successful for record ${recordToKeep.id} at ${new Date().toISOString()}`);
+        }
+
+        // Clean up duplicates if any
+        if (existingRecords.length > 1) {
+          const idsToDelete = existingRecords.slice(1).map(r => r.id);
+          const { error: deleteError } = await supabase
+            .from('db_keepalive')
+            .delete()
+            .in('id', idsToDelete);
+
+          if (deleteError) {
+            console.error('❌ Keep Alive CLEANUP failed:', deleteError.message);
+          } else {
+            console.log(`🧹 Keep Alive CLEANUP successful - removed ${idsToDelete.length} duplicate records`);
+          }
+        }
+      } else {
+        // No records exist - Insert new one
+        const { error: insertError } = await supabase
+          .from('db_keepalive')
+          .insert([{ message: 'goodmorning db' }]);
+
+        if (insertError) {
+          console.error('❌ Keep Alive INSERT failed:', insertError.message);
         } else {
           console.log(`✅ Keep Alive INSERT successful at ${new Date().toISOString()}`);
         }
-      } else {
-        // Delete mode: Find and delete "goodmorning db" records
-        const { error } = await supabase
-          .from('db_keepalive')
-          .delete()
-          .eq('message', 'goodmorning db');
-
-        if (error) {
-          console.error('❌ Keep Alive DELETE failed:', error.message);
-        } else {
-          console.log(`✅ Keep Alive DELETE successful at ${new Date().toISOString()}`);
-        }
       }
-
-      // Toggle between insert and delete mode
-      this.isInsertMode = !this.isInsertMode;
     } catch (error) {
       console.error('❌ Keep Alive operation failed:', error instanceof Error ? error.message : 'Unknown error');
     }
   }
 
-  /**
-   * Get the current status of the service
-   */
-  public getStatus(): { running: boolean; nextOperation: 'insert' | 'delete' } {
+  public getStatus(): { running: boolean; mode: string } {
     return {
       running: this.isRunning,
-      nextOperation: this.isInsertMode ? 'insert' : 'delete'
+      mode: 'maintenance'
     };
   }
 }
 
-// Create singleton instance
 const keepAliveService = new KeepAliveService();
 
 export default keepAliveService;

@@ -56,41 +56,17 @@ const Dashboard = () => {
         days: formData.days ? parseInt(formData.days) : 1,
         scheduled_at: formData.scheduleDate || undefined,
       };
-
-      // Debug: Log the request data
-        // console.log("🚀 Sending POST request to /api/v1/posts");
-        // console.log("Request data:", JSON.stringify(postData, null, 2));
-        // console.log("Platform:", platform);
-        // console.log("Tone:", tone);
-        // console.log("Input bullets:", inputBullets);
-
-      // Call the API to create posts
       const newPost = await createPostMutation.mutateAsync(postData);
 
-      // Debug: Log the API response
-      // console.log(" API Response received:", newPost);
-      // console.log("Generated posts:", newPost.generated_posts);
-      // console.log("Hashtags:", newPost.hashtags);
-
-      // Check if response has a data wrapper (backend might return { success: true, data: {...} })
       const finalPostData = (newPost as { data?: Post }).data || newPost;
 
-      // console.log("📝 Final post data to display:", finalPostData);
-      // console.log(
-      //   "Generated posts in final data:",
-      //   finalPostData.generated_posts
-      // );
-
-      // Add the new post to the list (only show current session posts)
+      setGeneratedPosts((prev) => [finalPostData, ...prev]);
       setGeneratedPosts((prev) => [finalPostData, ...prev]);
 
       toast.success("Posts Generated!", {
         description: "Your social media posts are ready to use.",
       });
     } catch (error: unknown) {
-      // console.error("Error generating posts:", error);
-
-      // Debug: Log more details about the error
       if (error && typeof error === "object" && "response" in error) {
         const axiosError = error as {
           response: { status: number; data: unknown };
@@ -98,11 +74,8 @@ const Dashboard = () => {
       toast.error("Failed to generate posts", {
         description: "Please try again later. Error: " + axiosError.response.data,
       });
-        // console.error("Response status:", axiosError.response.status);
-        // console.error("Response data:", axiosError.response.data);
       }
 
-      // Check if it's a timeout error
       if (error && typeof error === "object" && "code" in error) {
         const axiosError = error as { code: string; message: string };
         if (
@@ -134,20 +107,14 @@ const Dashboard = () => {
     setRegeneratingContentId(individualPostId);
 
     try {
-        // console.log("🔄 Regenerating individual post with ID:", individualPostId, "for post:", postId);
-      
-      // Call the individual post regeneration API
       const updatedPost = await regenerateIndividualPostMutation.mutateAsync({ 
         postId, 
         individualPostId 
       });
       
-        // console.log("✅ Individual post regenerated successfully:", updatedPost);
       
-      // Check if response has a data wrapper (backend might return { success: true, data: {...} })
       const finalPostData = (updatedPost as { data?: Post }).data || updatedPost;
       
-      // Update the post in the local state
       setGeneratedPosts((prev) => 
         prev.map((post) => 
           post.id === postId ? finalPostData : post
@@ -158,7 +125,7 @@ const Dashboard = () => {
         description: "The individual post content has been updated with new AI-generated content.",
       });
     } catch (error) {
-      // console.error("❌ Error regenerating individual post:", error);
+      
       toast.error("Failed to regenerate post", {
         description: "Please try again later. Error: " + error,
       });

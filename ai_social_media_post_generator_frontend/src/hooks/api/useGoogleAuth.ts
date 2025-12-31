@@ -25,7 +25,6 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
 
   const googleAuthService = GoogleAuthService.getInstance();
 
-  // Initialize state from localStorage on mount
   useEffect(() => {
     const storedUser = localStorage.getItem('googleUser');
     const storedBackendUser = localStorage.getItem('backendUser');
@@ -55,7 +54,6 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
       setUser(response.user);
       setIsAuthenticated(true);
 
-      // Store user data in localStorage for persistence
       localStorage.setItem('googleUser', JSON.stringify(response.user));
       localStorage.setItem('googleAccessToken', response.access_token);
       localStorage.setItem('googleTokenExpiry', response.expires_at.toString());
@@ -72,8 +70,6 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
         setBackendSession(JSON.parse(storedBackendSession));
       }
 
-      // Update React Query Cache immediately to prevent refetch on Dashboard
-      // Ideally we should use the backend user if available
       const userToCache = storedBackendUser ? JSON.parse(storedBackendUser) : response.user;
       queryClient.setQueryData(queryKeys.auth.user(), userToCache);
 
@@ -82,13 +78,11 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
       setError(errorMessage);
       console.error('Google Sign-In Hook Error:', err);
 
-      // Clear any partial state on error
       setUser(null);
       setIsAuthenticated(false);
       setBackendUser(null);
       setBackendSession(null);
 
-      // Clear localStorage on error
       localStorage.removeItem('googleUser');
       localStorage.removeItem('googleAccessToken');
       localStorage.removeItem('googleTokenExpiry');
@@ -106,7 +100,6 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
     setBackendUser(null);
     setBackendSession(null);
 
-    // Clear localStorage
     localStorage.removeItem('googleUser');
     localStorage.removeItem('googleAccessToken');
     localStorage.removeItem('googleTokenExpiry');
@@ -115,7 +108,7 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
 
     console.log('Google Sign-Out Successful');
   }, []);
-
+  
   return {
     signInWithGoogle,
     isLoading,
