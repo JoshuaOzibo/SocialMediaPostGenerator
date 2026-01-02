@@ -14,22 +14,16 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: LoginRequest) => authApi.login(credentials),
     onSuccess: (data: { session: unknown; user: unknown }) => {
-      // Invalidate and refetch user data
       queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
-      
-      // Set user data in query cache
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
-      
-      // Show success message
+
       toast.success('Login successful!');
-      
-      // Navigate to homapage
+
       router.push('/dashboard');
     },
     onError: (error: AxiosError) => {
       console.error('Login error:', error);
-      
-      // Handle different types of errors
+
       if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
         toast.error('Network Error', {
           description: 'Please check your internet connection and try again.',
@@ -63,15 +57,12 @@ export const useSignup = () => {
       return authApi.signup(userData);
     },
     onSuccess: (data: { user: unknown; session: unknown }) => {
-      // Invalidate and refetch user data
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
-      
-      // Set user data in query cache
+queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });      // Set user data in query cache
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
-      
+
       // Show success message
       toast.success('Account created successfully!');
-      
+
       // Navigate to dashboard immediately since user is authenticated
       router.push('/dashboard');
     },
@@ -79,7 +70,7 @@ export const useSignup = () => {
 
     onError: (error: AxiosError) => {
       console.error('Signup error:', error);
-      
+
       // Handle different types of errors
       if (error.code === 'NETWORK_ERROR' || error.message.includes('Network Error')) {
         toast.error('Network Error', {
@@ -143,30 +134,9 @@ export const useCurrentUser = () => {
   });
 };
 
-// Hook for refreshing token
-export const useRefreshToken = () => {
-  // const queryClient = useQueryClient();
-
-  // return useMutation({
-  //   mutationFn: () => authApi.refreshToken(),
-  //   onSuccess: () => {
-  //     // Update token in cache if needed
-  //     console.log('Token refreshed successfully');
-  //   },
-  //   onError: (error) => {
-  //     console.error('Token refresh error:', error);
-  //     // If refresh fails, logout user
-  //     authApi.logout();
-  //     queryClient.clear();
-  //   },
-  // });
-};
-
-// Hook for checking authentication status
 export const useAuthStatus = () => {
   const { data: user, isLoading, error } = useCurrentUser();
-  
-  // On server-side, always return not authenticated and not loading
+
   if (typeof window === 'undefined') {
     return {
       isAuthenticated: false,
@@ -175,7 +145,7 @@ export const useAuthStatus = () => {
       error: null,
     };
   }
-  
+
   return {
     isAuthenticated: !!user,
     user,

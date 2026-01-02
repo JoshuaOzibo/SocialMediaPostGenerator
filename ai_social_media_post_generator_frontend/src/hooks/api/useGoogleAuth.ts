@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { GoogleAuthResponse, BackendUser, BackendSession, queryKeys } from '@/lib/api/types';
 import GoogleAuthService from '@/lib/auth/googleAuthService';
+import { setAuthToken } from '@/lib/utils/auth';
 
 interface UseGoogleAuthReturn {
   signInWithGoogle: (credential: string) => Promise<void>;
@@ -58,7 +59,8 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
       localStorage.setItem('googleAccessToken', response.access_token);
       localStorage.setItem('googleTokenExpiry', response.expires_at.toString());
 
-      // Check for backend session data
+      setAuthToken(response.access_token);
+
       const storedBackendUser = localStorage.getItem('backendUser');
       const storedBackendSession = localStorage.getItem('backendSession');
 
@@ -108,7 +110,7 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
 
     console.log('Google Sign-Out Successful');
   }, []);
-  
+
   return {
     signInWithGoogle,
     isLoading,
