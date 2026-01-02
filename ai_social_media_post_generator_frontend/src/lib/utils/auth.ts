@@ -1,19 +1,15 @@
 // Secure token management utilities
 
 /**
- * Set authentication token in both localStorage and cookie
+ * Set authentication token in localStorage only
  */
 export const setAuthToken = (token: string): void => {
   if (typeof window === 'undefined') return;
-  
+
   // Store in localStorage for client-side access
   localStorage.setItem('auth_token', token);
-  
-  // Set cookie for server-side access (middleware)
-  // Use a simple format that middleware can easily read
-  document.cookie = `auth_token=${token}; path=/; max-age=3600; SameSite=Lax`;
-  
-  // console.log('Token stored in localStorage and cookie');
+
+  // console.log('Token stored in localStorage');
 };
 
 /**
@@ -29,15 +25,12 @@ export const getAuthToken = (): string | null => {
  */
 export const clearAuthData = (): void => {
   if (typeof window === 'undefined') return;
-  
+
   // Clear localStorage
   localStorage.removeItem('auth_token');
   localStorage.removeItem('backendSession');
   localStorage.removeItem('backendUser');
-  
-  // Clear cookie
-  document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-  
+
   // console.log('Auth data cleared');
 };
 
@@ -54,14 +47,14 @@ export const isAuthenticated = (): boolean => {
  */
 export const debugAuthState = (): void => {
   if (typeof window === 'undefined') return;
-  
+
   const localStorageToken = localStorage.getItem('auth_token');
   const cookies = document.cookie.split(';').reduce((acc, cookie) => {
     const [key, value] = cookie.trim().split('=');
     acc[key] = value;
     return acc;
   }, {} as Record<string, string>);
-  
+
   // console.log('=== Auth Debug Info ===');
   // console.log('localStorage token:', localStorageToken ? 'Present' : 'Missing');
   // console.log('Cookie token:', cookies.auth_token ? 'Present' : 'Missing');
@@ -75,11 +68,11 @@ export const debugAuthState = (): void => {
  */
 export const isValidToken = (token: string): boolean => {
   if (!token || typeof token !== 'string') return false;
-  
+
   // Basic JWT format validation (3 parts separated by dots)
   const parts = token.split('.');
   if (parts.length !== 3) return false;
-  
+
   // Check if parts are base64 encoded
   try {
     parts.forEach(part => {
@@ -114,7 +107,7 @@ export const getTokenExpiration = (token: string): Date | null => {
 export const isTokenExpired = (token: string): boolean => {
   const expiration = getTokenExpiration(token);
   if (!expiration) return true;
-  
+
   return expiration.getTime() < Date.now();
 };
 
@@ -124,7 +117,7 @@ export const isTokenExpired = (token: string): boolean => {
 export const shouldRefreshToken = (token: string): boolean => {
   const expiration = getTokenExpiration(token);
   if (!expiration) return true;
-  
+
   // Refresh if token expires in less than 5 minutes
   const fiveMinutes = 5 * 60 * 1000;
   return expiration.getTime() - Date.now() < fiveMinutes;

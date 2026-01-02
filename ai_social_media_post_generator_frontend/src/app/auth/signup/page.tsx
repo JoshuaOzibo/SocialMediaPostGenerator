@@ -16,7 +16,6 @@ const SignupPage = () => {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [isRedirecting, setIsRedirecting] = useState(false);
   const { mutate: signup, isPending } = useSignup();
   const router = useRouter();
 
@@ -47,11 +46,7 @@ const SignupPage = () => {
       email,
       password,
     };
-    signup(userData, {
-      onSuccess: () => {
-        setIsRedirecting(true);
-      }
-    });
+    signup(userData);
   };
 
   return (
@@ -166,7 +161,6 @@ const SignupPage = () => {
 
             <GoogleSignInButton
               onSuccess={() => {
-                setIsRedirecting(true);
                 toast.success("Google sign-in successful!");
               }}
               onError={(err) => toast.error(err)}
@@ -185,15 +179,7 @@ const SignupPage = () => {
             </p>
           </div>
         </CardContent>
-        {/* Redirecting Overlay */}
-        {isRedirecting && (
-          <div className="absolute inset-0 bg-white/60 dark:bg-gray-800/60 backdrop-blur-[2px] z-50 flex items-center justify-center rounded-lg">
-            <div className="flex flex-col items-center">
-              <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-              <p className="mt-2 text-sm font-medium text-gray-700 dark:text-gray-200">Redirecting to Dashboard...</p>
-            </div>
-          </div>
-        )}
+
       </Card>
     </div>
   );

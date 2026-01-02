@@ -7,33 +7,7 @@ const PROTECTED_ROUTES = ['/dashboard', '/history'];
 const AUTH_ROUTES = ['/auth/login', '/auth/signup', '/auth'];
 
 export function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
-  
-  // Get token from cookies or headers
-  const token = request.cookies.get('auth_token')?.value || 
-                request.headers.get('authorization')?.replace('Bearer ', '');
-
-  // Check if user is authenticated
-  const isAuthenticated = !!token;
-  
-  // Check if current route is protected
-  const isProtectedRoute = PROTECTED_ROUTES.some(route => pathname.startsWith(route));
-  const isAuthRoute = AUTH_ROUTES.some(route => pathname.startsWith(route));
-
-  // If accessing protected route without authentication, redirect to login
-  if (isProtectedRoute && !isAuthenticated) {
-    console.log('Middleware: Redirecting unauthenticated user from', pathname, 'to /auth/login');
-    const loginUrl = new URL('/auth/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // If authenticated user tries to access auth pages, redirect to dashboard
-  if (isAuthenticated && isAuthRoute) {
-    console.log('Middleware: Redirecting authenticated user from', pathname, 'to /dashboard');
-    return NextResponse.redirect(new URL('/dashboard', request.url));
-  }
-
+  // Client-side routing and RouteGuard will handle authentication
   return NextResponse.next();
 }
 
