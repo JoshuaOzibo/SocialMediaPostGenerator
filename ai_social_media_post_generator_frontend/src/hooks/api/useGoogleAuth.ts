@@ -90,6 +90,9 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
       localStorage.removeItem('googleTokenExpiry');
       localStorage.removeItem('backendUser');
       localStorage.removeItem('backendSession');
+
+      // Re-throw the error so the component handling the storage knows it failed
+      throw err;
     } finally {
       setIsLoading(false);
     }

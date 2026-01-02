@@ -45,13 +45,6 @@ export class GoogleAuthService {
         expires_at: Date.now() + 3600000,
       };
 
-      // Log user details as requested
-      console.log('Google Sign-In Successful:', {
-        user: formatUserData(user),
-        accessToken: credential.substring(0, 20) + '...',
-        expiresAt: new Date(response.expires_at).toISOString(),
-      });
-
       // Send user data to backend
       await this.sendToBackend(user, credential);
 
@@ -65,11 +58,6 @@ export class GoogleAuthService {
   private async sendToBackend(user: GoogleUser, accessToken: string): Promise<void> {
     try {
       const formattedUser = formatUserData(user);
-      
-      // console.log('Sending to backend:', {
-      //   user: formattedUser,
-      //   apiUrl: `${this.apiUrl}/auth/google`
-      // });
       
       const response = await fetch(`${this.apiUrl}/auth/google`, {
         method: 'POST',
