@@ -13,7 +13,7 @@ export const setAuthToken = (token: string): void => {
   // Use a simple format that middleware can easily read
   document.cookie = `auth_token=${token}; path=/; max-age=3600; SameSite=Lax`;
   
-  console.log('Token stored in localStorage and cookie');
+  // console.log('Token stored in localStorage and cookie');
 };
 
 /**
@@ -38,7 +38,7 @@ export const clearAuthData = (): void => {
   // Clear cookie
   document.cookie = 'auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
   
-  console.log('Auth data cleared');
+  // console.log('Auth data cleared');
 };
 
 /**
@@ -62,12 +62,12 @@ export const debugAuthState = (): void => {
     return acc;
   }, {} as Record<string, string>);
   
-  console.log('=== Auth Debug Info ===');
-  console.log('localStorage token:', localStorageToken ? 'Present' : 'Missing');
-  console.log('Cookie token:', cookies.auth_token ? 'Present' : 'Missing');
-  console.log('isAuthenticated():', isAuthenticated());
-  console.log('All cookies:', cookies);
-  console.log('=======================');
+  // console.log('=== Auth Debug Info ===');
+  // console.log('localStorage token:', localStorageToken ? 'Present' : 'Missing');
+  // console.log('Cookie token:', cookies.auth_token ? 'Present' : 'Missing');
+  // console.log('isAuthenticated():', isAuthenticated());
+  // console.log('All cookies:', cookies);
+  // console.log('=======================');
 };
 
 /**
