@@ -95,9 +95,8 @@ const DashboardResult = ({
                 post.individual_posts.map((individualPost, contentIndex) => (
                   <Card
                     key={`individual-post-${individualPost.id}`}
-                    className={`border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200 ${
-                      regeneratingContentId === individualPost.id ? 'opacity-75 bg-blue-50/30' : ''
-                    }`}
+                    className={`border-0 shadow-lg rounded-2xl hover:shadow-xl transition-all duration-200 ${regeneratingContentId === individualPost.id ? 'opacity-75 bg-blue-50/30' : ''
+                      }`}
                   >
                     <CardContent className="p-6">
                       <div className="flex items-center justify-between mb-4">
@@ -190,10 +189,9 @@ const DashboardResult = ({
                             d-xl"
                             disabled={regeneratingContentId === individualPost.id}
                           >
-                            <RefreshCw 
-                              className={`h-4 w-4 mr-1 ${
-                                regeneratingContentId === individualPost.id ? 'animate-spin' : ''
-                              }`} 
+                            <RefreshCw
+                              className={`h-4 w-4 mr-1 ${regeneratingContentId === individualPost.id ? 'animate-spin' : ''
+                                }`}
                             />
                             {regeneratingContentId === individualPost.id ? 'Regenerating...' : 'Regenerate'}
                           </Button>
@@ -220,14 +218,7 @@ const DashboardResult = ({
       </div>
 
       {/* Image Editor Modal */}
-      {imageEditorOpen && (
-        <ImageEditor
-          postId={selectedPostId}
-          contentIndex={selectedContentIndex}
-          currentImages={selectedImages}
-          onClose={handleCloseImageEditor}
-        />
-      )}
+
     </>
   );
 };

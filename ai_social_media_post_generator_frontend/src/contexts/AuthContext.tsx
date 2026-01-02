@@ -80,11 +80,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Check if error is 401 (Unauthorized)
       const isAuthError = (error as any)?.response?.status === 401;
 
-      if (isAuthError && PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {
-        toast.error('Session expired. Please log in again.');
-        // Perform cleanup using logout function to ensure consistency
-        logout();
-      }
+      if (isAuthError && PROTECTED_ROUTES.some(route => pathname.startsWith(route))) {}
     }
   }, [error, isLoading, pathname, router, isInitialized]);
 

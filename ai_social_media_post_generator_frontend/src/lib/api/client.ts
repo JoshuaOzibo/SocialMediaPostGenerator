@@ -23,7 +23,7 @@ apiClient.interceptors.request.use(
     }
 
     // Log request for debugging
-    console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
+    // console.log(`🚀 API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);
 
     return config;
   },
@@ -39,31 +39,31 @@ apiClient.interceptors.response.use(
   },
   (error) => {
     // Log error details for debugging
-    console.error('❌ API Error:', {
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      url: error.config?.url,
-      method: error.config?.method,
-      message: error.message,
-      data: error.response?.data
-    });
+    // console.error('❌ API Error:', {
+    //   status: error.response?.status,
+    //   statusText: error.response?.statusText,
+    //   url: error.config?.url,
+    //   method: error.config?.method,
+    //   message: error.message,
+    //   data: error.response?.data
+    // });
 
     // Handle authentication errors
     if (error.response?.status === 401) {
       // Let the application handle 401 errors (via AuthContext or hooks)
       // Do NOT clear token or redirect here, as it causes "blank screen" race conditions
-      console.warn('Authentication error (401) detected');
+      // console.warn('Authentication error (401) detected');
     }
 
     // Handle timeout errors
     if (error.code === 'ECONNABORTED' || error.message.includes('timeout')) {
-      console.error('Request timeout - the operation is taking longer than expected');
+      // console.error('Request timeout - the operation is taking longer than expected');
       // Don't redirect on timeout, just show error
     }
 
     // Handle network errors
     if (!error.response) {
-      console.error('Network error:', error.message);
+      // console.error('Network error:', error.message);
     }
 
     return Promise.reject(error);

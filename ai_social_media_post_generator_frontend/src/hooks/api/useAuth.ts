@@ -14,7 +14,7 @@ export const useLogin = () => {
   return useMutation({
     mutationFn: (credentials: LoginRequest) => authApi.login(credentials),
     onSuccess: (data: { session: unknown; user: unknown }) => {
-      queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });
+
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
 
       toast.success('Login successful!');
@@ -57,7 +57,7 @@ export const useSignup = () => {
       return authApi.signup(userData);
     },
     onSuccess: (data: { user: unknown; session: unknown }) => {
-queryClient.invalidateQueries({ queryKey: queryKeys.auth.user() });      // Set user data in query cache
+      // Set user data in query cache
       queryClient.setQueryData(queryKeys.auth.user(), data.user);
 
       // Show success message
