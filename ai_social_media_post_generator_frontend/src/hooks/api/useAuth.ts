@@ -117,6 +117,19 @@ export const useLogout = () => {
   });
 };
 
+// Hook for refreshing token
+export const useRefreshToken = () => {
+  return useMutation({
+    mutationFn: () => authApi.refreshToken(),
+    onSuccess: (data) => {
+
+    },
+    onError: (error) => {
+      console.error('Refresh token error:', error);
+    },
+  });
+};
+
 // Hook for getting current user
 export const useCurrentUser = () => {
   return useQuery({
