@@ -38,21 +38,10 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error) => {
-    // Log error details for debugging
-    // console.error('❌ API Error:', {
-    //   status: error.response?.status,
-    //   statusText: error.response?.statusText,
-    //   url: error.config?.url,
-    //   method: error.config?.method,
-    //   message: error.message,
-    //   data: error.response?.data
-    // });
 
     // Handle authentication errors
     if (error.response?.status === 401) {
-      // Let the application handle 401 errors (via AuthContext or hooks)
-      // Do NOT clear token or redirect here, as it causes "blank screen" race conditions
-      // console.warn('Authentication error (401) detected');
+
     }
 
     // Handle timeout errors

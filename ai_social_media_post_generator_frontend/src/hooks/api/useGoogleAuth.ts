@@ -59,8 +59,6 @@ export const useGoogleAuth = (): UseGoogleAuthReturn => {
       localStorage.setItem('googleAccessToken', response.access_token);
       localStorage.setItem('googleTokenExpiry', response.expires_at.toString());
 
-      setAuthToken(response.access_token);
-
       const storedBackendUser = localStorage.getItem('backendUser');
       const storedBackendSession = localStorage.getItem('backendSession');
 

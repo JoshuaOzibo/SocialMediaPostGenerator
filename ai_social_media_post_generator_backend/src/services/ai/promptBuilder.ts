@@ -9,8 +9,8 @@ export class PromptBuilder {
     const platformGuidelines = PLATFORM_GUIDELINES[request.platform];
     const toneGuidelines = TONE_GUIDELINES[request.tone];
     const days = request.days || 1;
-    const includeHashtags = request.includeHashtags !== false; // Default to true
-    const includeImages = request.includeImages !== false; // Default to true
+    const includeHashtags = request.includeHashtags !== false; 
+    const includeImages = request.includeImages !== false; 
     
     return `
       You are an expert social media content creator. Generate ${days} different ${request.platform} posts based on these bullet points:

@@ -3,7 +3,7 @@ import type { AIResponse } from '../../types/ai.js';
 
 export class GeminiClient {
   private apiKey = process.env.GEMINI_API_KEY || '';
-  private baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  private baseUrl = 'https://generativelanguage.googleapis.com/v1/models/gemini-2.5-flash:generateContent';
 
   async generateContent(prompt: string, maxRetries = 3): Promise<AIResponse> {
     for (let attempt = 1; attempt <= maxRetries; attempt++) {

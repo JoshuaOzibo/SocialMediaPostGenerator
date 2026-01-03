@@ -13,7 +13,7 @@ export async function protectRoute(req: Request, res: Response, next: NextFuncti
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
-      return res.status(401).json({ message: 'Unauthorized: Invalid token' });
+      return res.status(401).json({ message: 'Unauthorized: Invalid token', error: error?.message });
     }
 
     // Attach user to request object
