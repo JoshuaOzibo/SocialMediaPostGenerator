@@ -61,7 +61,6 @@ const Dashboard = () => {
       const finalPostData = (newPost as { data?: Post }).data || newPost;
 
       setGeneratedPosts((prev) => [finalPostData, ...prev]);
-      setGeneratedPosts((prev) => [finalPostData, ...prev]);
 
       toast.success("Posts Generated!", {
         description: "Your social media posts are ready to use.",
@@ -71,9 +70,9 @@ const Dashboard = () => {
         const axiosError = error as {
           response: { status: number; data: unknown };
         };
-      toast.error("Failed to generate posts", {
-        description: "Please try again later. Error: " + axiosError.response.data,
-      });
+        toast.error("Failed to generate posts", {
+          description: "Please try again later. Error: " + axiosError.response.data,
+        });
       }
 
       if (error && typeof error === "object" && "code" in error) {
@@ -107,25 +106,25 @@ const Dashboard = () => {
     setRegeneratingContentId(individualPostId);
 
     try {
-      const updatedPost = await regenerateIndividualPostMutation.mutateAsync({ 
-        postId, 
-        individualPostId 
+      const updatedPost = await regenerateIndividualPostMutation.mutateAsync({
+        postId,
+        individualPostId
       });
-      
-      
+
+
       const finalPostData = (updatedPost as { data?: Post }).data || updatedPost;
-      
-      setGeneratedPosts((prev) => 
-        prev.map((post) => 
+
+      setGeneratedPosts((prev) =>
+        prev.map((post) =>
           post.id === postId ? finalPostData : post
         )
       );
-      
+
       toast.success("Post regenerated!", {
         description: "The individual post content has been updated with new AI-generated content.",
       });
     } catch (error) {
-      
+
       toast.error("Failed to regenerate post", {
         description: "Please try again later. Error: " + error,
       });
